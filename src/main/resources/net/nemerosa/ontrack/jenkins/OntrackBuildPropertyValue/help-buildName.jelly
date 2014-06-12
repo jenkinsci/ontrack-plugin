@@ -1,0 +1,3 @@
+<div>
+    <p>When set, the plugin will use the specified build. Otherwise, it will fetch the last build in the promotion level specified</p>
+</div>

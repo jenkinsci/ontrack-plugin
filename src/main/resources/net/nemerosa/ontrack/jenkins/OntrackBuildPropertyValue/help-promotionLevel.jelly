@@ -1,0 +1,3 @@
+<div>
+    <p>When build name is not set, the plugin will use this promotion level to fetch the last build.</p>
+</div>

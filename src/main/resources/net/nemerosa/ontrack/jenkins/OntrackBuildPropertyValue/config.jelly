@@ -1,0 +1,26 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry title="Project" field="project">
+		<f:textbox />
+	</f:entry>
+	<f:entry title="Branch" field="branch">
+		<f:textbox />
+	</f:entry>
+	<f:entry title="Promotion level" field="promotionLevel">
+		<f:textbox />
+	</f:entry>
+	<f:entry title="Build name" field="buildName">
+	    <f:textbox />
+	</f:entry>
+	<f:entry title="Variable" field="variable">
+	    <f:textbox />
+	</f:entry>
+	<f:entry title="Property extension" field="extension">
+	    <f:textbox />
+	</f:entry>
+	<f:entry title="Property name" field="name">
+	    <f:textbox />
+	</f:entry>
+	<f:entry title="Fail on empty" field="failOnBlank">
+	    <f:checkbox />
+	</f:entry>
+</j:jelly>
