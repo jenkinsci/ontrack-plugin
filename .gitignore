@@ -1,0 +1,11 @@
+target
+.settings
+.project
+.classpath
+.groovy
+.idea
+*.iml
+work
+env.sh
+desktop.ini
+.DS_Store
