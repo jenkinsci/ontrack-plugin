@@ -42,7 +42,7 @@ public final class OntrackClient {
         JsonNode resource = connector.get();
 
         // Creates the resource
-        return new OntrackResource(resource);
+        return new OntrackResource(logger, resource);
     }
 
     private OntrackClient() {

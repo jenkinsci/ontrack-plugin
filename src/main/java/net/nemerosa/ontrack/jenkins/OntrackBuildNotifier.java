@@ -25,6 +25,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
     /**
      * Name of the Jenkins configuration in ontrack
      */
+    // FIXME Move the configuration name to the general plug-in configuration
     private final String configurationName;
     /**
      * Name of the project to create the build for
@@ -88,7 +89,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                             .with("description", buildDescription)
                             .with("properties", array()
                                     .with(object()
-                                            .with("propertyTypeName", "net.nemerosa.ontrack.extension.jenkins.JenkinsBuildProperty")
+                                            .with("propertyTypeName", "net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType")
                                             .with("propertyData", object()
                                                     .with("configuration", configuration)
                                                     .with("job", theBuild.getProject().getName())

@@ -11,7 +11,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -46,9 +45,9 @@ public class OntrackConnector {
     }
 
     private JsonNode execute(HttpRequestBase request) throws IOException {
-        CloseableHttpClient httpClient = OntrackHttpClientFactory.createHttpClient();
+        OntrackHttpClient client = OntrackHttpClientFactory.createHttpClient();
         try {
-            HttpResponse response = httpClient.execute(request);
+            HttpResponse response = client.execute(request);
             // Parses the response
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
@@ -65,7 +64,7 @@ public class OntrackConnector {
                 );
             }
         } finally {
-            httpClient.close();
+            client.close();
         }
     }
 
@@ -73,7 +72,7 @@ public class OntrackConnector {
         HttpEntity entity = response.getEntity();
         String content = entity != null ? EntityUtils.toString(entity, "UTF-8") : null;
         if (content != null) {
-            return objectMapper.valueToTree(content);
+            return objectMapper.readTree(content);
         } else {
             return null;
         }
