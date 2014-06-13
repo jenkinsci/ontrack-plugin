@@ -23,11 +23,6 @@ import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.object;
 public class OntrackBuildNotifier extends AbstractOntrackNotifier {
 
     /**
-     * Name of the Jenkins configuration in ontrack
-     */
-    // FIXME Move the configuration name to the general plug-in configuration
-    private final String configurationName;
-    /**
      * Name of the project to create the build for
      */
     private final String project;
@@ -41,15 +36,10 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
     private final String build;
 
     @DataBoundConstructor
-    public OntrackBuildNotifier(String configurationName, String project, String branch, String build) {
-        this.configurationName = configurationName;
+    public OntrackBuildNotifier(String project, String branch, String build) {
         this.project = project;
         this.branch = branch;
         this.build = build;
-    }
-
-    public String getConfigurationName() {
-        return configurationName;
     }
 
     public String getProject() {
@@ -69,18 +59,19 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
         // Only triggers in case of success
         if (theBuild.getResult().isBetterOrEqualTo(Result.SUCCESS)) {
             // Expands the expressions into actual values
-            String configuration = expand(configurationName, theBuild, listener);
             String projectName = expand(project, theBuild, listener);
             String branchName = expand(branch, theBuild, listener);
             String buildName = expand(build, theBuild, listener);
             // Build description
             String buildDescription = String.format("Build %s", theBuild);
+            // General configuration
+            OntrackConfiguration configuration = OntrackConfiguration.getOntrackConfiguration();
             // Logging of parameters
             listener.getLogger().format("[ontrack] Creating build %s on project %s for branch %s in configuration %s%n",
                     buildName,
                     projectName,
                     branchName,
-                    configuration);
+                    configuration.getOntrackConfigurationName());
 
             // Calling ontrack UI
             forBranch(listener.getLogger(), projectName, branchName).on("_createBuild").post(
@@ -91,7 +82,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                                     .with(object()
                                             .with("propertyTypeName", "net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType")
                                             .with("propertyData", object()
-                                                    .with("configuration", configuration)
+                                                    .with("configuration", configuration.getOntrackConfigurationName())
                                                     .with("job", theBuild.getProject().getName())
                                                     .with("build", theBuild.getNumber())
                                                     .end())

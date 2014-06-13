@@ -13,6 +13,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
         return (OntrackConfiguration) Jenkins.getInstance().getDescriptor(OntrackConfiguration.class);
     }
 
+    private String ontrackConfigurationName;
     private String ontrackUrl;
     private String ontrackUser;
     private String ontrackPassword;
@@ -23,11 +24,16 @@ public class OntrackConfiguration extends GlobalConfiguration {
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+        ontrackConfigurationName = json.getString("ontrackConfigurationName");
         ontrackUrl = json.getString("ontrackUrl");
         ontrackUser = json.getString("ontrackUser");
         ontrackPassword = json.getString("ontrackPassword");
         save();
         return super.configure(req, json);
+    }
+
+    public String getOntrackConfigurationName() {
+        return ontrackConfigurationName;
     }
 
     public String getOntrackUrl() {
