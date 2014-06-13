@@ -2,11 +2,16 @@ package net.nemerosa.ontrack.jenkins;
 
 import hudson.Extension;
 import jenkins.model.GlobalConfiguration;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
 @Extension
 public class OntrackConfiguration extends GlobalConfiguration {
+
+    public static OntrackConfiguration getOntrackConfiguration() {
+        return (OntrackConfiguration) Jenkins.getInstance().getDescriptor(OntrackConfiguration.class);
+    }
 
     private String ontrackUrl;
     private String ontrackUser;
