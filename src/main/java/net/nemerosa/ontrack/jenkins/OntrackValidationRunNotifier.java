@@ -14,6 +14,8 @@ import java.io.IOException;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
 import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBranch;
+import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBuild;
+import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forValidationStamp;
 import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.array;
 import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.object;
 
@@ -65,9 +67,9 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
         String runDescription = String.format("Run %s", theBuild);
         listener.getLogger().format("[ontrack] Running %s with status %s for build %s of branch %s of project %s%n", validationStampName, runStatus, buildName, branchName, projectName);
         // OK
-        forBranch(listener.getLogger(), projectName, branchName).on("_createValidationStamp").post(
+        forBuild(listener.getLogger(), projectName, branchName, buildName).on("_validate").post(
                 object()
-                        .with("name", validationStampName)
+                        .with("validationStamp", validationStampName)
                         .with("description", runDescription)
                         .with("properties", array()
                                 .with(object()
