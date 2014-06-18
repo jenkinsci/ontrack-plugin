@@ -74,7 +74,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                     configuration.getOntrackConfigurationName());
 
             // Calling ontrack UI
-            forBranch(listener.getLogger(), projectName, branchName).on("_createBuild").post(
+            forBranch(listener.getLogger(), projectName, branchName + ".*").on("_createBuild").post(
                     object()
                             .with("name", buildName)
                             .with("description", buildDescription)

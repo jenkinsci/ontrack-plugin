@@ -60,9 +60,10 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
         final String validationStampName = expand(validationStamp, theBuild, listener);
         // General configuration
         OntrackConfiguration configuration = OntrackConfiguration.getOntrackConfiguration();
+        Result runStatus = theBuild.getResult();
         // TODO Run description
         String runDescription = String.format("Run %s", theBuild);
-        listener.getLogger().format("[ontrack] Running %s with status %s for build %s of branch %s of project %s%n", validationStampName, ""/* TODO runStatus */, buildName, branchName, projectName);
+        listener.getLogger().format("[ontrack] Running %s with status %s for build %s of branch %s of project %s%n", validationStampName, runStatus, buildName, branchName, projectName);
         // OK
         forBranch(listener.getLogger(), projectName, branchName).on("_createValidationStamp").post(
                 object()
