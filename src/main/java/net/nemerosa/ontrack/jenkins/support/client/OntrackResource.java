@@ -27,4 +27,8 @@ public class OntrackResource {
         }
     }
 
+    public int getId() {
+        return resource.path("id").asInt();
+    }
+
 }

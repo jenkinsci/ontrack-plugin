@@ -9,8 +9,4 @@ public abstract class AbstractOntrackNotifier extends Notifier {
         return BuildStepMonitor.BUILD;
     }
 
-    // TODO protected <T> T call(ControlClientCall<T> controlClientCall) {
-//        return OntrackClient.control(controlClientCall);
-//    }
-
 }

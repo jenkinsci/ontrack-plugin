@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.jenkins;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -13,12 +14,15 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import java.io.IOException;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
-import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBranch;
+import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBuild;
+import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forValidationStamp;
 import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.array;
 import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.object;
 
 /**
- * Allows to notify for a build.
+ * Allows to create a run for a validation stamp on a build.
+ * <p/>
+ * The plug-in must get both the build and the validation stamp.
  */
 public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
 
@@ -54,34 +58,61 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
     @Override
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         // Expands the expressions into actual values
-        final String projectName = expand(project, theBuild, listener);
-        final String branchName = expand(branch, theBuild, listener);
-        final String buildName = expand(build, theBuild, listener);
-        final String validationStampName = expand(validationStamp, theBuild, listener);
+        String projectName = expand(project, theBuild, listener);
+        String branchName = expand(branch, theBuild, listener);
+        String buildName = expand(build, theBuild, listener);
+        String validationStampName = expand(validationStamp, theBuild, listener);
+        // Run status
+        String runStatus = getRunStatus(theBuild);
+        // Run description
+        String runDescription = String.format("Build %s", theBuild);
         // General configuration
         OntrackConfiguration configuration = OntrackConfiguration.getOntrackConfiguration();
-        // TODO Run description
-        String runDescription = String.format("Run %s", theBuild);
-        listener.getLogger().format("[ontrack] Running %s with status %s for build %s of branch %s of project %s%n", validationStampName, ""/* TODO runStatus */, buildName, branchName, projectName);
-        // OK
-        forBranch(listener.getLogger(), projectName, branchName).on("_createValidationStamp").post(
-                object()
-                        .with("name", validationStampName)
-                        .with("description", runDescription)
-                        .with("properties", array()
-                                .with(object()
-                                        .with("propertyTypeName", "net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType")
-                                        .with("propertyData", object()
-                                                .with("configuration", configuration.getOntrackConfigurationName())
-                                                .with("job", theBuild.getProject().getName())
-                                                .with("build", theBuild.getNumber())
-                                                .end())
+        listener.getLogger().format("[ontrack] Running %s with status %s for build %s of branch %s of project %s%n",
+                validationStampName,
+                runStatus,
+                buildName,
+                branchName,
+                projectName
+        );
+        // Gets the validation stamp id
+        int validationStampId = forValidationStamp(listener.getLogger(), projectName, branchName, validationStampName).getId();
+        // Validation run request
+        JsonNode validationRunRequest = object()
+                .with("validationStamp", validationStampId)
+                .with("validationRunStatusId", runStatus)
+                .with("description", runDescription)
+                .with("properties", array()
+                        // TODO This property creation can be factorised (see also OntrackBuildNotifier)
+                        .with(object()
+                                .with("propertyTypeName", "net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType")
+                                .with("propertyData", object()
+                                        .with("configuration", configuration.getOntrackConfigurationName())
+                                        .with("job", theBuild.getProject().getName())
+                                        .with("build", theBuild.getNumber())
                                         .end())
                                 .end())
-                        .end()
+                        .end())
+                .end();
+        // OK
+        forBuild(listener.getLogger(), projectName, branchName, buildName).on("_validate").post(
+                validationRunRequest
         );
 
         return true;
+    }
+
+    private String getRunStatus(AbstractBuild<?, ?> theBuild) {
+        Result result = theBuild.getResult();
+        if (result.isBetterOrEqualTo(Result.SUCCESS)) {
+            return "PASSED";
+        } else if (result.isBetterOrEqualTo(Result.UNSTABLE)) {
+            return "WARNING";
+        } else if (result.equals(Result.ABORTED)) {
+            return "INTERRUPTED";
+        } else {
+            return "FAILED";
+        }
     }
 
     @Extension
