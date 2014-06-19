@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.534</version>
+        <version>1.567</version>
         <!-- which version of Jenkins is this plugin built against? -->
     </parent>
 
