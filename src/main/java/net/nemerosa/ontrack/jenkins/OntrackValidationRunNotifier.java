@@ -83,15 +83,7 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
                 .with("validationRunStatusId", runStatus)
                 .with("description", runDescription)
                 .with("properties", array()
-                        // TODO This property creation can be factorised (see also OntrackBuildNotifier)
-                        .with(object()
-                                .with("propertyTypeName", "net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType")
-                                .with("propertyData", object()
-                                        .with("configuration", configuration.getOntrackConfigurationName())
-                                        .with("job", theBuild.getProject().getName())
-                                        .with("build", theBuild.getNumber())
-                                        .end())
-                                .end())
+                        .with(getBuildPropertyData(theBuild, configuration))
                         .end())
                 .end();
         // OK
