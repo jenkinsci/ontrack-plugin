@@ -14,7 +14,7 @@ public abstract class AbstractOntrackNotifier extends Notifier {
         return BuildStepMonitor.BUILD;
     }
 
-    public ObjectNode getPropertyData(AbstractBuild<?, ?> theBuild, OntrackConfiguration configuration) {
+    public ObjectNode getBuildPropertyData(AbstractBuild<?, ?> theBuild, OntrackConfiguration configuration) {
         return object()
                 .with("propertyTypeName", "net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType")
                 .with("propertyData", object()

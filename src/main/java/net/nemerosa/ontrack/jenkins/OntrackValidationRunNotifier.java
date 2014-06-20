@@ -83,7 +83,7 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
                 .with("validationRunStatusId", runStatus)
                 .with("description", runDescription)
                 .with("properties", array()
-                        .with(getPropertyData(theBuild,configuration))
+                        .with(getBuildPropertyData(theBuild, configuration))
                         .end())
                 .end();
         // OK
