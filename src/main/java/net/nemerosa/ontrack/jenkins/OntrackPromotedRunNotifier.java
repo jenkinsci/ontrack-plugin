@@ -9,9 +9,13 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
 import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBuild;
@@ -72,6 +76,7 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
             // Validation run request
             JsonNode promotionLevelRequest = object()
                     .with("promotionLevel", promotionLevelId)
+                    .with("dateTime", now())
                     .with("description", runDescription)
                     .with("properties", array()
                             .with(getBuildPropertyData(theBuild, configuration))
@@ -86,6 +91,10 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
         }
         // OK
         return true;
+    }
+
+    private String now() {
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date());
     }
 
     @Extension
