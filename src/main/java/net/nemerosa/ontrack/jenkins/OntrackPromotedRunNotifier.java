@@ -9,8 +9,6 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
