@@ -1,5 +1,17 @@
 package net.nemerosa.ontrack.jenkins;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import hudson.Extension;
+import hudson.Launcher;
+import hudson.model.*;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Builder;
+import org.kohsuke.stapler.DataBoundConstructor;
+
+import java.io.IOException;
+
+import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBranch;
+
 /**
  */
 public class OntrackLastBuildWithPromotionLevel extends Builder {
@@ -39,25 +51,15 @@ public class OntrackLastBuildWithPromotionLevel extends Builder {
         final String actualBranch = OntrackPluginSupport.expand(branch, theBuild, listener);
         final String actualPromotionLevel = OntrackPluginSupport.expand(promotionLevel, theBuild, listener);
 
-        // Gets the last build
-        BuildSummary lastBuild = OntrackClient.manage(new ManageClientCall<OptionalBuildSummary>() {
-            @Override
-            public OptionalBuildSummary onCall(ManageUIClient ui) {
-				return ui.getLastBuildWithPromotionLevel(null, actualProject, actualBranch, actualPromotionLevel);
-            }
-        }).getBuild();
-        // Found
+        JsonNode lastBuild =forBranch(listener.getLogger(), actualProject, actualBranch).on("_status").get();
         if (lastBuild != null) {
-            String name = lastBuild.getName();
+            String name = lastBuild.path("name").asText();
             listener.getLogger().format("Found build '%s' for branch '%s' and project '%s' and promotion level '%s'%n", name, actualBranch, actualProject, actualPromotionLevel);
             theBuild.addAction(new ParametersAction(new StringParameterValue(variable, name)));
-        }
-        // Not found
-        else {
+        } else {
             listener.getLogger().format("Could not find any build for branch '%s' and project '%s' and promotion level '%s'%n", actualBranch, actualProject, actualPromotionLevel);
             theBuild.setResult(Result.FAILURE);
         }
-        // OK
         return true;
     }
 
