@@ -45,6 +45,10 @@ public final class OntrackClient {
         return forResource(logger, "structure/entity/validationStamp/%s/%s/%s", project, branch, validationStamp);
     }
 
+    public static OntrackResource forPromotionLevel(PrintStream logger, String project, String branch, String promotionLevel) throws IOException {
+        return forResource(logger, "structure/entity/promotionLevel/%s/%s/%s", project, branch, promotionLevel);
+    }
+
     private static OntrackResource forResource(PrintStream logger, String path, Object... parameters) throws IOException {
 
         // Gets the configuration
