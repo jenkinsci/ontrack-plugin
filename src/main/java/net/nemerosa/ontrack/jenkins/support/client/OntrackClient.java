@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
+import java.util.Collections;
 
 import static net.nemerosa.ontrack.jenkins.OntrackConfiguration.getOntrackConfiguration;
 

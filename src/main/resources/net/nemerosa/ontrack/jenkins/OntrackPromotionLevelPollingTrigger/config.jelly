@@ -5,7 +5,7 @@
 	<f:entry title="Branch" field="branch">
 		<f:textbox />
 	</f:entry>
-	<f:entry title="Validation stamp" field="promotionLevel">
+	<f:entry title="Promotion level" field="promotionLevel">
 		<f:textbox />
 	</f:entry>
 	<f:entry title="${%Schedule}" help="/descriptor/hudson.triggers.TimerTrigger/help/spec">
