@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.jenkins.support.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.jenkins.support.json.JsonUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -79,6 +80,9 @@ public class OntrackConnector {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
                 return parse(response);
+            } else if (statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_ACCEPTED || statusCode == HttpStatus.SC_NO_CONTENT) {
+                // Empty JSON object
+                return JsonUtils.object().end();
             } else {
                 // Generic error
                 throw new RuntimeException(
