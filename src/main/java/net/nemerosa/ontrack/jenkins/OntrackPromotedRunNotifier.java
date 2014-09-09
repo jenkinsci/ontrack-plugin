@@ -17,7 +17,7 @@ import java.util.Date;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
 import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBuild;
-import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forValidationStamp;
+import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forPromotionLevel;
 import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.array;
 import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.object;
 
@@ -64,13 +64,13 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
         final String promotionLevelName = expand(promotionLevel, theBuild, listener);
         // Only triggers in case of success
         if (theBuild.getResult().isBetterOrEqualTo(Result.SUCCESS)) {
-            // TODO Run description
+            // Run description
             String runDescription = String.format("Run %s", theBuild);
             // Logging of parameters
             OntrackConfiguration configuration = OntrackConfiguration.getOntrackConfiguration();
             listener.getLogger().format("[ontrack] Promoting build %s of branch %s of project %s for %s%n", buildName, branchName, projectName, promotionLevelName);
             // Calling ontrack UI
-            int promotionLevelId = forValidationStamp(listener.getLogger(), projectName, branchName, promotionLevelName).getId();
+            int promotionLevelId = forPromotionLevel(listener.getLogger(), projectName, branchName, promotionLevelName).getId();
             // Validation run request
             JsonNode promotionLevelRequest = object()
                     .with("promotionLevel", promotionLevelId)
