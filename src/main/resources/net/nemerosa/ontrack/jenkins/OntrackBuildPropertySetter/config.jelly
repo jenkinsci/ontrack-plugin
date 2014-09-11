@@ -8,10 +8,7 @@
   <f:entry title="Build" field="build">
     <f:textbox />
   </f:entry>
-  <f:entry title="Extension" field="extension">
-    <f:textbox />
-  </f:entry>
-  <f:entry title="Property" field="property">
+  <f:entry title="Property type" field="typeName">
     <f:textbox />
   </f:entry>
   <f:entry title="Value" field="value">
