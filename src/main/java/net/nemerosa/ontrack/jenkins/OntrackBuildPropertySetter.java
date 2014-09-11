@@ -89,7 +89,7 @@ public class OntrackBuildPropertySetter extends AbstractOntrackNotifier {
                 theBuild.setResult(Result.FAILURE);
             }
             // Checks if the property is editable
-            else if (!propertyDef.path("editable").asBoolean()) {
+            else if (!propertyDef.has("_update")) {
                 listener.getLogger().format("Property %s on build %s is not editable.%n", typeName, buildName);
                 theBuild.setResult(Result.FAILURE);
             }
