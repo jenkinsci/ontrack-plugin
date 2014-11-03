@@ -184,7 +184,7 @@ public class OntrackValidationStampPollingTrigger extends AbstractTrigger {
 
         @Override
         public String getDisplayName() {
-            return "Ontrack: Poll validation stamp";
+            return "Ontrack2: Poll validation stamp";
         }
     }
 }

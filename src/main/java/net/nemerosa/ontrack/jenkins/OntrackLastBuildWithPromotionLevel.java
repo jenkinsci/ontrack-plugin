@@ -103,7 +103,7 @@ public class OntrackLastBuildWithPromotionLevel extends Builder {
 
         @Override
         public String getDisplayName() {
-            return "Ontrack: Last build with promotion level";
+            return "Ontrack2: Last build with promotion level";
         }
     }
 }

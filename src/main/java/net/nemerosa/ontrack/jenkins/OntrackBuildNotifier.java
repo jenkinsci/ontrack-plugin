@@ -105,7 +105,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
 
         @Override
         public String getDisplayName() {
-            return "Ontrack: Build creation";
+            return "Ontrack2: Build creation";
         }
     }
 }
