@@ -186,7 +186,7 @@ public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
 
         @Override
         public String getDisplayName() {
-            return "Ontrack: Poll promotion level";
+            return "Ontrack2: Poll promotion level";
         }
     }
 }

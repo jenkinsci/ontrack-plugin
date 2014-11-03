@@ -101,7 +101,7 @@ public class OntrackLastBuildWithValidationStamp extends Builder {
 
         @Override
         public String getDisplayName() {
-            return "Ontrack: Last build with validation stamp";
+            return "Ontrack2: Last build with validation stamp";
         }
     }
 }
