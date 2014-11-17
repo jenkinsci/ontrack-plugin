@@ -21,6 +21,19 @@
         <httpClientVersion>4.3.3</httpClientVersion>
     </properties>
 
+    <developers>
+        <developer>
+            <id>dcoraboeuf</id>
+            <name>Damien Coraboeuf</name>
+            <email>damien.coraboeuf@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:nemerosa/ontrack-jenkins.git</connection>
+        <developerConnection>scm:git:git@github.com:nemerosa/ontrack-jenkins.git</developerConnection>
+        <url>https://github.com/nemerosa/ontrack-jenkins</url>
+    </scm>
 
     <dependencies>
         <!-- This plug-in extends the XTrigger one -->
