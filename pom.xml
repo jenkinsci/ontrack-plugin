@@ -70,6 +70,12 @@
             <artifactId>httpclient</artifactId>
             <version>${httpClientVersion}</version>
         </dependency>
+        <!-- Ontrack client -->
+        <dependency>
+            <groupId>net.nemerosa.ontrack</groupId>
+            <artifactId>ontrack-dsl</artifactId>
+            <version>feature-186-dsl-a57fed5</version>
+        </dependency>
     </dependencies>
 
     <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
