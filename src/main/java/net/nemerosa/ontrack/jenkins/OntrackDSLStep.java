@@ -16,8 +16,27 @@ import java.io.IOException;
  */
 public class OntrackDSLStep extends Builder {
 
+    private final String script;
+    private final boolean injectEnvironment;
+    private final String injectProperties;
+
     @DataBoundConstructor
-    public OntrackDSLStep() {
+    public OntrackDSLStep(String script, boolean injectEnvironment, String injectProperties) {
+        this.script = script;
+        this.injectEnvironment = injectEnvironment;
+        this.injectProperties = injectProperties;
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public boolean isInjectEnvironment() {
+        return injectEnvironment;
+    }
+
+    public String getInjectProperties() {
+        return injectProperties;
     }
 
     @Override
