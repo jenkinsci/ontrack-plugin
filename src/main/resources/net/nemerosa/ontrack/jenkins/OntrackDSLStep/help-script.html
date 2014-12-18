@@ -1,0 +1,21 @@
+<div>
+    <p>Ontrack DSL script to execute.</p>
+
+    <p>Two objects are injected into the script:</p>
+    <ul>
+        <li><code>ontrack</code> - base access to Ontrack.</li>
+        <li><code>jenkins</code> - allows interaction with Jenkins. Supported methods are:
+            <ul>
+                <li><code>env(name, value)</code> - injects an environment variable.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <p>
+        The execution will fail if one the following conditions is met:
+    </p>
+    <ul>
+        <li>an exception occurs.</li>
+        <li>the script returns something else than nothing, 0, <code>false</code> or an empty string.</li>
+    </ul>
+</div>
