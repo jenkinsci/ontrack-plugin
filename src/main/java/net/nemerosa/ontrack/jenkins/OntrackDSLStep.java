@@ -71,7 +71,12 @@ public class OntrackDSLStep extends Builder {
         // Result
         Result result = toJenkinsResult(shellResult);
         listener.getLogger().format("Ontrack DSL script result evaluated to %s", result);
-        theBuild.setResult(theBuild.getResult().combine(Result.FAILURE));
+        Result currentResult = theBuild.getResult();
+        if (currentResult != null) {
+            theBuild.setResult(theBuild.getResult().combine(result));
+        } else {
+            theBuild.setResult(result);
+        }
         // TODO Environment
         // End
         return true;
