@@ -65,7 +65,15 @@ public class OntrackDSLStep extends Builder {
         JenkinsConnector jenkins = new JenkinsConnector();
         // Values to bind
         Map<String, Object> values = new HashMap<String, Object>();
-        // TODO Gets the environment
+        // Gets the environment
+        String[] names = injectEnvironment.split(",");
+        for (String name : names) {
+            name = name.trim();
+            String value = theBuild.getEnvironment(listener).get(name, "");
+            if (value != null) {
+                values.put(name, value);
+            }
+        }
         // TODO Gets the properties
         // Binding
         values.put("ontrack", ontrack);
