@@ -81,11 +81,14 @@ public class OntrackDSLStep extends Builder {
         Binding binding = new Binding(values);
         // Groovy shell
         GroovyShell shell = new GroovyShell(binding);
-        // TODO Groovy sandbox in Jenkins?
         // Runs the script
         try {
             Object shellResult = shell.evaluate(script);
-            listener.getLogger().format("Ontrack DSL script returned result: %s%n", shellResult);
+            if (ontrackLog) {
+                listener.getLogger().format("Ontrack DSL script returned result: %s%n", shellResult);
+            } else {
+                listener.getLogger().format("Ontrack DSL script returned result.%n");
+            }
             // Result
             Result result = toJenkinsResult(shellResult);
             listener.getLogger().format("Ontrack DSL script result evaluated to %s%n", result);
