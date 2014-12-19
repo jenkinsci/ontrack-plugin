@@ -29,12 +29,14 @@ public class OntrackDSLStep extends Builder {
     private final String script;
     private final boolean injectEnvironment;
     private final String injectProperties;
+    private final boolean ontrackLog;
 
     @DataBoundConstructor
-    public OntrackDSLStep(String script, boolean injectEnvironment, String injectProperties) {
+    public OntrackDSLStep(String script, boolean injectEnvironment, String injectProperties, boolean ontrackLog) {
         this.script = script;
         this.injectEnvironment = injectEnvironment;
         this.injectProperties = injectProperties;
+        this.ontrackLog = ontrackLog;
     }
 
     public String getScript() {
@@ -47,6 +49,10 @@ public class OntrackDSLStep extends Builder {
 
     public String getInjectProperties() {
         return injectProperties;
+    }
+
+    public boolean isOntrackLog() {
+        return ontrackLog;
     }
 
     @Override
@@ -68,10 +74,10 @@ public class OntrackDSLStep extends Builder {
         // TODO Groovy sandbox in Jenkins?
         // Runs the script
         Object shellResult = shell.evaluate(script);
-        listener.getLogger().format("Ontrack DSL script returned result: %s", shellResult);
+        listener.getLogger().format("Ontrack DSL script returned result: %s%n", shellResult);
         // Result
         Result result = toJenkinsResult(shellResult);
-        listener.getLogger().format("Ontrack DSL script result evaluated to %s", result);
+        listener.getLogger().format("Ontrack DSL script result evaluated to %s%n", result);
         Result currentResult = theBuild.getResult();
         if (currentResult != null) {
             theBuild.setResult(theBuild.getResult().combine(result));
@@ -98,11 +104,13 @@ public class OntrackDSLStep extends Builder {
         OntrackConfiguration config = OntrackConfiguration.getOntrackConfiguration();
         OntrackConnection connection = OntrackConnection.create(config.getOntrackUrl());
         // Logging
-        connection = connection.logger(new OTHttpClientLogger() {
-            public void trace(String message) {
-                listener.getLogger().println(message);
-            }
-        });
+        if (ontrackLog) {
+            connection = connection.logger(new OTHttpClientLogger() {
+                public void trace(String message) {
+                    listener.getLogger().println(message);
+                }
+            });
+        }
         // Authentication
         String user = config.getOntrackUser();
         if (StringUtils.isNotBlank(user)) {
