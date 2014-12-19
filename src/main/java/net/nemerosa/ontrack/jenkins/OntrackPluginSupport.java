@@ -4,6 +4,8 @@ import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,5 +44,25 @@ public final class OntrackPluginSupport {
                 throw new RuntimeException("Cannot get value for " + name, ex);
             }
         }
+    }
+
+    public static Map<String, String> parseProperties(String text, AbstractBuild<?, ?> theBuild, BuildListener listener) {
+        Map<String, String> properties = new LinkedHashMap<String, String>();
+        String[] lines = StringUtils.split(text, "\n\r");
+        for (String line : lines) {
+            if (!StringUtils.isBlank(line)) {
+                line = line.trim();
+                if (!line.startsWith("#")) {
+                    int pos = line.indexOf("=");
+                    if (pos > 0) {
+                        String name = line.substring(0, pos).trim();
+                        String value = line.substring(pos + 1).trim();
+                        String expandedValue = expand(value, theBuild, listener);
+                        properties.put(name, expandedValue);
+                    }
+                }
+            }
+        }
+        return properties;
     }
 }

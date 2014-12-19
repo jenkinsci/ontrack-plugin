@@ -74,7 +74,14 @@ public class OntrackDSLStep extends Builder {
                 values.put(name, value);
             }
         }
-        // TODO Gets the properties
+        // Gets the properties
+        Map<String, String> properties = OntrackPluginSupport.parseProperties(injectProperties, theBuild, listener);
+        values.putAll(properties);
+        // Traces
+        listener.getLogger().format("Injecting following values:%n");
+        for (Map.Entry<String, ?> entry : values.entrySet()) {
+            listener.getLogger().format(" - %s = %s%n", entry.getKey(), entry.getValue());
+        }
         // Binding
         values.put("ontrack", ontrack);
         values.put("jenkins", jenkins);
@@ -83,6 +90,7 @@ public class OntrackDSLStep extends Builder {
         GroovyShell shell = new GroovyShell(binding);
         // Runs the script
         try {
+            listener.getLogger().format("Ontrack DSL script running...%n");
             Object shellResult = shell.evaluate(script);
             if (ontrackLog) {
                 listener.getLogger().format("Ontrack DSL script returned result: %s%n", shellResult);
