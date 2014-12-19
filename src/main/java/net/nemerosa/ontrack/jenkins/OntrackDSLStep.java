@@ -29,12 +29,12 @@ import java.util.Map;
 public class OntrackDSLStep extends Builder {
 
     private final String script;
-    private final boolean injectEnvironment;
+    private final String injectEnvironment;
     private final String injectProperties;
     private final boolean ontrackLog;
 
     @DataBoundConstructor
-    public OntrackDSLStep(String script, boolean injectEnvironment, String injectProperties, boolean ontrackLog) {
+    public OntrackDSLStep(String script, String injectEnvironment, String injectProperties, boolean ontrackLog) {
         this.script = script;
         this.injectEnvironment = injectEnvironment;
         this.injectProperties = injectProperties;
@@ -45,7 +45,7 @@ public class OntrackDSLStep extends Builder {
         return script;
     }
 
-    public boolean isInjectEnvironment() {
+    public String getInjectEnvironment() {
         return injectEnvironment;
     }
 

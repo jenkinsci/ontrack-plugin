@@ -3,7 +3,7 @@
 		<f:textarea />
 	</f:entry>
 	<f:entry title="Inject environment variables" field="injectEnvironment">
-		<f:checkbox />
+		<f:textbox />
 	</f:entry>
 	<f:entry title="Inject properties" field="injectProperties">
 		<f:textarea />

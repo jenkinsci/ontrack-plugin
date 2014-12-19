@@ -1,7 +1,8 @@
 <div>
-    <p>If check, all <i>current</i> environment variables will be bound to variables of the same name
-    into the script.</p>
-    <p>For example, you can access the <code>BUILD_NUMBER</code> from the script using:</p>
+    Comma-separated list of environment variable (like <code>BUILD_NUMBER</code>) to bind as variables
+    into the script.
+    <p>For example, if you set this field to <code>BUILD_NUMBER</code>, you can access the <code>BUILD_NUMBER</code>
+        value from the script using:</p>
     <pre>
         ontrack.branch('PRJ', '1.0').build("1.0-${BUILD_NUMBER}", '')
     </pre>
