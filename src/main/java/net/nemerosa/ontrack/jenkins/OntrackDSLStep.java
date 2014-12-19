@@ -10,9 +10,11 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
+import net.nemerosa.ontrack.client.ClientException;
 import net.nemerosa.ontrack.client.OTHttpClientLogger;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.OntrackConnection;
+import net.nemerosa.ontrack.dsl.ProjectEntity;
 import net.nemerosa.ontrack.jenkins.support.JenkinsConnector;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -73,27 +75,40 @@ public class OntrackDSLStep extends Builder {
         GroovyShell shell = new GroovyShell(binding);
         // TODO Groovy sandbox in Jenkins?
         // Runs the script
-        Object shellResult = shell.evaluate(script);
-        listener.getLogger().format("Ontrack DSL script returned result: %s%n", shellResult);
-        // Result
-        Result result = toJenkinsResult(shellResult);
-        listener.getLogger().format("Ontrack DSL script result evaluated to %s%n", result);
+        try {
+            Object shellResult = shell.evaluate(script);
+            listener.getLogger().format("Ontrack DSL script returned result: %s%n", shellResult);
+            // Result
+            Result result = toJenkinsResult(shellResult);
+            listener.getLogger().format("Ontrack DSL script result evaluated to %s%n", result);
+            setBuildResult(theBuild, result);
+            // TODO Environment
+        } catch (ClientException ex) {
+            listener.getLogger().format("Ontrack DSL script failed with:%n%s%n", ex.getMessage());
+            if (ontrackLog) {
+                ex.printStackTrace(listener.getLogger());
+            }
+            setBuildResult(theBuild, Result.FAILURE);
+        }
+        // End
+        return true;
+    }
+
+    private void setBuildResult(AbstractBuild<?, ?> theBuild, Result result) {
         Result currentResult = theBuild.getResult();
         if (currentResult != null) {
             theBuild.setResult(theBuild.getResult().combine(result));
         } else {
             theBuild.setResult(result);
         }
-        // TODO Environment
-        // End
-        return true;
     }
 
     private Result toJenkinsResult(Object shellResult) {
         if (shellResult == null ||
                 shellResult.equals(0) ||
                 shellResult.equals(false) ||
-                shellResult.equals("")) {
+                shellResult.equals("") ||
+                shellResult instanceof ProjectEntity) {
             return Result.SUCCESS;
         } else {
             return Result.FAILURE;
