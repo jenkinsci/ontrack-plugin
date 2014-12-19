@@ -10,6 +10,7 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
+import net.nemerosa.ontrack.client.OTHttpClientLogger;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.OntrackConnection;
 import net.nemerosa.ontrack.jenkins.support.JenkinsConnector;
@@ -51,7 +52,7 @@ public class OntrackDSLStep extends Builder {
     @Override
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         // Connection to Ontrack
-        Ontrack ontrack = createOntrackConnector();
+        Ontrack ontrack = createOntrackConnector(listener);
         // Connector to Jenkins
         JenkinsConnector jenkins = new JenkinsConnector();
         // Values to bind
@@ -93,9 +94,16 @@ public class OntrackDSLStep extends Builder {
         }
     }
 
-    private Ontrack createOntrackConnector() {
+    private Ontrack createOntrackConnector(final BuildListener listener) {
         OntrackConfiguration config = OntrackConfiguration.getOntrackConfiguration();
         OntrackConnection connection = OntrackConnection.create(config.getOntrackUrl());
+        // Logging
+        connection = connection.logger(new OTHttpClientLogger() {
+            public void trace(String message) {
+                listener.getLogger().println(message);
+            }
+        });
+        // Authentication
         String user = config.getOntrackUser();
         if (StringUtils.isNotBlank(user)) {
             connection = connection.authenticate(
@@ -103,6 +111,7 @@ public class OntrackDSLStep extends Builder {
                     config.getOntrackPassword()
             );
         }
+        // Building the Ontrack root
         return connection.build();
     }
 
