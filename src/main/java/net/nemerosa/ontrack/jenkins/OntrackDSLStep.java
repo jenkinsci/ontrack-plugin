@@ -4,10 +4,7 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
-import hudson.model.Result;
+import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import net.nemerosa.ontrack.client.ClientException;
@@ -101,7 +98,16 @@ public class OntrackDSLStep extends Builder {
             Result result = toJenkinsResult(shellResult);
             listener.getLogger().format("Ontrack DSL script result evaluated to %s%n", result);
             setBuildResult(theBuild, result);
-            // TODO Environment
+            // Environment
+            for (Map.Entry<String, String> entry : jenkins.env().entrySet()) {
+                String name = entry.getKey();
+                String value = entry.getValue();
+                listener.getLogger().format("Ontrack DSL: setting %s = %s%n", name, value);
+                theBuild.addAction(new ParametersAction(new StringParameterValue(
+                        name,
+                        value
+                )));
+            }
         } catch (ClientException ex) {
             listener.getLogger().format("Ontrack DSL script failed with:%n%s%n", ex.getMessage());
             if (ontrackLog) {
