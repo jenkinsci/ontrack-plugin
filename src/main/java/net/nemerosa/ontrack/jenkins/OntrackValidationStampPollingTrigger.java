@@ -4,11 +4,7 @@ import antlr.ANTLRException;
 import com.fasterxml.jackson.databind.JsonNode;
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.model.AbstractProject;
-import hudson.model.Action;
-import hudson.model.Item;
-import hudson.model.Node;
-import net.nemerosa.ontrack.jenkins.support.client.OntrackClient;
+import hudson.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.xtrigger.AbstractTrigger;
 import org.jenkinsci.lib.xtrigger.XTriggerDescriptor;
@@ -16,30 +12,29 @@ import org.jenkinsci.lib.xtrigger.XTriggerException;
 import org.jenkinsci.lib.xtrigger.XTriggerLog;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import net.nemerosa.ontrack.jenkins.support.client.OntrackClient;
 
-public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
+public class OntrackValidationStampPollingTrigger extends AbstractTrigger {
 
     private final String project;
     private final String branch;
-    private final String promotionLevel;
+    private final String validationStamp;
 
     @DataBoundConstructor
-    public OntrackPromotionLevelPollingTrigger(String cronTabSpec, String triggerLabel, String project, String branch,
-                                               String promotionLevel) throws ANTLRException {
+    public OntrackValidationStampPollingTrigger(String cronTabSpec, String triggerLabel, String project, String branch,
+            String validationStamp) throws ANTLRException {
         super(cronTabSpec, triggerLabel);
         this.project = project;
         this.branch = branch;
-        this.promotionLevel = promotionLevel;
+        this.validationStamp = validationStamp;
     }
 
     @Override
     protected File getLogFile() {
-        return new File(job.getRootDir(), "ontrack-promotionlevel-polling-trigger.log");
+        return new File(job.getRootDir(), "ontrack-validationstamp-polling-trigger.log");
     }
 
     @Override
@@ -49,7 +44,7 @@ public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
 
     @Override
     protected String getName() {
-        return "Ontrack: Poll promotion level";
+        return "Ontrack: Poll validation stamp";
     }
 
     @Override
@@ -59,19 +54,21 @@ public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
 
     @Override
     protected boolean checkIfModified(Node node, XTriggerLog xTriggerLog) throws XTriggerException {
-        if (checkConfigs(xTriggerLog)) return false;
+        if (checkConfigs(xTriggerLog)) {
+            return false;
+        }
 
         String actualProject = resolveEnvVars(project, (AbstractProject) job, node);
         String actualBranch = resolveEnvVars(branch, (AbstractProject) job, node);
-        String actualPromotionLevel = resolveEnvVars(promotionLevel, (AbstractProject) job, node);
+        String actualValidationStamp = resolveEnvVars(validationStamp, (AbstractProject) job, node);
 
-        FilePath lastBuildNameFile = new FilePath(node.getRootPath(), String.format("%s-promotionlevel-lastBuildNr", job.getName()));
+        FilePath lastBuildNameFile = new FilePath(node.getRootPath(), String.format("%s-validationStamp-lastBuildNr", job.getName()));
         String lastBuildName = loadLastBuildNr(xTriggerLog, lastBuildNameFile);
 
-        // Gets the last build with this promotion level
+        // Gets the last build with this validation stamp
         JsonNode lastBuild = null;
         try {
-            lastBuild = getBuild(System.out, actualProject, actualBranch, actualPromotionLevel);
+            lastBuild = getBuild(System.out, actualProject, actualBranch, actualValidationStamp);
         } catch (IOException e) {
             logException(xTriggerLog, e);
         }
@@ -79,7 +76,7 @@ public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
         // Found
         if (lastBuild != null) {
             String buildName = lastBuild.path("name").textValue();
-            xTriggerLog.info(String.format("Found build '%s' for branch '%s' and project '%s' and promotion level '%s'%n", buildName, actualBranch, actualProject, actualPromotionLevel));
+            xTriggerLog.info(String.format("Found build '%s' for branch '%s' and project '%s' and validation stamp '%s'%n", buildName, actualBranch, actualProject, actualValidationStamp));
             try {
                 if (lastBuildName == null || lastBuildName.isEmpty() || !lastBuildName.equals(buildName)) {
                     saveLastBuildNr(buildName, xTriggerLog, lastBuildNameFile);
@@ -97,7 +94,7 @@ public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
 
     @Override
     protected String getCause() {
-        return String.format("New build found with promotion level %s", promotionLevel);
+        return String.format("New build found with validation stamp %s", validationStamp);
     }
 
     public String getProject() {
@@ -108,8 +105,8 @@ public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
         return branch;
     }
 
-    public String getPromotionLevel() {
-        return promotionLevel;
+    public String getValidationStamp() {
+        return validationStamp;
     }
 
     private static void saveLastBuildNr(String lastBuildNr, XTriggerLog xTriggerLog, FilePath lastBuildNrFile) throws IOException, InterruptedException {
@@ -146,17 +143,17 @@ public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
             return true;
         }
 
-        if (StringUtils.isEmpty(promotionLevel)) {
-            xTriggerLog.info("Ontrack: No promotion level configured");
+        if (StringUtils.isEmpty(validationStamp)) {
+            xTriggerLog.info("Ontrack: No validation stamp configured");
             return true;
         }
         return false;
     }
 
-    private JsonNode getBuild(PrintStream logger, final String project, final String branch, final String promotionLevel) throws IOException {
+    private JsonNode getBuild(PrintStream logger, final String project, final String branch, final String validationStamp) throws IOException {
         Map<String, Object> filter = new LinkedHashMap<String, Object>();
         filter.put("count", 1);
-        filter.put("withPromotionLevel", promotionLevel);
+        filter.put("withValidationStamp", validationStamp);
         JsonNode branchBuildView = OntrackClient.forBranch(logger, project, branch)
                 .on("_view", "/net.nemerosa.ontrack.service.StandardBuildFilterProvider", filter)
                 .get();
@@ -179,6 +176,7 @@ public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
 
     @Extension
     public static class OntrackValidationStampPollingTriggerDescriptor extends XTriggerDescriptor {
+
         @Override
         public boolean isApplicable(Item item) {
             return true;
@@ -186,7 +184,7 @@ public class OntrackPromotionLevelPollingTrigger extends AbstractTrigger {
 
         @Override
         public String getDisplayName() {
-            return "Ontrack2: Poll promotion level";
+            return "Ontrack2: Poll validation stamp";
         }
     }
 }
