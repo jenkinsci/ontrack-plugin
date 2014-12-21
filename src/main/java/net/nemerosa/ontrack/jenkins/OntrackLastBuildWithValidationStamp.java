@@ -6,31 +6,29 @@ import hudson.Launcher;
 import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
-import net.nemerosa.ontrack.jenkins.support.client.OntrackClient;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBranch;
+import net.nemerosa.ontrack.jenkins.support.client.OntrackClient;
 
 /**
  */
-public class OntrackLastBuildWithPromotionLevel extends Builder {
+public class OntrackLastBuildWithValidationStamp extends Builder {
 
     private final String project;
     private final String branch;
-	private final String promotionLevel;
+	private final String validationStamp;
     private final String variable;
 
     @DataBoundConstructor
-    public OntrackLastBuildWithPromotionLevel(String project, String branch, String variable, String promotionLevel) {
+    public OntrackLastBuildWithValidationStamp(String project, String branch, String variable, String validationStamp) {
         this.project = project;
         this.branch = branch;
         this.variable = variable;
-		this.promotionLevel = promotionLevel;
+		this.validationStamp = validationStamp;
     }
 
     public String getProject() {
@@ -45,41 +43,41 @@ public class OntrackLastBuildWithPromotionLevel extends Builder {
         return variable;
     }
 
-	public String getPromotionLevel() {
-		return promotionLevel;
+	public String getValidationStamp() {
+		return validationStamp;
 	}
 
     @Override
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         final String actualProject = OntrackPluginSupport.expand(project, theBuild, listener);
         final String actualBranch = OntrackPluginSupport.expand(branch, theBuild, listener);
-        final String actualPromotionLevel = OntrackPluginSupport.expand(promotionLevel, theBuild, listener);
+        final String actualValidationStamp = OntrackPluginSupport.expand(validationStamp, theBuild, listener);
 
-        JsonNode lastBuild = getBuild(System.out, actualProject, actualBranch, actualPromotionLevel);
+        JsonNode lastBuild = getBuild(System.out, actualProject, actualBranch, actualValidationStamp);
         if (lastBuild != null) {
             String name = lastBuild.path("name").textValue();
-            listener.getLogger().format("Found build '%s' for branch '%s' and project '%s' and promotion level '%s'%n", name, actualBranch, actualProject, actualPromotionLevel);
+            listener.getLogger().format("Found build '%s' for branch '%s' and project '%s' and validation stamp '%s'%n", name, actualBranch, actualProject, actualValidationStamp);
             theBuild.addAction(new ParametersAction(new StringParameterValue(variable, name)));
         } else {
-            listener.getLogger().format("Could not find any build for branch '%s' and project '%s' and promotion level '%s'%n", actualBranch, actualProject, actualPromotionLevel);
+            listener.getLogger().format("Could not find any build for branch '%s' and project '%s' and validation stamp '%s'%n", actualBranch, actualProject, actualValidationStamp);
             theBuild.setResult(Result.FAILURE);
         }
         return true;
     }
-
+    
     /**
      * Get last build with a certain promotion level on a branch
      * @param logger The logger
      * @param project The project
      * @param branch The branch
-     * @param promotionLevel The promotion level
+     * @param validationStamp The validation stamp
      * @return The build or null of no build found.
      * @throws IOException
      */
-    private JsonNode getBuild(PrintStream logger, final String project, final String branch, final String promotionLevel) throws IOException {
+    private JsonNode getBuild(PrintStream logger, final String project, final String branch, final String validationStamp) throws IOException {
         Map<String, Object> filter = new LinkedHashMap<String, Object>();
         filter.put("count", 1);
-        filter.put("withPromotionLevel", promotionLevel);
+        filter.put("withValidationStamp", validationStamp);
         JsonNode branchBuildView = OntrackClient.forBranch(logger, project, branch)
                 .on("_view", "/net.nemerosa.ontrack.service.StandardBuildFilterProvider", filter)
                 .get();
@@ -103,7 +101,7 @@ public class OntrackLastBuildWithPromotionLevel extends Builder {
 
         @Override
         public String getDisplayName() {
-            return "Ontrack2: Last build with promotion level";
+            return "Ontrack2: Last build with validation stamp";
         }
     }
 }
