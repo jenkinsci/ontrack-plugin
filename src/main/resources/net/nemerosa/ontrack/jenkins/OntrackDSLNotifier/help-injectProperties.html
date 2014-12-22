@@ -1,0 +1,22 @@
+<div>
+    <p>You can define variables to inject into the script by using a property-like format.</p>
+
+    <p>For example, the following text:</p>
+    <pre>
+        BRANCH = 1.0
+        BUILD = ${VERSION}
+    </pre>
+    <p>would inject the corresponding <code>BRANCH</code> and <code>BUILD</code> variables in the script:</p>
+    <pre>
+        ontrack.branch('PRJ', BRANCH).build(VERSION, "Build ${VERSION}")
+    </pre>
+    <p>In the text:</p>
+    <ul>
+        <li>declare properties using <code>name = value</code> syntax</li>
+        <li>empty lines are ignored</li>
+        <li>lines started by <code>#</code> are ignored</li>
+        <li>patterns like <code>${VAR}</code> are expanded using <code>VAR</code> from the current
+            environment variables.
+        </li>
+    </ul>
+</div>
