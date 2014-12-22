@@ -1,23 +1,16 @@
 package net.nemerosa.ontrack.jenkins;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import net.nemerosa.ontrack.client.ClientException;
-import net.nemerosa.ontrack.client.OTHttpClientLogger;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.OntrackConnection;
-import net.nemerosa.ontrack.dsl.ProjectEntity;
-import net.nemerosa.ontrack.jenkins.support.JenkinsConnector;
-import org.apache.commons.lang.StringUtils;
+import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSL;
+import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSLResult;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -56,50 +49,22 @@ public class OntrackDSLStep extends Builder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        // Connection to Ontrack
-        Ontrack ontrack = createOntrackConnector(listener);
-        // Connector to Jenkins
-        JenkinsConnector jenkins = new JenkinsConnector();
-        // Values to bind
-        Map<String, Object> values = new HashMap<String, Object>();
-        // Gets the environment
-        String[] names = injectEnvironment.split(",");
-        for (String name : names) {
-            name = name.trim();
-            String value = theBuild.getEnvironment(listener).get(name, "");
-            if (value != null) {
-                values.put(name, value);
-            }
-        }
-        // Gets the properties
-        Map<String, String> properties = OntrackPluginSupport.parseProperties(injectProperties, theBuild, listener);
-        values.putAll(properties);
-        // Traces
-        listener.getLogger().format("Injecting following values:%n");
-        for (Map.Entry<String, ?> entry : values.entrySet()) {
-            listener.getLogger().format(" - %s = %s%n", entry.getKey(), entry.getValue());
-        }
-        // Binding
-        values.put("ontrack", ontrack);
-        values.put("jenkins", jenkins);
-        Binding binding = new Binding(values);
-        // Groovy shell
-        GroovyShell shell = new GroovyShell(binding);
+        // Ontrack DSL support
+        OntrackDSL dsl = new OntrackDSL(
+                script,
+                injectEnvironment,
+                injectProperties,
+                ontrackLog
+        );
         // Runs the script
         try {
-            listener.getLogger().format("Ontrack DSL script running...%n");
-            Object shellResult = shell.evaluate(script);
-            if (ontrackLog) {
-                listener.getLogger().format("Ontrack DSL script returned result: %s%n", shellResult);
-            } else {
-                listener.getLogger().format("Ontrack DSL script returned result.%n");
-            }
+            OntrackDSLResult dslResult = dsl.run(theBuild, listener);
             // Result
-            Result result = toJenkinsResult(shellResult);
+            Result result = OntrackDSL.toJenkinsResult(dslResult.getShellResult());
             listener.getLogger().format("Ontrack DSL script result evaluated to %s%n", result);
             setBuildResult(theBuild, result);
             // Environment
-            for (Map.Entry<String, String> entry : jenkins.env().entrySet()) {
+            for (Map.Entry<String, String> entry : dslResult.getConnector().env().entrySet()) {
                 String name = entry.getKey();
                 String value = entry.getValue();
                 listener.getLogger().format("Ontrack DSL: setting %s = %s%n", name, value);
@@ -126,41 +91,6 @@ public class OntrackDSLStep extends Builder {
         } else {
             theBuild.setResult(result);
         }
-    }
-
-    private Result toJenkinsResult(Object shellResult) {
-        if (shellResult == null ||
-                shellResult.equals(0) ||
-                shellResult.equals(false) ||
-                shellResult.equals("") ||
-                shellResult instanceof ProjectEntity) {
-            return Result.SUCCESS;
-        } else {
-            return Result.FAILURE;
-        }
-    }
-
-    private Ontrack createOntrackConnector(final BuildListener listener) {
-        OntrackConfiguration config = OntrackConfiguration.getOntrackConfiguration();
-        OntrackConnection connection = OntrackConnection.create(config.getOntrackUrl());
-        // Logging
-        if (ontrackLog) {
-            connection = connection.logger(new OTHttpClientLogger() {
-                public void trace(String message) {
-                    listener.getLogger().println(message);
-                }
-            });
-        }
-        // Authentication
-        String user = config.getOntrackUser();
-        if (StringUtils.isNotBlank(user)) {
-            connection = connection.authenticate(
-                    user,
-                    config.getOntrackPassword()
-            );
-        }
-        // Building the Ontrack root
-        return connection.build();
     }
 
     @Extension

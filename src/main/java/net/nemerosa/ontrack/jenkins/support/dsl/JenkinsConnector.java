@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.jenkins.support;
+package net.nemerosa.ontrack.jenkins.support.dsl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
