@@ -25,6 +25,13 @@ public class JenkinsConnector {
         return result;
     }
 
+    /**
+     * Is the build a failure?
+     */
+    public boolean isSuccess() {
+        return result != null && result.isBetterOrEqualTo(Result.SUCCESS);
+    }
+
     public Map<String, String> env() {
         return env;
     }
