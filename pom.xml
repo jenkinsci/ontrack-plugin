@@ -74,7 +74,7 @@
         <dependency>
             <groupId>net.nemerosa.ontrack</groupId>
             <artifactId>ontrack-dsl</artifactId>
-            <version>feature-186-dsl-7a78eef</version>
+            <version>2.1.0</version>
         </dependency>
     </dependencies>
 
