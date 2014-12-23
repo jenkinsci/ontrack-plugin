@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.jenkins;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -9,15 +8,14 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
+import net.nemerosa.ontrack.dsl.Build;
+import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
-import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBuild;
-import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forValidationStamp;
-import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.array;
-import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.object;
 
 /**
  * Allows to create a run for a validation stamp on a build.
@@ -64,10 +62,11 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
         String validationStampName = expand(validationStamp, theBuild, listener);
         // Run status
         String runStatus = getRunStatus(theBuild);
-        // Run description
-        String runDescription = String.format("Build %s", theBuild);
-        // General configuration
-        OntrackConfiguration configuration = OntrackConfiguration.getOntrackConfiguration();
+        // Gets the Ontrack connector
+        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+        // Gets the build
+        Build build = ontrack.build(projectName, branchName, buildName);
+        // Validation
         listener.getLogger().format("[ontrack] Running %s with status %s for build %s of branch %s of project %s%n",
                 validationStampName,
                 runStatus,
@@ -75,22 +74,8 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
                 branchName,
                 projectName
         );
-        // Gets the validation stamp id
-        int validationStampId = forValidationStamp(listener.getLogger(), projectName, branchName, validationStampName).getId();
-        // Validation run request
-        JsonNode validationRunRequest = object()
-                .with("validationStamp", validationStampId)
-                .with("validationRunStatusId", runStatus)
-                .with("description", runDescription)
-                .with("properties", array()
-                        .with(getBuildPropertyData(theBuild, configuration))
-                        .end())
-                .end();
+        build.validate(validationStampName, runStatus);
         // OK
-        forBuild(listener.getLogger(), projectName, branchName, buildName).on("_validate").post(
-                validationRunRequest
-        );
-
         return true;
     }
 

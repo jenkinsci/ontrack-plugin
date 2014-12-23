@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.jenkins;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -9,17 +8,14 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
+import net.nemerosa.ontrack.dsl.Build;
+import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
-import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBuild;
-import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forPromotionLevel;
-import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.array;
-import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.object;
 
 /**
  * Allows to notify for a promoted run.
@@ -64,35 +60,20 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
         final String promotionLevelName = expand(promotionLevel, theBuild, listener);
         // Only triggers in case of success
         if (theBuild.getResult().isBetterOrEqualTo(Result.SUCCESS)) {
-            // Run description
-            String runDescription = String.format("Run %s", theBuild);
-            // Logging of parameters
-            OntrackConfiguration configuration = OntrackConfiguration.getOntrackConfiguration();
+            // Gets the Ontrack connector
+            Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+            // Gets the build
+            Build build = ontrack.build(projectName, branchName, buildName);
+            // Promotes it
             listener.getLogger().format("[ontrack] Promoting build %s of branch %s of project %s for %s%n", buildName, branchName, projectName, promotionLevelName);
-            // Calling ontrack UI
-            int promotionLevelId = forPromotionLevel(listener.getLogger(), projectName, branchName, promotionLevelName).getId();
-            // Validation run request
-            JsonNode promotionLevelRequest = object()
-                    .with("promotionLevel", promotionLevelId)
-                    .with("dateTime", now())
-                    .with("description", runDescription)
-                    .with("properties", array()
-                            .with(getBuildPropertyData(theBuild, configuration))
-                            .end())
-                    .end();
-            // OK
-            forBuild(listener.getLogger(), projectName, branchName, buildName).on("_promote").post(
-                    promotionLevelRequest
-            );
+            build.promote(promotionLevelName);
+            // TODO Sets the Jenkins build property
+            // getBuildPropertyData(theBuild, configuration)
         } else {
             listener.getLogger().format("[ontrack] No promotion to %s since build is broken", promotionLevelName);
         }
         // OK
         return true;
-    }
-
-    private String now() {
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date());
     }
 
     @Extension
@@ -109,7 +90,7 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
 
         @Override
         public String getDisplayName() {
-            return "Ontrack2: Promoted run creation";
+            return "Ontrack: Promoted run creation";
         }
     }
 }
