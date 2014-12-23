@@ -35,7 +35,7 @@ public class OntrackDSL {
         // Connection to Ontrack
         Ontrack ontrack = createOntrackConnector(listener);
         // Connector to Jenkins
-        JenkinsConnector jenkins = new JenkinsConnector();
+        JenkinsConnector jenkins = new JenkinsConnector(theBuild.getResult());
         // Values to bind
         Map<String, Object> values = new HashMap<String, Object>();
         // Gets the environment
