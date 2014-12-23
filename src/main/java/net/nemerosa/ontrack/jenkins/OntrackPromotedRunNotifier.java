@@ -67,8 +67,6 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
             // Promotes it
             listener.getLogger().format("[ontrack] Promoting build %s of branch %s of project %s for %s%n", buildName, branchName, projectName, promotionLevelName);
             build.promote(promotionLevelName);
-            // TODO Sets the Jenkins build property
-            // getBuildPropertyData(theBuild, configuration)
         } else {
             listener.getLogger().format("[ontrack] No promotion to %s since build is broken", promotionLevelName);
         }
