@@ -26,10 +26,24 @@ public class JenkinsConnector {
     }
 
     /**
-     * Is the build a failure?
+     * Is the build a success?
      */
     public boolean isSuccess() {
         return result != null && result.isBetterOrEqualTo(Result.SUCCESS);
+    }
+
+    /**
+     * Is the build unstable?
+     */
+    public boolean isUnstable() {
+        return result != null && result.isBetterOrEqualTo(Result.UNSTABLE) && result.isWorseThan(Result.SUCCESS);
+    }
+
+    /**
+     * Is the build a failure?
+     */
+    public boolean isFailure() {
+        return result != null && result.isWorseOrEqualTo(Result.FAILURE);
     }
 
     public Map<String, String> env() {
