@@ -5,13 +5,9 @@ import groovy.lang.GroovyShell;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-import net.nemerosa.ontrack.client.OTHttpClientLogger;
 import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.OntrackConnection;
 import net.nemerosa.ontrack.dsl.ProjectEntity;
-import net.nemerosa.ontrack.jenkins.OntrackConfiguration;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,7 +29,7 @@ public class OntrackDSL {
 
     public OntrackDSLResult run(AbstractBuild<?, ?> theBuild, BuildListener listener) throws InterruptedException, IOException {
         // Connection to Ontrack
-        Ontrack ontrack = createOntrackConnector(listener);
+        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLog ? listener : null);
         // Connector to Jenkins
         JenkinsConnector jenkins = new JenkinsConnector(theBuild.getResult());
         // Values to bind
@@ -74,29 +70,6 @@ public class OntrackDSL {
                 shellResult,
                 jenkins
         );
-    }
-
-    private Ontrack createOntrackConnector(final BuildListener listener) {
-        OntrackConfiguration config = OntrackConfiguration.getOntrackConfiguration();
-        OntrackConnection connection = OntrackConnection.create(config.getOntrackUrl());
-        // Logging
-        if (ontrackLog) {
-            connection = connection.logger(new OTHttpClientLogger() {
-                public void trace(String message) {
-                    listener.getLogger().println(message);
-                }
-            });
-        }
-        // Authentication
-        String user = config.getOntrackUser();
-        if (StringUtils.isNotBlank(user)) {
-            connection = connection.authenticate(
-                    user,
-                    config.getOntrackPassword()
-            );
-        }
-        // Building the Ontrack root
-        return connection.build();
     }
 
     public static Result toJenkinsResult(Object shellResult) {

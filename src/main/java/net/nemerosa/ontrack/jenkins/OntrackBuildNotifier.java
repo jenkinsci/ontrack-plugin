@@ -8,14 +8,15 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
+import net.nemerosa.ontrack.dsl.Branch;
+import net.nemerosa.ontrack.dsl.Build;
+import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
-import static net.nemerosa.ontrack.jenkins.support.client.OntrackClient.forBranch;
-import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.array;
-import static net.nemerosa.ontrack.jenkins.support.json.JsonUtils.object;
 
 /**
  * Creation of a build for a branch. The created build will be associated with the Jenkins Build as a property.
@@ -64,25 +65,14 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
             String buildName = expand(build, theBuild, listener);
             // Build description
             String buildDescription = String.format("Build %s", theBuild);
-            // General configuration
-            OntrackConfiguration configuration = OntrackConfiguration.getOntrackConfiguration();
-            // Logging of parameters
-            listener.getLogger().format("[ontrack] Creating build %s on project %s for branch %s in configuration %s%n",
-                    buildName,
-                    projectName,
-                    branchName,
-                    configuration.getOntrackConfigurationName());
-
-            // Calling ontrack UI
-            forBranch(listener.getLogger(), projectName, branchName).on("_createBuild").post(
-                    object()
-                            .with("name", buildName)
-                            .with("description", buildDescription)
-                            .with("properties", array()
-                                    .with(getBuildPropertyData(theBuild, configuration))
-                                    .end())
-                            .end()
-            );
+            // Gets the Ontrack connector
+            Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+            // Gets the branch...
+            Branch branch = ontrack.branch(projectName, branchName);
+            // ... and creates a build
+            Build build = branch.build(buildName, buildDescription);
+            // TODO Sets the Jenkins build property
+            // getBuildPropertyData(theBuild, configuration)
 
         } else {
             listener.getLogger().format("[ontrack] No creation of build since it is broken");
