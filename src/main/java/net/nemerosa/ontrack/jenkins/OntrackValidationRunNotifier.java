@@ -106,7 +106,7 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
 
         @Override
         public String getDisplayName() {
-            return "Ontrack2: Validation run creation";
+            return "Ontrack: Validation run creation";
         }
     }
 }
