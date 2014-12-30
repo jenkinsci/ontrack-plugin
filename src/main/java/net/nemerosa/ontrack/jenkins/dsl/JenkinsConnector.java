@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.jenkins.support.dsl;
+package net.nemerosa.ontrack.jenkins.dsl;
 
 import hudson.model.Result;
 

@@ -11,7 +11,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.client.ClientException;
-import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSL;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSL;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;

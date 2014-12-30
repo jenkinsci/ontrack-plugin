@@ -10,7 +10,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;

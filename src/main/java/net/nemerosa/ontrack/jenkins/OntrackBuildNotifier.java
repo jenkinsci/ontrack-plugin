@@ -12,7 +12,7 @@ import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.properties.BuildProperties;
-import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;

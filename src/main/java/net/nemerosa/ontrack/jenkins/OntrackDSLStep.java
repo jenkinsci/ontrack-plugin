@@ -6,8 +6,8 @@ import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import net.nemerosa.ontrack.client.ClientException;
-import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSL;
-import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSLResult;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSL;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLResult;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
