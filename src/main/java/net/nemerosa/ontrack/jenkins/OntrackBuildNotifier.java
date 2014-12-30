@@ -11,6 +11,7 @@ import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.properties.BuildProperties;
 import net.nemerosa.ontrack.jenkins.support.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -71,9 +72,13 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
             Branch branch = ontrack.branch(projectName, branchName);
             // ... and creates a build
             Build build = branch.build(buildName, buildDescription);
-            // TODO Sets the Jenkins build property
-            // getBuildPropertyData(theBuild, configuration)
-
+            // Sets the Jenkins build property
+            // Note: cannot use the Groovy DSL here, using internal classes
+            new BuildProperties(ontrack, build).jenkinsBuild(
+                    OntrackConfiguration.getOntrackConfiguration().getOntrackConfigurationName(),
+                    theBuild.getProject().getName(),
+                    theBuild.getNumber()
+            );
         } else {
             listener.getLogger().format("[ontrack] No creation of build since it is broken");
         }
