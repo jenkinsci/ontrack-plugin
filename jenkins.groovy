@@ -24,4 +24,18 @@ job {
     triggers {
         scm 'H/5 * * * *'
     }
+    steps {
+        maven {
+            goals 'clean verify'
+            mavenInstallation 'Maven-3.2.x'
+        }
+    }
+    publishers {
+        archiveJunit("**/target/surefire-reports/*.xml")
+        tasks(
+                '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
+                '**/target/**',
+                'FIXME', 'TODO', '@Deprecated', true
+        )
+    }
 }
