@@ -71,13 +71,13 @@ job {
     steps {
         shell '''\
 export PATH=${MAVEN_3_2_X_HOME}/bin:$PATH
-mvn versions:set -DgenerateBackupPoms=false -Dversion=${VERSION}
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${VERSION}
 git commit -am "Release ${VERSION}"
 git tag "${VERSION}"
 
 mvn clean deploy
 
-mvn versions:set -DgenerateBackupPoms=false -Dversion=${NEXT_VERSION}-SNAPSHOT
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}-SNAPSHOT
 git commit -am "Starting ${NEXT_VERSION}"
 '''
     }
