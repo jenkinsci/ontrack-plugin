@@ -92,6 +92,7 @@ git push origin master
                 '**/target/**',
                 'FIXME', 'TODO', '@Deprecated', true
         )
+        buildDescription('', 'v${VERSION}', '', 'v${VERSION}')
     }
 }
 
