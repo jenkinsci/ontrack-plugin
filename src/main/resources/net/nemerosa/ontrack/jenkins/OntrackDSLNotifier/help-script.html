@@ -4,23 +4,14 @@
     <p>Two objects are injected into the script:</p>
     <ul>
         <li><code>ontrack</code> - base access to Ontrack.</li>
-        <li><code>jenkins</code> - allows interaction with Jenkins. Supported methods are:
-            <ul>
-                <li><code>env(name, value)</code> - injects an environment variable.</li>
-                <li><code>result</code> - read only access to the
-                    <a href="http://javadoc.jenkins-ci.org/hudson/model/Result.html">build result</a>.</li>
-                <li><code>success</code> - read only check to see if the current build is successful</li>
-                <li><code>unstable</code> - read only check to see if the current build is unstable</li>
-                <li><code>failure</code> - read only check to see if the current build is a failure</li>
-            </ul>
+        <li><code>jenkins</code> - allows interaction with Jenkins. See the
+            <a href="https://github.com/nemerosa/ontrack-jenkins/wiki">Wiki</a> for the list
+            of supported methods.
         </li>
     </ul>
 
     <p>
-        The execution will fail if one the following conditions is met:
+        See the <a href="https://github.com/nemerosa/ontrack-jenkins/wiki">Wiki</a> for the complete documentation.
     </p>
-    <ul>
-        <li>an exception occurs.</li>
-        <li>the script returns something else than nothing, 0, <code>false</code> or an empty string.</li>
-    </ul>
+
 </div>
