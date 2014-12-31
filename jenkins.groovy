@@ -49,7 +49,7 @@ job {
     name "ontrack-jenkins/ontrack-jenkins-release"
     description "Release job for the Ontrack Jenkins plug-in"
     logRotator(numToKeep = 40)
-    deliveryPipelineConfiguration('Commit', 'CI')
+    deliveryPipelineConfiguration('Release', 'Publication')
     parameters {
         stringParam('VERSION', '', '')
         stringParam('NEXT_VERSION', '', '')
