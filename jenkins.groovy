@@ -74,13 +74,9 @@ export PATH=${MAVEN_3_2_X_HOME}/bin:$PATH
 mvn versions:set -DgenerateBackupPoms=false -Dversion=${VERSION}
 git commit -am "Release ${VERSION}"
 git tag "${VERSION}"
-'''
-        maven {
-            goals 'clean install'
-            mavenInstallation 'Maven-3.2.x'
-        }
-        shell '''\
-export PATH=${MAVEN_3_2_X_HOME}/bin:$PATH
+
+mvn clean install
+
 mvn versions:set -DgenerateBackupPoms=false -Dversion=${NEXT_VERSION}-SNAPSHOT
 git commit -am "Starting ${NEXT_VERSION}"
 '''
