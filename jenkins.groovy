@@ -75,14 +75,13 @@ mvn versions:set -DgenerateBackupPoms=false -Dversion=${VERSION}
 git commit -am "Release ${VERSION}"
 git tag "${VERSION}"
 
-mvn clean install
+mvn clean deploy
 
 mvn versions:set -DgenerateBackupPoms=false -Dversion=${NEXT_VERSION}-SNAPSHOT
 git commit -am "Starting ${NEXT_VERSION}"
 '''
     }
     publishers {
-        archiveJunit("**/target/surefire-reports/*.xml")
         tasks(
                 '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
                 '**/target/**',
