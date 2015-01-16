@@ -1,9 +1,10 @@
 package net.nemerosa.ontrack.jenkins;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 import hudson.model.ParameterDefinition;
-import hudson.model.Result;
-import net.nemerosa.ontrack.client.ClientException;
-import net.nemerosa.ontrack.jenkins.dsl.OntrackDSL;
+import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.beanutils.BeanUtils;
 
 public abstract class AbstractOntrackParameterDefinition extends ParameterDefinition {
@@ -26,8 +27,15 @@ public abstract class AbstractOntrackParameterDefinition extends ParameterDefini
     }
 
     protected Object runDSL() {
-        // FIXME Runs the DSL
-        return null;
+        // Connection to Ontrack
+        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(System.out);
+        // Binding
+        Binding binding = new Binding();
+        binding.setProperty("ontrack", ontrack);
+        // Groovy shell
+        GroovyShell shell = new GroovyShell(binding);
+        // Runs the script
+        return shell.evaluate(dsl);
     }
 
     protected String getProperty(Object any, String property) {
