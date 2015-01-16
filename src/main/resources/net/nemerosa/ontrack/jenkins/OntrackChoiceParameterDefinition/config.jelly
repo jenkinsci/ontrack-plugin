@@ -14,7 +14,4 @@
     <f:entry title="Value property" help="/help/ontrack/parameter-value-property.html">
         <f:textbox name="parameter.valueProperty" value="${instance.valueProperty}" />
     </f:entry>
-    <f:entry title="Label property" help="/help/ontrack/parameter-label-property.html">
-        <f:textbox name="parameter.labelProperty" value="${instance.labelProperty}" />
-    </f:entry>
 </j:jelly>
