@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.jenkins.dsl;
 
 import hudson.model.BuildListener;
-import net.nemerosa.ontrack.client.OTHttpClientLogger;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.OntrackConnection;
+import net.nemerosa.ontrack.dsl.OntrackLogger;
 import net.nemerosa.ontrack.jenkins.OntrackConfiguration;
 import org.apache.commons.lang.StringUtils;
 
@@ -16,7 +16,8 @@ public class OntrackDSLConnector {
         OntrackConnection connection = OntrackConnection.create(config.getOntrackUrl());
         // Logging
         if (logger != null) {
-            connection = connection.logger(new OTHttpClientLogger() {
+            connection = connection.logger(new OntrackLogger() {
+                @Override
                 public void trace(String message) {
                     logger.println(message);
                 }

@@ -5,7 +5,7 @@ import hudson.Launcher;
 import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
-import net.nemerosa.ontrack.client.ClientException;
+import net.nemerosa.ontrack.dsl.http.OTHttpClientException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSL;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLResult;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -73,7 +73,7 @@ public class OntrackDSLStep extends Builder {
                         value
                 )));
             }
-        } catch (ClientException ex) {
+        } catch (OTHttpClientException ex) {
             listener.getLogger().format("Ontrack DSL script failed with:%n%s%n", ex.getMessage());
             if (ontrackLog) {
                 ex.printStackTrace(listener.getLogger());
