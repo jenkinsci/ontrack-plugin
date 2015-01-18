@@ -40,6 +40,11 @@ public class OntrackSingleParameterDefinition extends AbstractOntrackParameterDe
         return new StringParameterValue(getName(), value, getDescription());
     }
 
+    @Override
+    public ParameterValue getDefaultParameterValue() {
+        return createValue();
+    }
+
     @Extension
     public static class DescriptorImpl extends ParameterDescriptor {
 
