@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.jenkins;
 
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
