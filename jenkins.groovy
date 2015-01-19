@@ -11,7 +11,7 @@ job {
     description "Continuous Integration for the Ontrack Jenkins plug-in"
     logRotator(numToKeep = 40)
     deliveryPipelineConfiguration('Commit', 'CI')
-    jdk 'JDK8u20'
+    jdk 'JDK7'
     scm {
         git {
             remote {
