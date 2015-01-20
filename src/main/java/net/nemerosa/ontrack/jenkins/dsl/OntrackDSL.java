@@ -6,7 +6,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.ProjectEntity;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 
 import java.io.IOException;
@@ -73,14 +72,10 @@ public class OntrackDSL {
     }
 
     public static Result toJenkinsResult(Object shellResult) {
-        if (shellResult == null ||
-                shellResult.equals(0) ||
-                shellResult.equals(false) ||
-                shellResult.equals("") ||
-                shellResult instanceof ProjectEntity) {
-            return Result.SUCCESS;
-        } else {
+        if (shellResult instanceof String && !shellResult.equals("")) {
             return Result.FAILURE;
+        } else {
+            return Result.SUCCESS;
         }
     }
 }
