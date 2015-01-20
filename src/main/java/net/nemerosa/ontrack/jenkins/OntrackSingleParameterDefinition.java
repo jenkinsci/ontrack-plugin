@@ -53,9 +53,5 @@ public class OntrackSingleParameterDefinition extends AbstractOntrackParameterDe
             return "Ontrack: Single parameter";
         }
 
-        @Override
-        public String getHelpFile() {
-            return "/help/ontrack/parameter-single.html";
-        }
     }
 }
