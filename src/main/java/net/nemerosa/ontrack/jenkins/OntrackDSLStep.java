@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.jenkins;
 
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
@@ -18,21 +19,33 @@ import java.util.Map;
  */
 public class OntrackDSLStep extends Builder {
 
-    private final String script;
+    private final boolean usingText;
+    private final String scriptPath;
+    private final String scriptText;
     private final String injectEnvironment;
     private final String injectProperties;
     private final boolean ontrackLog;
 
     @DataBoundConstructor
-    public OntrackDSLStep(String script, String injectEnvironment, String injectProperties, boolean ontrackLog) {
-        this.script = script;
+    public OntrackDSLStep(ScriptLocation scriptLocation, String injectEnvironment, String injectProperties, boolean ontrackLog) {
+        this.usingText = scriptLocation == null || scriptLocation.isUsingText();
+        this.scriptPath = scriptLocation == null ? null : scriptLocation.getScriptPath();
+        this.scriptText = scriptLocation == null ? null : scriptLocation.getScriptText();
         this.injectEnvironment = injectEnvironment;
         this.injectProperties = injectProperties;
         this.ontrackLog = ontrackLog;
     }
 
-    public String getScript() {
-        return script;
+    public boolean isUsingText() {
+        return usingText;
+    }
+
+    public String getScriptPath() {
+        return scriptPath;
+    }
+
+    public String getScriptText() {
+        return scriptText;
     }
 
     public String getInjectEnvironment() {
@@ -49,6 +62,14 @@ public class OntrackDSLStep extends Builder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+        // Reads the script text
+        String script;
+        if (usingText) {
+            script = scriptText;
+        } else {
+            FilePath path = theBuild.getWorkspace().child(scriptPath);
+            script = path.readToString();
+        }
         // Ontrack DSL support
         OntrackDSL dsl = new OntrackDSL(
                 script,

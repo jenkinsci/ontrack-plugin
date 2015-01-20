@@ -1,7 +1,18 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-	<f:entry title="DSL script" field="script">
-		<f:textarea />
-	</f:entry>
+
+	<f:radioBlock name="scriptLocation" value="true" title="Use the provided DSL script" checked="${instance.isUsingText()}">
+		<f:entry title='DSL Script' field='scriptText'>
+			<f:textarea codemirror-mode="groovy"
+						codemirror-config="mode: 'text/x-groovy', lineNumbers: true, matchBrackets: true, onBlur: function(editor){editor.save()}"/>
+		</f:entry>
+	</f:radioBlock>
+
+	<f:radioBlock name="scriptLocation" value="false" title="Look on Filesystem" checked="${!instance.isUsingText()}">
+		<f:entry title="DSL Script file" field="scriptPath">
+			<f:textbox/>
+		</f:entry>
+	</f:radioBlock>
+
 	<f:entry title="Inject environment variables" field="injectEnvironment">
 		<f:textbox />
 	</f:entry>
