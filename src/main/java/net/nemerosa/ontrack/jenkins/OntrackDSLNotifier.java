@@ -21,21 +21,33 @@ import java.io.IOException;
  */
 public class OntrackDSLNotifier extends Notifier {
 
-    private final String script;
+    private final boolean usingText;
+    private final String scriptPath;
+    private final String scriptText;
     private final String injectEnvironment;
     private final String injectProperties;
     private final boolean ontrackLog;
 
     @DataBoundConstructor
-    public OntrackDSLNotifier(String script, String injectEnvironment, String injectProperties, boolean ontrackLog) {
-        this.script = script;
+    public OntrackDSLNotifier(ScriptLocation scriptLocation, String injectEnvironment, String injectProperties, boolean ontrackLog) {
+        this.usingText = scriptLocation == null || scriptLocation.isUsingText();
+        this.scriptPath = scriptLocation == null ? null : scriptLocation.getScriptPath();
+        this.scriptText = scriptLocation == null ? null : scriptLocation.getScriptText();
         this.injectEnvironment = injectEnvironment;
         this.injectProperties = injectProperties;
         this.ontrackLog = ontrackLog;
     }
 
-    public String getScript() {
-        return script;
+    public boolean isUsingText() {
+        return usingText;
+    }
+
+    public String getScriptPath() {
+        return scriptPath;
+    }
+
+    public String getScriptText() {
+        return scriptText;
     }
 
     public String getInjectEnvironment() {
@@ -58,7 +70,7 @@ public class OntrackDSLNotifier extends Notifier {
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         // Ontrack DSL support
         OntrackDSL dsl = new OntrackDSL(
-                script,
+                scriptText,
                 injectEnvironment,
                 injectProperties,
                 ontrackLog
