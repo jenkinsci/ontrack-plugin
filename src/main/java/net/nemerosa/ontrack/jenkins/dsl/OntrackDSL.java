@@ -7,8 +7,11 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
+import org.apache.commons.io.output.TeeOutputStream;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +56,7 @@ public class OntrackDSL {
         // Binding
         values.put("ontrack", ontrack);
         values.put("jenkins", jenkins);
+        values.put("out", listener.getLogger());
         Binding binding = new Binding(values);
         // Groovy shell
         GroovyShell shell = new GroovyShell(binding);
