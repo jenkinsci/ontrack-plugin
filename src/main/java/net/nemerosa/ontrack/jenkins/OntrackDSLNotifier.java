@@ -12,6 +12,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.http.OTHttpClientException;
+import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSL;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -87,8 +88,11 @@ public class OntrackDSLNotifier extends Notifier {
         // Runs the script
         try {
             dsl.run(theBuild, listener);
+        } catch (OTMessageClientException ex) {
+            listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
+            theBuild.setResult(Result.FAILURE);
         } catch (OTHttpClientException ex) {
-            listener.getLogger().format("Ontrack DSL script failed with:%n%s%n", ex.getMessage());
+            listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
             if (ontrackLog) {
                 ex.printStackTrace(listener.getLogger());
             }

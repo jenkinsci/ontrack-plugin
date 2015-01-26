@@ -11,6 +11,8 @@ import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.http.OTHttpClientException;
+import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.dsl.properties.BuildProperties;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -68,17 +70,22 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
             String buildDescription = String.format("Build %s", theBuild);
             // Gets the Ontrack connector
             Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
-            // Gets the branch...
-            Branch branch = ontrack.branch(projectName, branchName);
-            // ... and creates a build
-            Build build = branch.build(buildName, buildDescription);
-            // Sets the Jenkins build property
-            // Note: cannot use the Groovy DSL here, using internal classes
-            new BuildProperties(ontrack, build).jenkinsBuild(
-                    OntrackConfiguration.getOntrackConfiguration().getOntrackConfigurationName(),
-                    theBuild.getProject().getName(),
-                    theBuild.getNumber()
-            );
+            try {
+                // Gets the branch...
+                Branch branch = ontrack.branch(projectName, branchName);
+                // ... and creates a build
+                Build build = branch.build(buildName, buildDescription);
+                // Sets the Jenkins build property
+                // Note: cannot use the Groovy DSL here, using internal classes
+                new BuildProperties(ontrack, build).jenkinsBuild(
+                        OntrackConfiguration.getOntrackConfiguration().getOntrackConfigurationName(),
+                        theBuild.getProject().getName(),
+                        theBuild.getNumber()
+                );
+            } catch (OTMessageClientException ex) {
+                listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
+                theBuild.setResult(Result.FAILURE);
+            }
         } else {
             listener.getLogger().format("[ontrack] No creation of build since it is broken");
         }

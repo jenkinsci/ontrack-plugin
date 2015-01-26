@@ -10,6 +10,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -60,13 +61,18 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
         final String promotionLevelName = expand(promotionLevel, theBuild, listener);
         // Only triggers in case of success
         if (theBuild.getResult().isBetterOrEqualTo(Result.SUCCESS)) {
-            // Gets the Ontrack connector
-            Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
-            // Gets the build
-            Build build = ontrack.build(projectName, branchName, buildName);
-            // Promotes it
-            listener.getLogger().format("[ontrack] Promoting build %s of branch %s of project %s for %s%n", buildName, branchName, projectName, promotionLevelName);
-            build.promote(promotionLevelName);
+            try {
+                // Gets the Ontrack connector
+                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+                // Gets the build
+                Build build = ontrack.build(projectName, branchName, buildName);
+                // Promotes it
+                listener.getLogger().format("[ontrack] Promoting build %s of branch %s of project %s for %s%n", buildName, branchName, projectName, promotionLevelName);
+                build.promote(promotionLevelName);
+            } catch (OTMessageClientException ex) {
+                listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
+                theBuild.setResult(Result.FAILURE);
+            }
         } else {
             listener.getLogger().format("[ontrack] No promotion to %s since build is broken", promotionLevelName);
         }

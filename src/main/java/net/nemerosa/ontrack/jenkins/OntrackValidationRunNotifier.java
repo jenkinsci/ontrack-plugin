@@ -10,6 +10,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -64,17 +65,22 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
         String runStatus = getRunStatus(theBuild);
         // Gets the Ontrack connector
         Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
-        // Gets the build
-        Build build = ontrack.build(projectName, branchName, buildName);
-        // Validation
-        listener.getLogger().format("[ontrack] Running %s with status %s for build %s of branch %s of project %s%n",
-                validationStampName,
-                runStatus,
-                buildName,
-                branchName,
-                projectName
-        );
-        build.validate(validationStampName, runStatus);
+        try {
+            // Gets the build
+            Build build = ontrack.build(projectName, branchName, buildName);
+            // Validation
+            listener.getLogger().format("[ontrack] Running %s with status %s for build %s of branch %s of project %s%n",
+                    validationStampName,
+                    runStatus,
+                    buildName,
+                    branchName,
+                    projectName
+            );
+            build.validate(validationStampName, runStatus);
+        } catch (OTMessageClientException ex) {
+            listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
+            theBuild.setResult(Result.FAILURE);
+        }
         // OK
         return true;
     }
