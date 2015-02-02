@@ -28,10 +28,10 @@ public class OntrackDSLStep extends Builder {
     private final boolean ontrackLog;
 
     @DataBoundConstructor
-    public OntrackDSLStep(ScriptLocation scriptLocation, String injectEnvironment, String injectProperties, boolean ontrackLog) {
-        this.usingText = scriptLocation == null || scriptLocation.isUsingText();
-        this.scriptPath = scriptLocation == null ? null : scriptLocation.getScriptPath();
-        this.scriptText = scriptLocation == null ? null : scriptLocation.getScriptText();
+    public OntrackDSLStep(ScriptLocation ontrackScriptLocation, String injectEnvironment, String injectProperties, boolean ontrackLog) {
+        this.usingText = ontrackScriptLocation == null || ontrackScriptLocation.isUsingText();
+        this.scriptPath = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptPath();
+        this.scriptText = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptText();
         this.injectEnvironment = injectEnvironment;
         this.injectProperties = injectProperties;
         this.ontrackLog = ontrackLog;
