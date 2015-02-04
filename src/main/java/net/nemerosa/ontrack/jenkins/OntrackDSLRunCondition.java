@@ -9,10 +9,10 @@ import net.nemerosa.ontrack.dsl.http.OTHttpClientException;
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSL;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLResult;
-import org.jenkins_ci.plugins.run_condition.common.PrebuildSameAsPerformRunCondition;
+import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-public class OntrackDSLRunCondition extends PrebuildSameAsPerformRunCondition {
+public class OntrackDSLRunCondition extends RunCondition {
 
     private final boolean usingText;
     private final String scriptPath;
@@ -56,7 +56,16 @@ public class OntrackDSLRunCondition extends PrebuildSameAsPerformRunCondition {
     }
 
     @Override
-    protected boolean runBuildStep(AbstractBuild<?, ?> build, BuildListener listener) throws Exception {
+    public boolean runPrebuild(AbstractBuild<?, ?> build, BuildListener listener) throws Exception {
+        return true;
+    }
+
+    @Override
+    public boolean runPerform(AbstractBuild<?, ?> build, BuildListener listener) throws Exception {
+        return evaluate(build, listener);
+    }
+
+    protected boolean evaluate(AbstractBuild<?, ?> build, BuildListener listener) throws Exception {
         // Reads the script text
         String script;
         if (usingText) {

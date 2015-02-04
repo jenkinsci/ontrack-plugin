@@ -75,6 +75,8 @@ public class OntrackDSL {
     public static Result toJenkinsResult(Object shellResult) {
         if (shellResult instanceof String && !shellResult.equals("")) {
             return Result.FAILURE;
+        } else if (shellResult instanceof Boolean) {
+            return (Boolean) shellResult ? Result.SUCCESS : Result.FAILURE;
         } else {
             return Result.SUCCESS;
         }
