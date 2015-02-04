@@ -7,11 +7,8 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
-import org.apache.commons.io.output.TeeOutputStream;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +30,7 @@ public class OntrackDSL {
         // Connection to Ontrack
         Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLog ? listener : null);
         // Connector to Jenkins
-        JenkinsConnector jenkins = new JenkinsConnector(theBuild.getResult());
+        JenkinsConnector jenkins = new JenkinsConnector(theBuild, listener);
         // Values to bind
         Map<String, Object> values = new HashMap<String, Object>();
         // Gets the environment
