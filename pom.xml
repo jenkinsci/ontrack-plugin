@@ -40,6 +40,12 @@
             <artifactId>httpclient</artifactId>
             <version>${httpClientVersion}</version>
         </dependency>
+        <!-- Run condition -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>run-condition</artifactId>
+            <version>1.0</version>
+        </dependency>
         <!-- Ontrack DSL -->
         <dependency>
             <groupId>net.nemerosa.ontrack</groupId>
