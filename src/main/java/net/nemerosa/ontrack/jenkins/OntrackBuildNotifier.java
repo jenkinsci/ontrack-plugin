@@ -74,7 +74,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                 // Gets the branch...
                 Branch branch = ontrack.branch(projectName, branchName);
                 // ... and creates a build
-                Build build = branch.build(buildName, buildDescription);
+                Build build = branch.build(buildName, buildDescription, true);
                 // Sets the Jenkins build property
                 // Note: cannot use the Groovy DSL here, using internal classes
                 new BuildProperties(ontrack, build).jenkinsBuild(
