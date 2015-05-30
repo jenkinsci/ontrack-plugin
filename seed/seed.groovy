@@ -2,12 +2,7 @@
  * Jenkins job definitions
  */
 
-folder {
-    name "ontrack-jenkins"
-}
-
-job {
-    name "ontrack-jenkins/ontrack-jenkins-ci"
+freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-ci") {
     description "Continuous Integration for the Ontrack Jenkins plug-in"
     logRotator(numToKeep = 40)
     deliveryPipelineConfiguration('Commit', 'CI')
@@ -37,7 +32,7 @@ job {
                 '**/target/**',
                 'FIXME', 'TODO', '@Deprecated', true
         )
-        buildPipelineTrigger("ontrack-jenkins/ontrack-jenkins-release") {
+        buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-release") {
             parameters {
                 currentBuild()
             }
@@ -45,8 +40,7 @@ job {
     }
 }
 
-job {
-    name "ontrack-jenkins/ontrack-jenkins-release"
+freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
     description "Release job for the Ontrack Jenkins plug-in"
     logRotator(numToKeep = 40)
     deliveryPipelineConfiguration('Release', 'Publication')
@@ -96,8 +90,7 @@ git push origin master
     }
 }
 
-view(type: DeliveryPipelineView) {
-    name "ontrack-jenkins/Pipeline"
+deliveryPipelineView("Pipeline") {
     pipelineInstances(4)
     enableManualTriggers()
     showChangeLog()
