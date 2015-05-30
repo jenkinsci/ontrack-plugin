@@ -2,7 +2,7 @@
  * Jenkins job definitions
  */
 
-freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-ci") {
+freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     description "Continuous Integration for the Ontrack Jenkins plug-in"
     logRotator(numToKeep = 40)
     deliveryPipelineConfiguration('Commit', 'CI')
@@ -96,6 +96,6 @@ deliveryPipelineView("Pipeline") {
     showChangeLog()
     updateInterval(5)
     pipelines {
-        component("ontrack-jenkins", "${SEED_PROJECT}-${SEED_BRANCH}-ci")
+        component("ontrack-jenkins", "${SEED_PROJECT}-${SEED_BRANCH}-build")
     }
 }
