@@ -32,11 +32,6 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
                 '**/target/**',
                 'FIXME', 'TODO', '@Deprecated', true
         )
-        buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-release") {
-            parameters {
-                currentBuild()
-            }
-        }
     }
 }
 
@@ -87,15 +82,5 @@ git push origin master
                 'FIXME', 'TODO', '@Deprecated', true
         )
         buildDescription('', 'v${VERSION}', '', 'v${VERSION}')
-    }
-}
-
-deliveryPipelineView("Pipeline") {
-    pipelineInstances(4)
-    enableManualTriggers()
-    showChangeLog()
-    updateInterval(5)
-    pipelines {
-        component("ontrack-jenkins", "${SEED_PROJECT}-${SEED_BRANCH}-build")
     }
 }
