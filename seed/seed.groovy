@@ -96,6 +96,6 @@ deliveryPipelineView("Pipeline") {
     showChangeLog()
     updateInterval(5)
     pipelines {
-        component("ontrack-jenkins", "ontrack-jenkins/ontrack-jenkins-ci")
+        component("ontrack-jenkins", "${SEED_PROJECT}-${SEED_BRANCH}-ci")
     }
 }
