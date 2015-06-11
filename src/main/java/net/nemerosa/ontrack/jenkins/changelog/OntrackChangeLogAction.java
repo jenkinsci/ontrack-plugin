@@ -1,18 +1,18 @@
 package net.nemerosa.ontrack.jenkins.changelog;
 
+import hudson.model.AbstractBuild;
 import hudson.model.Action;
-import hudson.model.Build;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.List;
 
 public class OntrackChangeLogAction implements Action {
 
-    private final Build<?, ?> build;
+    private final AbstractBuild<?, ?> build;
     private final List<OntrackChangeLog> changeLogs;
 
     @DataBoundConstructor
-    public OntrackChangeLogAction(Build<?, ?> build, List<OntrackChangeLog> changeLogs) {
+    public OntrackChangeLogAction(AbstractBuild<?, ?> build, List<OntrackChangeLog> changeLogs) {
         this.build = build;
         this.changeLogs = changeLogs;
     }
@@ -22,7 +22,7 @@ public class OntrackChangeLogAction implements Action {
         return changeLogs;
     }
 
-    public Build<?, ?> getBuild() {
+    public AbstractBuild<?, ?> getBuild() {
         return build;
     }
 

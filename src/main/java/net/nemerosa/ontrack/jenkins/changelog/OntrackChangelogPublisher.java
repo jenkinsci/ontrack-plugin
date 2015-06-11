@@ -10,9 +10,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.ChangeLog;
-import net.nemerosa.ontrack.dsl.ChangeLogCommit;
-import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.*;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -100,13 +98,14 @@ public class OntrackChangelogPublisher extends Notifier {
         }
 
         // Adds a change log action to register the change log
-        build.addAction(new OntrackChangeLogAction((hudson.model.Build<?, ?>) build, changeLogs));
+        build.addAction(new OntrackChangeLogAction(build, changeLogs));
 
         // OK
         return true;
     }
 
     protected OntrackChangeLog collectInfo(ChangeLog changeLog) {
+
         // Gets the commits
         List<OntrackChangeLogCommit> commits = Lists.transform(
                 changeLog.getCommits(),
@@ -126,10 +125,30 @@ public class OntrackChangelogPublisher extends Notifier {
                 }
         );
 
+        // Gets the issues
+        List<OntrackChangeLogIssue> issues = Lists.transform(
+                changeLog.getIssues(),
+                new Function<ChangeLogIssue, OntrackChangeLogIssue>() {
+                    @Override
+                    public OntrackChangeLogIssue apply(ChangeLogIssue input) {
+                        return new OntrackChangeLogIssue(
+                                input.getKey(),
+                                input.getDisplayKey(),
+                                input.getSummary(),
+                                input.getStatus(),
+                                input.getUpdateTime()
+                        );
+                    }
+                }
+        );
+
         // OK
         return new OntrackChangeLog(
                 new ArrayList<OntrackChangeLogCommit>(
                         commits
+                ),
+                new ArrayList<OntrackChangeLogIssue>(
+                        issues
                 )
         );
     }
