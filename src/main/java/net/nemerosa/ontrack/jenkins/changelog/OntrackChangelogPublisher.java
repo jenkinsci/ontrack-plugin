@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,11 +72,12 @@ public class OntrackChangelogPublisher extends Notifier {
 
         // Gets the two builds from Ontrack
         // TODO What happens when they do not exist?
-        Build lastOntrackBuild = ontrack.build(projectName, branchName, lastBuildName);
-        Build firstOntrackBuild = ontrack.build(projectName, branchName, previousBuildName);
+        Build build1= ontrack.build(projectName, branchName, previousBuildName);
+        Build buildN = ontrack.build(projectName, branchName, lastBuildName);
 
-        // TODO Gets the build intervals
-
+        // Gets the build intervals
+        List<Build> builds = Arrays.asList(build1, buildN);
+        // TODO If distinctBuilds, collect all builds between 1 and N
 
         // TODO Collects the change logs
         // TODO Adds a change log action to register the change log
