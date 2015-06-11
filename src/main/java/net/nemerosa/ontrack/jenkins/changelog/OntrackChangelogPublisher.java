@@ -99,7 +99,8 @@ public class OntrackChangelogPublisher extends Notifier {
             changeLogs.add(ontrackChangeLog);
         }
 
-        // TODO Adds a change log action to register the change log
+        // Adds a change log action to register the change log
+        build.addAction(new OntrackChangeLogAction(changeLogs));
 
         // OK
         return true;
