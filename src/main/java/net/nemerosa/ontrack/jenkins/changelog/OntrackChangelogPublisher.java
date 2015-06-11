@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.jenkins.changelog;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.*;
@@ -9,6 +11,7 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.ChangeLog;
+import net.nemerosa.ontrack.dsl.ChangeLogCommit;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
@@ -75,7 +78,7 @@ public class OntrackChangelogPublisher extends Notifier {
 
         // Gets the two builds from Ontrack
         // TODO What happens when they do not exist?
-        Build build1= ontrack.build(projectName, branchName, previousBuildName);
+        Build build1 = ontrack.build(projectName, branchName, previousBuildName);
         Build buildN = ontrack.build(projectName, branchName, lastBuildName);
 
         // Gets the build intervals
@@ -83,22 +86,49 @@ public class OntrackChangelogPublisher extends Notifier {
         // TODO If distinctBuilds, collect all builds between 1 and N
 
         // Collects the change logs for each interval
-        List<ChangeLog> changeLogs = new ArrayList<ChangeLog>();
+        List<OntrackChangeLog> changeLogs = new ArrayList<OntrackChangeLog>();
         int count = builds.size();
-        for (int i = 1 ; i < count ; i++) {
+        for (int i = 1; i < count; i++) {
             Build a = builds.get(i - 1);
             Build b = builds.get(i);
             // Gets the change log from A to B
             ChangeLog changeLog = a.getChangeLog(b);
-            // TODO Reduces the amount of information for the change log
+            // Reduces the amount of information for the change log
+            OntrackChangeLog ontrackChangeLog = collectInfo(changeLog);
             // Adds to the list
-            changeLogs.add(changeLog);
+            changeLogs.add(ontrackChangeLog);
         }
 
         // TODO Adds a change log action to register the change log
 
         // OK
         return true;
+    }
+
+    protected OntrackChangeLog collectInfo(ChangeLog changeLog) {
+        // Gets the commits
+        List<OntrackChangeLogCommit> commits = Lists.transform(
+                changeLog.getCommits(),
+                new Function<ChangeLogCommit, OntrackChangeLogCommit>() {
+                    @Override
+                    public OntrackChangeLogCommit apply(ChangeLogCommit input) {
+                        return new OntrackChangeLogCommit(
+                                input.getId(),
+                                input.getShortId(),
+                                input.getAuthor(),
+                                input.getTimestamp(),
+                                input.getMessage(),
+                                input.getFormattedMessage(),
+                                input.getLink()
+                        );
+                    }
+                }
+        );
+
+        // OK
+        return new OntrackChangeLog(
+                commits
+        );
     }
 
     protected boolean noChangeLog(BuildListener listener, String reason) {
