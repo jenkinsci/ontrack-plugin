@@ -8,18 +8,21 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Build;
+import net.nemerosa.ontrack.dsl.ChangeLog;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
 
+@SuppressWarnings("unused")
 public class OntrackChangelogPublisher extends Notifier {
 
     /**
@@ -79,12 +82,17 @@ public class OntrackChangelogPublisher extends Notifier {
         List<Build> builds = Arrays.asList(build1, buildN);
         // TODO If distinctBuilds, collect all builds between 1 and N
 
-        // TODO Collects the change logs for each interval
+        // Collects the change logs for each interval
+        List<ChangeLog> changeLogs = new ArrayList<ChangeLog>();
         int count = builds.size();
         for (int i = 1 ; i < count ; i++) {
             Build a = builds.get(i - 1);
             Build b = builds.get(i);
-            // TODO Gets the change log from A to B
+            // Gets the change log from A to B
+            ChangeLog changeLog = a.getChangeLog(b);
+            // TODO Reduces the amount of information for the change log
+            // Adds to the list
+            changeLogs.add(changeLog);
         }
 
         // TODO Adds a change log action to register the change log
