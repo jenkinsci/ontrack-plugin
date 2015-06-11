@@ -79,8 +79,16 @@ public class OntrackChangelogPublisher extends Notifier {
         List<Build> builds = Arrays.asList(build1, buildN);
         // TODO If distinctBuilds, collect all builds between 1 and N
 
-        // TODO Collects the change logs
+        // TODO Collects the change logs for each interval
+        int count = builds.size();
+        for (int i = 1 ; i < count ; i++) {
+            Build a = builds.get(i - 1);
+            Build b = builds.get(i);
+            // TODO Gets the change log from A to B
+        }
+
         // TODO Adds a change log action to register the change log
+
         // OK
         return true;
     }
