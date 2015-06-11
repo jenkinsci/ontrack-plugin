@@ -4,6 +4,7 @@
     <t:summary icon="${it.iconFileName}">
 
         <j:forEach var="changeLog" items="${it.changeLogs}">
+            <h4>${changeLog.from} --> ${changeLog.to}</h4>
             <table>
                 <tbody>
                     <j:forEach var="commit" items="${changeLog.commits}">

@@ -3,7 +3,7 @@
         <st:include it="${it.build}" page="sidepanel.jelly"/>
         <l:main-panel>
             <j:forEach var="changeLog" items="${it.changeLogs}">
-                <h2>From X to Y</h2>
+                <h2>From ${changeLog.from} to ${changeLog.to}</h2>
 
                 <h3>Commits</h3>
                 <table>

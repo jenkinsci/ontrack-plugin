@@ -144,6 +144,8 @@ public class OntrackChangelogPublisher extends Notifier {
 
         // OK
         return new OntrackChangeLog(
+                changeLog.getFrom().getName(),
+                changeLog.getTo().getName(),
                 new ArrayList<OntrackChangeLogCommit>(
                         commits
                 ),
