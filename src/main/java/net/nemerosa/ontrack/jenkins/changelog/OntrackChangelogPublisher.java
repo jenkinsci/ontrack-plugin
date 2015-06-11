@@ -7,6 +7,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
+import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
@@ -65,10 +66,17 @@ public class OntrackChangelogPublisher extends Notifier {
             return noChangeLog(listener, "No build name can be retrieved from the previous build");
         }
 
-        // TODO Gets the build intervals
-
         // Gets the Ontrack connector
         Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+
+        // Gets the two builds from Ontrack
+        // TODO What happens when they do not exist?
+        Build lastOntrackBuild = ontrack.build(projectName, branchName, lastBuildName);
+        Build firstOntrackBuild = ontrack.build(projectName, branchName, previousBuildName);
+
+        // TODO Gets the build intervals
+
+
         // TODO Collects the change logs
         // TODO Adds a change log action to register the change log
         // OK
