@@ -49,6 +49,22 @@
                         </j:forEach>
                     </tbody>
                 </table>
+
+                <h3>File changes</h3>
+                <table>
+                    <tbody>
+                        <j:forEach var="change" items="${changeLog.files}">
+                            <tr>
+                                <td>
+                                    ${change.path}
+                                </td>
+                                <td>
+                                    ${change.changeTypes}
+                                </td>
+                            </tr>
+                        </j:forEach>
+                    </tbody>
+                </table>
             </j:forEach>
         </l:main-panel>
     </l:layout>

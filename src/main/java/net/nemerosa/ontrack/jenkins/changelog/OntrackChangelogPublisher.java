@@ -142,6 +142,20 @@ public class OntrackChangelogPublisher extends Notifier {
                 }
         );
 
+        // Gets the files
+        List<OntrackChangeLogFile> files = Lists.transform(
+                changeLog.getFiles(),
+                new Function<ChangeLogFile, OntrackChangeLogFile>() {
+                    @Override
+                    public OntrackChangeLogFile apply(ChangeLogFile input) {
+                        return new OntrackChangeLogFile(
+                                input.getPath(),
+                                input.getChangeTypes()
+                        );
+                    }
+                }
+        );
+
         // OK
         return new OntrackChangeLog(
                 changeLog.getFrom().getName(),
@@ -151,6 +165,9 @@ public class OntrackChangelogPublisher extends Notifier {
                 ),
                 new ArrayList<OntrackChangeLogIssue>(
                         issues
+                ),
+                new ArrayList<OntrackChangeLogFile>(
+                        files
                 )
         );
     }
