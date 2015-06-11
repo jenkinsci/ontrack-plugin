@@ -128,7 +128,9 @@ public class OntrackChangelogPublisher extends Notifier {
 
         // OK
         return new OntrackChangeLog(
-                commits
+                new ArrayList<OntrackChangeLogCommit>(
+                        commits
+                )
         );
     }
 
