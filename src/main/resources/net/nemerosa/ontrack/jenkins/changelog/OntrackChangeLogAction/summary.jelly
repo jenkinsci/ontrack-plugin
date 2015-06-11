@@ -30,6 +30,10 @@
             </table>
         </j:forEach>
 
+        <p>
+            <a href="${it.urlName}">Full details</a>
+        </p>
+
     </t:summary>
 
 </j:jelly>

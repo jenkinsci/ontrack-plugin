@@ -100,7 +100,7 @@ public class OntrackChangelogPublisher extends Notifier {
         }
 
         // Adds a change log action to register the change log
-        build.addAction(new OntrackChangeLogAction(changeLogs));
+        build.addAction(new OntrackChangeLogAction((hudson.model.Build<?, ?>) build, changeLogs));
 
         // OK
         return true;

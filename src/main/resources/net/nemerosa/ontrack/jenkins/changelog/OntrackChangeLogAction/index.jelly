@@ -1,3 +1,8 @@
-<j:jelly xmlns:j="jelly:core">
-    Change log
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+    <l:layout>
+        <st:include it="${it.build}" page="sidepanel.jelly"/>
+        <l:main-panel>
+            ${it}
+        </l:main-panel>
+    </l:layout>
 </j:jelly>
