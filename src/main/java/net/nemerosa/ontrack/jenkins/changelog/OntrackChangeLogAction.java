@@ -21,7 +21,7 @@ public class OntrackChangeLogAction implements Action {
 
     @Override
     public String getIconFileName() {
-        return "/ontrack/changelog.png";
+        return "/plugin/ontrack/icons/changelog.png";
     }
 
     @Override
