@@ -8,9 +8,9 @@
             </j:if>
 
             <j:forEach var="changeLog" items="${it.changeLogs}">
-                <h2>From ${changeLog.from} to ${changeLog.to}</h2>
-
-                <a href="${changeLog.pageLink}">See in Ontrack</a>
+                <h2 class="changeset-message">
+                    <a href="${changeLog.pageLink}">From ${changeLog.from} to ${changeLog.to}</a>
+                </h2>
 
                 <h3>Commits</h3>
                 <table>
