@@ -18,7 +18,9 @@
                                 <td>
                                     <j:choose>
                                         <j:when test="${commit.link != ''}">
-                                            <code><a href="${commit.link}">${commit.shortId}</a></code>
+                                            <code>
+                                                <a href="${commit.link}">${commit.shortId}</a>
+                                            </code>
                                         </j:when>
                                         <j:otherwise>
                                             <code>${commit.shortId}</code>
@@ -36,47 +38,52 @@
                     </tbody>
                 </table>
 
-                <h3>Issues</h3>
-                <table>
-                    <tbody>
-                        <j:forEach var="issue" items="${changeLog.issues}">
-                            <tr>
-                                <td>
-                                    <j:choose>
-                                        <j:when test="${issue.url != ''}">
-                                            <a href="${issue.url}">${issue.displayKey}</a>
-                                        </j:when>
-                                        <j:otherwise>
-                                            ${issue.displayKey}
-                                        </j:otherwise>
-                                    </j:choose>
-                                </td>
-                                <td>
-                                    <b>${issue.status}</b>
-                                </td>
-                                <td>
-                                    ${issue.summary}
-                                </td>
-                            </tr>
-                        </j:forEach>
-                    </tbody>
-                </table>
+                <j:if test="${!changeLog.issues.isEmpty()}">
+                    <h3>Issues</h3>
+                    <table>
+                        <tbody>
+                            <j:forEach var="issue" items="${changeLog.issues}">
+                                <tr>
+                                    <td>
+                                        <j:choose>
+                                            <j:when test="${issue.url != ''}">
+                                                <a href="${issue.url}">${issue.displayKey}</a>
+                                            </j:when>
+                                            <j:otherwise>
+                                                ${issue.displayKey}
+                                            </j:otherwise>
+                                        </j:choose>
+                                    </td>
+                                    <td>
+                                        <b>${issue.status}</b>
+                                    </td>
+                                    <td>
+                                        ${issue.summary}
+                                    </td>
+                                </tr>
+                            </j:forEach>
+                        </tbody>
+                    </table>
+                </j:if>
 
-                <h3>File changes</h3>
-                <table>
-                    <tbody>
-                        <j:forEach var="change" items="${changeLog.files}">
-                            <tr>
-                                <td>
-                                    ${change.path}
-                                </td>
-                                <td>
-                                    ${change.changeTypes}
-                                </td>
-                            </tr>
-                        </j:forEach>
-                    </tbody>
-                </table>
+                <j:if test="${!changeLog.files.isEmpty()}">
+                    <h3>File changes</h3>
+                    <table>
+                        <tbody>
+                            <j:forEach var="change" items="${changeLog.files}">
+                                <tr>
+                                    <td>
+                                        ${change.path}
+                                    </td>
+                                    <td>
+                                        ${change.changeTypes}
+                                    </td>
+                                </tr>
+                            </j:forEach>
+                        </tbody>
+                    </table>
+                </j:if>
+
             </j:forEach>
         </l:main-panel>
     </l:layout>
