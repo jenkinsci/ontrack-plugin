@@ -89,12 +89,15 @@ public class OntrackChangelogPublisher extends Notifier {
         for (int i = 1; i < count; i++) {
             Build a = builds.get(i - 1);
             Build b = builds.get(i);
-            // Gets the change log from A to B
-            ChangeLog changeLog = a.getChangeLog(b);
-            // Reduces the amount of information for the change log
-            OntrackChangeLog ontrackChangeLog = collectInfo(changeLog);
-            // Adds to the list
-            changeLogs.add(ontrackChangeLog);
+            // Different builds
+            if (a.getId() != b.getId()) {
+                // Gets the change log from A to B
+                ChangeLog changeLog = a.getChangeLog(b);
+                // Reduces the amount of information for the change log
+                OntrackChangeLog ontrackChangeLog = collectInfo(changeLog);
+                // Adds to the list
+                changeLogs.add(ontrackChangeLog);
+            }
         }
 
         // Adds a change log action to register the change log

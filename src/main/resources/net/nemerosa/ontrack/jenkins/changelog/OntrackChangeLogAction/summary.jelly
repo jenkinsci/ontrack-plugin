@@ -3,6 +3,10 @@
 
     <t:summary icon="${it.iconFileName}">
 
+        <j:if test="${it.changeLogs.isEmpty()}">
+            <b>No change since last build.</b>
+        </j:if>
+
         <j:forEach var="changeLog" items="${it.changeLogs}">
             <h4>${changeLog.from} --> ${changeLog.to}</h4>
             <table>
@@ -31,9 +35,11 @@
             </table>
         </j:forEach>
 
-        <p>
-            <a href="${it.urlName}">Full details</a>
-        </p>
+        <j:if test="${!it.changeLogs.isEmpty()}">
+            <p>
+                <a href="${it.urlName}">Full details</a>
+            </p>
+        </j:if>
 
     </t:summary>
 

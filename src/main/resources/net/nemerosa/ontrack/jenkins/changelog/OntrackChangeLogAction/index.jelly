@@ -2,6 +2,11 @@
     <l:layout>
         <st:include it="${it.build}" page="sidepanel.jelly"/>
         <l:main-panel>
+
+            <j:if test="${it.changeLogs.isEmpty()}">
+                <h2>No change since last build.</h2>
+            </j:if>
+
             <j:forEach var="changeLog" items="${it.changeLogs}">
                 <h2>From ${changeLog.from} to ${changeLog.to}</h2>
 
