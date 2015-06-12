@@ -48,7 +48,7 @@
         <dependency>
             <groupId>net.nemerosa.ontrack</groupId>
             <artifactId>ontrack-dsl</artifactId>
-            <version>master-3c86af6</version>
+            <version>feature-275-page-link-aab1758</version>
         </dependency>
     </dependencies>
 

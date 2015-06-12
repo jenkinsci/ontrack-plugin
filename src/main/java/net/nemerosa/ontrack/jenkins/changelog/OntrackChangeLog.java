@@ -6,16 +6,19 @@ public class OntrackChangeLog {
 
     private final String from;
     private final String to;
+    private final String pageLink;
     private final List<OntrackChangeLogCommit> commits;
     private final List<OntrackChangeLogIssue> issues;
     private final List<OntrackChangeLogFile> files;
 
     public OntrackChangeLog(String from, String to,
+                            String pageLink,
                             List<OntrackChangeLogCommit> commits,
                             List<OntrackChangeLogIssue> issues,
                             List<OntrackChangeLogFile> files) {
         this.from = from;
         this.to = to;
+        this.pageLink = pageLink;
         this.commits = commits;
         this.issues = issues;
         this.files = files;
@@ -27,6 +30,10 @@ public class OntrackChangeLog {
 
     public String getTo() {
         return to;
+    }
+
+    public String getPageLink() {
+        return pageLink;
     }
 
     public List<OntrackChangeLogCommit> getCommits() {

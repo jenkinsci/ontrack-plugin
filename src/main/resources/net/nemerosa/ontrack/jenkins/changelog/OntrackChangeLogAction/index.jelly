@@ -10,6 +10,8 @@
             <j:forEach var="changeLog" items="${it.changeLogs}">
                 <h2>From ${changeLog.from} to ${changeLog.to}</h2>
 
+                <a href="${changeLog.pageLink}">See in Ontrack</a>
+
                 <h3>Commits</h3>
                 <table>
                     <tbody>

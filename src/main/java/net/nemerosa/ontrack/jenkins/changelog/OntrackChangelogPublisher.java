@@ -160,10 +160,14 @@ public class OntrackChangelogPublisher extends Notifier {
                 }
         );
 
+        // Page link
+        String page = changeLog.link("page");
+
         // OK
         return new OntrackChangeLog(
                 changeLog.getFrom().getName(),
                 changeLog.getTo().getName(),
+                page,
                 new ArrayList<OntrackChangeLogCommit>(
                         commits
                 ),
