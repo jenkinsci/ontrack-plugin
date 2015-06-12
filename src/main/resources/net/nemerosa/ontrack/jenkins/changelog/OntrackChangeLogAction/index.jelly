@@ -37,10 +37,17 @@
                         <j:forEach var="issue" items="${changeLog.issues}">
                             <tr>
                                 <td>
-                                    ${issue.displayKey}
+                                    <j:choose>
+                                        <j:when test="${issue.url != ''}">
+                                            <a href="${issue.url}">${issue.displayKey}</a>
+                                        </j:when>
+                                        <j:otherwise>
+                                            ${issue.displayKey}
+                                        </j:otherwise>
+                                    </j:choose>
                                 </td>
                                 <td>
-                                    ${issue.status}
+                                    <b>${issue.status}</b>
                                 </td>
                                 <td>
                                     ${issue.summary}

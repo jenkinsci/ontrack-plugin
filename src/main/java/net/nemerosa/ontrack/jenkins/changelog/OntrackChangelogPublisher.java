@@ -136,7 +136,8 @@ public class OntrackChangelogPublisher extends Notifier {
                                 input.getDisplayKey(),
                                 input.getSummary(),
                                 input.getStatus(),
-                                input.getUpdateTime()
+                                input.getUpdateTime(),
+                                input.getUrl()
                         );
                     }
                 }

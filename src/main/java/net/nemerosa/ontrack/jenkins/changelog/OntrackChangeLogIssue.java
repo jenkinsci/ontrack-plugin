@@ -7,13 +7,15 @@ public class OntrackChangeLogIssue {
     private final String summary;
     private final String status;
     private final String updateTime;
+    private final String url;
 
-    public OntrackChangeLogIssue(String key, String displayKey, String summary, String status, String updateTime) {
+    public OntrackChangeLogIssue(String key, String displayKey, String summary, String status, String updateTime, String url) {
         this.key = key;
         this.displayKey = displayKey;
         this.summary = summary;
         this.status = status;
         this.updateTime = updateTime;
+        this.url = url;
     }
 
     public String getKey() {
@@ -34,5 +36,9 @@ public class OntrackChangeLogIssue {
 
     public String getUpdateTime() {
         return updateTime;
+    }
+
+    public String getUrl() {
+        return url;
     }
 }
