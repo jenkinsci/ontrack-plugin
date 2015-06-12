@@ -9,4 +9,7 @@
     <f:entry title="Build name parameter" field="buildNameParameter">
         <f:textbox/>
     </f:entry>
+    <f:entry title="Distinct change logs" field="distinctBuilds">
+        <f:checkbox/>
+    </f:entry>
 </j:jelly>

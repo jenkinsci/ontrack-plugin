@@ -39,11 +39,17 @@ public class OntrackChangelogPublisher extends Notifier {
      */
     private final String buildNameParameter;
 
+    /**
+     * If the change logs must be distinguished between each intermediate build
+     */
+    private final boolean distinctBuilds;
+
     @DataBoundConstructor
-    public OntrackChangelogPublisher(String project, String branch, String buildNameParameter) {
+    public OntrackChangelogPublisher(String project, String branch, String buildNameParameter, boolean distinctBuilds) {
         this.project = project;
         this.branch = branch;
         this.buildNameParameter = buildNameParameter;
+        this.distinctBuilds = distinctBuilds;
     }
 
     @Override
@@ -207,6 +213,10 @@ public class OntrackChangelogPublisher extends Notifier {
 
     public String getBuildNameParameter() {
         return buildNameParameter;
+    }
+
+    public boolean isDistinctBuilds() {
+        return distinctBuilds;
     }
 
     @Override
