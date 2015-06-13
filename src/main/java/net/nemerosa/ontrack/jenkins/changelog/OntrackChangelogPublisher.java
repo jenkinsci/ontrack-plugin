@@ -12,6 +12,7 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.*;
+import net.nemerosa.ontrack.dsl.http.OTNotFoundException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static java.lang.String.format;
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
 
 @SuppressWarnings("unused")
@@ -82,9 +84,18 @@ public class OntrackChangelogPublisher extends Notifier {
         Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
 
         // Gets the two builds from Ontrack
-        // TODO What happens when they do not exist?
-        Build build1 = ontrack.build(projectName, branchName, previousBuildName);
-        Build buildN = ontrack.build(projectName, branchName, lastBuildName);
+        Build build1;
+        try {
+            build1 = ontrack.build(projectName, branchName, previousBuildName);
+        } catch (OTNotFoundException ignored) {
+            return noChangeLog(listener, format("Build %s cannot be found.", previousBuildName));
+        }
+        Build buildN;
+        try {
+            buildN = ontrack.build(projectName, branchName, lastBuildName);
+        } catch (OTNotFoundException ignored) {
+            return noChangeLog(listener, format("Build %s cannot be found.", lastBuildName));
+        }
 
         // Gets the build intervals
         List<Build> builds = Arrays.asList(build1, buildN);

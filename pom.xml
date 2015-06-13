@@ -48,7 +48,7 @@
         <dependency>
             <groupId>net.nemerosa.ontrack</groupId>
             <artifactId>ontrack-dsl</artifactId>
-            <version>master-4d3a951</version>
+            <version>feature-277-not-found-exception-b3a3b3d</version>
         </dependency>
     </dependencies>
 
