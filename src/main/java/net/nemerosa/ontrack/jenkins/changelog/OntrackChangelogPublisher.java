@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.jenkins.changelog;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import hudson.Extension;
 import hudson.Launcher;
@@ -87,7 +88,15 @@ public class OntrackChangelogPublisher extends Notifier {
 
         // Gets the build intervals
         List<Build> builds = Arrays.asList(build1, buildN);
-        // TODO If distinctBuilds, collect all builds between 1 and N
+        // If distinctBuilds, collect all builds between 1 and N
+        if (distinctBuilds) {
+            builds = ontrack.branch(projectName, branchName).intervalFilter(
+                    ImmutableMap.of(
+                            "from", build1.getName(),
+                            "to", buildN.getName()
+                    )
+            );
+        }
 
         // Collects the change logs for each interval
         List<OntrackChangeLog> changeLogs = new ArrayList<OntrackChangeLog>();
