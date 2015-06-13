@@ -78,7 +78,7 @@ git push origin master
     publishers {
         tasks(
                 '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
-                '**/target/**',
+                '**/target/**,seed/**',
                 'FIXME', 'TODO', '@Deprecated', true
         )
         buildDescription('', 'v${VERSION}', '', 'v${VERSION}')
