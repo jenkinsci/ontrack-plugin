@@ -29,7 +29,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         archiveJunit("**/target/surefire-reports/*.xml")
         tasks(
                 '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
-                '**/target/**',
+                '**/target/**,seed/**',
                 'FIXME', 'TODO', '@Deprecated', true
         )
     }
