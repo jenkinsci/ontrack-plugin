@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.jenkins;
 import hudson.Extension;
 import hudson.model.ParameterValue;
 import hudson.model.StringParameterValue;
+import net.nemerosa.ontrack.jenkins.dsl.DSLRunner;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -13,6 +14,10 @@ public class OntrackSingleParameterDefinition extends AbstractOntrackParameterDe
     @DataBoundConstructor
     public OntrackSingleParameterDefinition(String name, String description, String dsl, String valueProperty) {
         super(name, description, dsl, valueProperty);
+    }
+
+    public OntrackSingleParameterDefinition(String name, String description, String dsl, String valueProperty, DSLRunner dslRunner) {
+        super(name, description, dsl, valueProperty, dslRunner);
     }
 
     /**
@@ -35,7 +40,7 @@ public class OntrackSingleParameterDefinition extends AbstractOntrackParameterDe
         // Runs the DSL and gets its result
         Object any = runDSL();
         // Gets the value for this object
-        String value = getProperty(any, getValueProperty());
+        String value = any != null ? getProperty(any, getValueProperty()) : "";
         // Returns the string as a parameter
         return new StringParameterValue(getName(), value, getDescription());
     }

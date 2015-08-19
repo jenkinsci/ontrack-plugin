@@ -22,8 +22,10 @@ public abstract class AbstractOntrackMultipleParameterDefinition extends Abstrac
         // If not a collection, converts to it
         if (any instanceof Collection) {
             items = (Collection<?>) any;
-        } else {
+        } else if (any != null) {
             items = Collections.singletonList(any);
+        } else {
+            items = Collections.emptyList();
         }
         // Gets the values
         List<String> values = new ArrayList<String>();

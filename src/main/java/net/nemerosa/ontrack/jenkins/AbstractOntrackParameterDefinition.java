@@ -1,21 +1,31 @@
 package net.nemerosa.ontrack.jenkins;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
 import hudson.model.ParameterDefinition;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.DSLRunner;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLRunner;
 import org.apache.commons.beanutils.BeanUtils;
 
 public abstract class AbstractOntrackParameterDefinition extends ParameterDefinition {
 
     private final String dsl;
     private final String valueProperty;
+    private final DSLRunner dslRunner;
 
     public AbstractOntrackParameterDefinition(String name, String description, String dsl, String valueProperty) {
+        this(
+                name,
+                description,
+                dsl,
+                valueProperty,
+                new OntrackDSLRunner()
+        );
+    }
+
+    public AbstractOntrackParameterDefinition(String name, String description, String dsl, String valueProperty, DSLRunner dslRunner) {
         super(name, description);
         this.dsl = dsl;
         this.valueProperty = valueProperty;
+        this.dslRunner = dslRunner;
     }
 
     public String getDsl() {
@@ -27,15 +37,7 @@ public abstract class AbstractOntrackParameterDefinition extends ParameterDefini
     }
 
     protected Object runDSL() {
-        // Connection to Ontrack
-        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(System.out);
-        // Binding
-        Binding binding = new Binding();
-        binding.setProperty("ontrack", ontrack);
-        // Groovy shell
-        GroovyShell shell = new GroovyShell(binding);
-        // Runs the script
-        return shell.evaluate(dsl);
+        return dslRunner.run(dsl);
     }
 
     protected String getProperty(Object any, String property) {
