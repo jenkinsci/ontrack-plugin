@@ -18,10 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.lang.String.format;
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
@@ -47,12 +44,18 @@ public class OntrackChangelogPublisher extends Notifier {
      */
     private final boolean distinctBuilds;
 
+    /**
+     * Must the file change log be collected?
+     */
+    private final boolean collectFiles;
+
     @DataBoundConstructor
-    public OntrackChangelogPublisher(String project, String branch, String buildNameParameter, boolean distinctBuilds) {
+    public OntrackChangelogPublisher(String project, String branch, String buildNameParameter, boolean distinctBuilds, boolean collectFiles) {
         this.project = project;
         this.branch = branch;
         this.buildNameParameter = buildNameParameter;
         this.distinctBuilds = distinctBuilds;
+        this.collectFiles = collectFiles;
     }
 
     @Override
@@ -173,18 +176,23 @@ public class OntrackChangelogPublisher extends Notifier {
         );
 
         // Gets the files
-        List<OntrackChangeLogFile> files = Lists.transform(
-                changeLog.getFiles(),
-                new Function<ChangeLogFile, OntrackChangeLogFile>() {
-                    @Override
-                    public OntrackChangeLogFile apply(ChangeLogFile input) {
-                        return new OntrackChangeLogFile(
-                                input.getPath(),
-                                input.getChangeTypes()
-                        );
+        List<OntrackChangeLogFile> files;
+        if (collectFiles) {
+            files = Lists.transform(
+                    changeLog.getFiles(),
+                    new Function<ChangeLogFile, OntrackChangeLogFile>() {
+                        @Override
+                        public OntrackChangeLogFile apply(ChangeLogFile input) {
+                            return new OntrackChangeLogFile(
+                                    input.getPath(),
+                                    input.getChangeTypes()
+                            );
+                        }
                     }
-                }
-        );
+            );
+        } else {
+            files = Collections.emptyList();
+        }
 
         // Page link
         String page = changeLog.link("page");
@@ -237,6 +245,10 @@ public class OntrackChangelogPublisher extends Notifier {
 
     public boolean isDistinctBuilds() {
         return distinctBuilds;
+    }
+
+    public boolean isCollectFiles() {
+        return collectFiles;
     }
 
     @Override
