@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.dsl.Ontrack;
 
 public class OntrackDSLRunner implements DSLRunner {
 
+    public static final OntrackDSLRunner INSTANCE = new OntrackDSLRunner();
+
     @Override
     public Object run(String dsl) {
         // Connection to Ontrack

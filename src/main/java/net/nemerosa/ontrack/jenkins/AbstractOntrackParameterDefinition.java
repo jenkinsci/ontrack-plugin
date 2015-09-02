@@ -9,7 +9,7 @@ public abstract class AbstractOntrackParameterDefinition extends ParameterDefini
 
     private final String dsl;
     private final String valueProperty;
-    private final DSLRunner dslRunner;
+    private final transient DSLRunner dslRunner;
 
     public AbstractOntrackParameterDefinition(String name, String description, String dsl, String valueProperty) {
         this(
@@ -17,7 +17,7 @@ public abstract class AbstractOntrackParameterDefinition extends ParameterDefini
                 description,
                 dsl,
                 valueProperty,
-                new OntrackDSLRunner()
+                OntrackDSLRunner.INSTANCE
         );
     }
 
@@ -37,7 +37,8 @@ public abstract class AbstractOntrackParameterDefinition extends ParameterDefini
     }
 
     protected Object runDSL() {
-        return dslRunner.run(dsl);
+        DSLRunner runner = dslRunner != null ? dslRunner : OntrackDSLRunner.INSTANCE;
+        return runner.run(dsl);
     }
 
     protected String getProperty(Object any, String property) {
