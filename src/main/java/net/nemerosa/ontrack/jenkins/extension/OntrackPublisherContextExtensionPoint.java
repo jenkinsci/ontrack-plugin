@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier;
 import net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier;
 
 @Extension(optional = true)
-public class OntrackContextExtensionPoint extends ContextExtensionPoint {
+public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint {
 
     /**
      * Creation of a build
