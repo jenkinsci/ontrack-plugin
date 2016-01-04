@@ -44,6 +44,13 @@
             <artifactId>run-condition</artifactId>
             <version>1.0</version>
         </dependency>
+        <!-- Extending the DSL -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>job-dsl</artifactId>
+            <version>1.35</version>
+            <optional>true</optional>
+        </dependency>
         <!-- Ontrack DSL -->
         <dependency>
             <groupId>net.nemerosa.ontrack</groupId>

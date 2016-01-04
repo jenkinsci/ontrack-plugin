@@ -27,4 +27,12 @@ public class ScriptLocation {
     public String getScriptText() {
         return scriptText;
     }
+
+    public static ScriptLocation text(String text) {
+        return new ScriptLocation("true", null, text);
+    }
+
+    public static ScriptLocation path(String path) {
+        return new ScriptLocation("false", path, null);
+    }
 }
