@@ -13,6 +13,7 @@ import org.jenkinsci.plugins.envinject.model.EnvInjectJobPropertyContributor;
 import org.jenkinsci.plugins.envinject.model.EnvInjectJobPropertyContributorDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,8 +44,6 @@ public class OntrackDSLEnvInjectJobPropertyContributor extends EnvInjectJobPrope
 
     @Override
     public void init() {
-        // FIXME Method net.nemerosa.ontrack.jenkins.OntrackDSLEnvInjectJobPropertyContributor.init
-
     }
 
     @Override
@@ -58,7 +57,13 @@ public class OntrackDSLEnvInjectJobPropertyContributor extends EnvInjectJobPrope
         values.put("jenkins", Jenkins.getInstance());
         values.put("build", build);
         values.put("out", listener.getLogger());
-        // TODO Parameters
+        try {
+            values.put("env", build.getEnvironment(listener));
+        } catch (IOException e) {
+            throw new EnvInjectException("Cannot inject environment in DSL", e);
+        } catch (InterruptedException e) {
+            throw new EnvInjectException("Cannot inject environment in DSL", e);
+        }
         Binding binding = new Binding(values);
         // Groovy shell
         GroovyShell shell = new GroovyShell(binding);
