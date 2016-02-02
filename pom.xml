@@ -44,6 +44,12 @@
             <artifactId>run-condition</artifactId>
             <version>1.0</version>
         </dependency>
+        <!-- Environment injection -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>envinject</artifactId>
+            <version>1.92.1</version>
+        </dependency>
         <!-- Ontrack DSL -->
         <dependency>
             <groupId>net.nemerosa.ontrack</groupId>
