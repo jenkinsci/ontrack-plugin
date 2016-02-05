@@ -79,7 +79,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                 // Note: cannot use the Groovy DSL here, using internal classes
                 new BuildProperties(ontrack, build).jenkinsBuild(
                         OntrackConfiguration.getOntrackConfiguration().getOntrackConfigurationName(),
-                        theBuild.getProject().getName(),
+                        getProjectPath(theBuild),
                         theBuild.getNumber()
                 );
             } catch (OTMessageClientException ex) {
@@ -91,6 +91,10 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
         }
         // OK
         return true;
+    }
+
+    protected String getProjectPath(AbstractBuild<?, ?> theBuild) {
+        return theBuild.getProject().getName();
     }
 
     @Extension
