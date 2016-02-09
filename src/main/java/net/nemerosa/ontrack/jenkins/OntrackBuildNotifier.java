@@ -8,13 +8,14 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
+import jenkins.model.Jenkins;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.http.OTHttpClientException;
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.dsl.properties.BuildProperties;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
@@ -93,8 +94,15 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
         return true;
     }
 
+    /**
+     * Gets the slash (/) separated path to the build.
+     */
     protected String getProjectPath(AbstractBuild<?, ?> theBuild) {
-        return theBuild.getProject().getName();
+        return StringUtils.replace(
+                theBuild.getProject().getRelativeNameFrom(Jenkins.getInstance()),
+                "/",
+                "/job/"
+        );
     }
 
     @Extension
