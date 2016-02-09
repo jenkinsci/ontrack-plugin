@@ -49,6 +49,12 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>job-dsl</artifactId>
             <version>1.35</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-all</artifactId>
+                </exclusion>
+            </exclusions>
             <optional>true</optional>
         </dependency>
         <!-- Environment injection -->
@@ -56,6 +62,7 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>envinject</artifactId>
             <version>1.92.1</version>
+            <scope>compile</scope>
         </dependency>
         <!-- Ontrack DSL -->
         <dependency>
