@@ -8,6 +8,7 @@ import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.envinject.EnvInjectException;
 import org.jenkinsci.plugins.envinject.model.EnvInjectJobPropertyContributor;
 import org.jenkinsci.plugins.envinject.model.EnvInjectJobPropertyContributorDescriptor;
@@ -48,6 +49,10 @@ public class OntrackDSLEnvInjectJobPropertyContributor extends EnvInjectJobPrope
 
     @Override
     public Map<String, String> getEnvVars(AbstractBuild build, TaskListener listener) throws EnvInjectException {
+        // No contribution if no script
+        if (StringUtils.isBlank(scriptText)) {
+            return Collections.emptyMap();
+        }
         // Ontrack connection
         Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLog ? listener.getLogger() : null);
         // Values to bind
