@@ -114,9 +114,9 @@ Following variables are bound to the script context:
 
 * `ontrack` - see the _DSL_ section below
 * `jenkins` - see the _DSL_ section below
-* `build` - the current `AbstractBuild` being configured
+* `build` - the current [`AbstractBuild`](http://javadoc.jenkins-ci.org/hudson/model/AbstractBuild.html) being configured
 * `out` - a `PrintStream` which can be used for logging
-* `env` - `hudson.EnvVars` instance which can be used to access current environment or build parameters.
+* `env` - [`hudson.EnvVars`](http://javadoc.jenkins-ci.org/hudson/EnvVars.html) instance which can be used to access current environment or build parameters.
 
 > The set of bound variables is different than the one used in other DSL actions.
 
