@@ -27,6 +27,10 @@ public class OntrackChangeLog {
         this.files = files;
     }
 
+    public boolean isError() {
+        return error;
+    }
+
     public String getFrom() {
         return from;
     }
