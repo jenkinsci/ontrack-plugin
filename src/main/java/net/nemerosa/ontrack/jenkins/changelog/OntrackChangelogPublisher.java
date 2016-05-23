@@ -134,10 +134,17 @@ public class OntrackChangelogPublisher extends Notifier {
                     // Adds to the list
                     changeLogs.add(ontrackChangeLog);
                 } catch (Exception ex) {
-                    changeLogs.add(OntrackChangeLog.error(
-                            a.getName(),
-                            b.getName()
-                    ));
+                    if (failOnChangeLogFailure) {
+                        throw new RuntimeException(
+                                "Could not collect the change log",
+                                ex
+                        );
+                    } else {
+                        changeLogs.add(OntrackChangeLog.error(
+                                a.getName(),
+                                b.getName()
+                        ));
+                    }
                 }
             }
         }
