@@ -49,13 +49,19 @@ public class OntrackChangelogPublisher extends Notifier {
      */
     private final boolean collectFiles;
 
+    /**
+     * Do we fail the build when the collection of the log fails?
+     */
+    private final boolean failOnChangeLogFailure;
+
     @DataBoundConstructor
-    public OntrackChangelogPublisher(String project, String branch, String buildNameParameter, boolean distinctBuilds, boolean collectFiles) {
+    public OntrackChangelogPublisher(String project, String branch, String buildNameParameter, boolean distinctBuilds, boolean collectFiles, boolean failOnChangeLogFailure) {
         this.project = project;
         this.branch = branch;
         this.buildNameParameter = buildNameParameter;
         this.distinctBuilds = distinctBuilds;
         this.collectFiles = collectFiles;
+        this.failOnChangeLogFailure = failOnChangeLogFailure;
     }
 
     @Override
@@ -120,12 +126,19 @@ public class OntrackChangelogPublisher extends Notifier {
             Build b = builds.get(i);
             // Different builds
             if (a.getId() != b.getId()) {
-                // Gets the change log from A to B
-                ChangeLog changeLog = a.getChangeLog(b);
-                // Reduces the amount of information for the change log
-                OntrackChangeLog ontrackChangeLog = collectInfo(changeLog);
-                // Adds to the list
-                changeLogs.add(ontrackChangeLog);
+                try {
+                    // Gets the change log from A to B
+                    ChangeLog changeLog = a.getChangeLog(b);
+                    // Reduces the amount of information for the change log
+                    OntrackChangeLog ontrackChangeLog = collectInfo(changeLog);
+                    // Adds to the list
+                    changeLogs.add(ontrackChangeLog);
+                } catch (Exception ex) {
+                    changeLogs.add(OntrackChangeLog.error(
+                            a.getName(),
+                            b.getName()
+                    ));
+                }
             }
         }
 
@@ -199,6 +212,7 @@ public class OntrackChangelogPublisher extends Notifier {
 
         // OK
         return new OntrackChangeLog(
+                false,
                 changeLog.getFrom().getName(),
                 changeLog.getTo().getName(),
                 page,
@@ -249,6 +263,10 @@ public class OntrackChangelogPublisher extends Notifier {
 
     public boolean isCollectFiles() {
         return collectFiles;
+    }
+
+    public boolean isFailOnChangeLogFailure() {
+        return failOnChangeLogFailure;
     }
 
     @Override

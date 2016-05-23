@@ -9,6 +9,11 @@
 
         <j:forEach var="changeLog" items="${it.changeLogs}">
             <h4>${changeLog.from} --> ${changeLog.to}</h4>
+            <j:if test="${changeLog.error}">
+                <p>
+                    An error occurred while collecting the change log.
+                </p>
+            </j:if>
             <table>
                 <tbody>
                     <j:forEach var="commit" items="${changeLog.commits}">

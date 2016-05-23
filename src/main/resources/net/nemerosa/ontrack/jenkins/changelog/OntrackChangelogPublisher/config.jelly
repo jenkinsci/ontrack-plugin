@@ -15,4 +15,7 @@
     <f:entry title="Collect file change log" field="collectFiles">
         <f:checkbox/>
     </f:entry>
+    <f:entry title="Fail on change log failure" field="failOnChangeLogFailure">
+        <f:checkbox/>
+    </f:entry>
 </j:jelly>
