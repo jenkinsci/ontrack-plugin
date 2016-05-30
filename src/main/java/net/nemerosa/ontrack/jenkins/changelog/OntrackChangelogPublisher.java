@@ -54,14 +54,27 @@ public class OntrackChangelogPublisher extends Notifier {
      */
     private final boolean failOnChangeLogFailure;
 
+    /**
+     * Name of the environment variable used to collect emails of all committers (optional)
+     */
+    private final String committersVariable;
+
+    /**
+     * Email suffix to add to the committer IDs when they are not emails (optional, mostly useful
+     * for Subversion)
+     */
+    private final String committerMailSuffix;
+
     @DataBoundConstructor
-    public OntrackChangelogPublisher(String project, String branch, String buildNameParameter, boolean distinctBuilds, boolean collectFiles, boolean failOnChangeLogFailure) {
+    public OntrackChangelogPublisher(String project, String branch, String buildNameParameter, boolean distinctBuilds, boolean collectFiles, boolean failOnChangeLogFailure, String committersVariable, String committerMailSuffix) {
         this.project = project;
         this.branch = branch;
         this.buildNameParameter = buildNameParameter;
         this.distinctBuilds = distinctBuilds;
         this.collectFiles = collectFiles;
         this.failOnChangeLogFailure = failOnChangeLogFailure;
+        this.committersVariable = committersVariable;
+        this.committerMailSuffix = committerMailSuffix;
     }
 
     @Override
@@ -149,6 +162,25 @@ public class OntrackChangelogPublisher extends Notifier {
             }
         }
 
+        // Do we collect the list of committers?
+        if (StringUtils.isNotBlank(committersVariable)) {
+            // Gets the comma-separated list of committer emails
+            String committersMailingList = getCommittersMailingList(changeLogs);
+            // Logging
+            listener.getLogger().format(
+                    "Injecting mailing list into %s: %s%n",
+                    committersVariable,
+                    committersMailingList
+            );
+            // Injects as environment variable
+            build.addAction(new ParametersAction(
+                    new StringParameterValue(
+                            committersVariable,
+                            committersMailingList
+                    )
+            ));
+        }
+
         // Adds a change log action to register the change log
         build.addAction(new OntrackChangeLogAction(build, changeLogs));
 
@@ -156,7 +188,31 @@ public class OntrackChangelogPublisher extends Notifier {
         return true;
     }
 
-    protected OntrackChangeLog collectInfo(ChangeLog changeLog) {
+    private String getCommittersMailingList(List<OntrackChangeLog> changeLogs) {
+        // Set of unique emails
+        Set<String> emails = new TreeSet<String>();
+        // For all change logs
+        for (OntrackChangeLog changeLog : changeLogs) {
+            for (OntrackChangeLogCommit commit : changeLog.getCommits()) {
+                String authorEmail = commit.getAuthorEmail();
+                if (StringUtils.isNotBlank(authorEmail)) {
+                    emails.add(authorEmail);
+                } else {
+                    String author = commit.getAuthor();
+                    if (StringUtils.isNotBlank(author)) {
+                        if (!StringUtils.contains(author, "@")) {
+                            author = author + committerMailSuffix;
+                        }
+                        emails.add(author);
+                    }
+                }
+            }
+        }
+        // OK, as a comma-separated list
+        return StringUtils.join(emails, ",");
+    }
+
+    private OntrackChangeLog collectInfo(ChangeLog changeLog) {
 
         // Gets the commits
         List<OntrackChangeLogCommit> commits = Lists.transform(
@@ -168,6 +224,7 @@ public class OntrackChangelogPublisher extends Notifier {
                                 input.getId(),
                                 input.getShortId(),
                                 input.getAuthor(),
+                                input.getAuthorEmail(),
                                 input.getTimestamp(),
                                 input.getMessage(),
                                 input.getFormattedMessage(),
@@ -274,6 +331,14 @@ public class OntrackChangelogPublisher extends Notifier {
 
     public boolean isFailOnChangeLogFailure() {
         return failOnChangeLogFailure;
+    }
+
+    public String getCommittersVariable() {
+        return committersVariable;
+    }
+
+    public String getCommitterMailSuffix() {
+        return committerMailSuffix;
     }
 
     @Override
