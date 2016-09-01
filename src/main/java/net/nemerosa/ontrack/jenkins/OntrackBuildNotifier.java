@@ -97,6 +97,9 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
 
     /**
      * Gets the slash (/) separated path to the build.
+     *
+     * @param theBuild Build to get the path for
+     * @return Relative URL path to the build
      */
     protected String getProjectPath(AbstractBuild<?, ?> theBuild) {
         return StringUtils.replace(

@@ -20,7 +20,7 @@ import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
 
 /**
  * Allows to create a run for a validation stamp on a build.
- * <p/>
+ * <p>
  * The plug-in must get both the build and the validation stamp.
  */
 public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {

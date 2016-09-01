@@ -24,6 +24,8 @@ public class JenkinsConnector {
 
     /**
      * Gets the current result of the build.
+     *
+     * @return Result of the result (can be null)
      */
     public Result getResult() {
         return build.getResult();
@@ -31,6 +33,8 @@ public class JenkinsConnector {
 
     /**
      * Gets access to the build
+     *
+     * @return Associated build
      */
     public AbstractBuild getBuild() {
         return build;
@@ -38,6 +42,8 @@ public class JenkinsConnector {
 
     /**
      * Gets access to the listener
+     *
+     * @return Build listener
      */
     public BuildListener getListener() {
         return listener;
@@ -45,6 +51,8 @@ public class JenkinsConnector {
 
     /**
      * Is the build a success?
+     *
+     * @return true if the build is a success
      */
     public boolean isSuccess() {
         Result result = getResult();
@@ -53,6 +61,8 @@ public class JenkinsConnector {
 
     /**
      * Is the build unstable?
+     *
+     * @return true if the build is unstable
      */
     public boolean isUnstable() {
         Result result = getResult();
@@ -61,6 +71,8 @@ public class JenkinsConnector {
 
     /**
      * Is the build a failure?
+     *
+     * @return true if the build is failed
      */
     public boolean isFailure() {
         Result result = getResult();

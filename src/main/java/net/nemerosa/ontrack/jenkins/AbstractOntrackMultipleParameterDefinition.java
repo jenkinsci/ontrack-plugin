@@ -13,6 +13,8 @@ public abstract class AbstractOntrackMultipleParameterDefinition extends Abstrac
 
     /**
      * List of possible values
+     *
+     * @return List of choices
      */
     public List<String> getChoices() {
         // Runs the DSL
