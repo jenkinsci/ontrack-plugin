@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.jenkins;
 
+import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -12,6 +14,20 @@ import java.util.regex.Pattern;
 public final class OntrackPluginSupport {
 
     public static final String REGEX_ENV_VARIABLE = "\\$\\{([a-zA-Z0-9_]+)\\}";
+
+    public static String readScript(AbstractBuild build, boolean usingText, String scriptText, String scriptPath) throws IOException {
+        if (usingText) {
+            return scriptText;
+        } else {
+            FilePath workspace = build.getWorkspace();
+            if (workspace != null) {
+                FilePath path = workspace.child(scriptPath);
+                return path.readToString();
+            } else {
+                throw new IOException("Cannot get a workspace to get the script path at " + scriptPath);
+            }
+        }
+    }
 
     public static String expand(String template, AbstractBuild<?, ?> theBuild, BuildListener listener) {
         if (StringUtils.isBlank(template)) {

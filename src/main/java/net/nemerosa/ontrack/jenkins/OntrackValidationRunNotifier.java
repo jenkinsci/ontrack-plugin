@@ -87,12 +87,16 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
 
     private String getRunStatus(AbstractBuild<?, ?> theBuild) {
         Result result = theBuild.getResult();
-        if (result.isBetterOrEqualTo(Result.SUCCESS)) {
-            return "PASSED";
-        } else if (result.isBetterOrEqualTo(Result.UNSTABLE)) {
-            return "WARNING";
-        } else if (result.equals(Result.ABORTED)) {
-            return "INTERRUPTED";
+        if (result != null) {
+            if (result.isBetterOrEqualTo(Result.SUCCESS)) {
+                return "PASSED";
+            } else if (result.isBetterOrEqualTo(Result.UNSTABLE)) {
+                return "WARNING";
+            } else if (result.equals(Result.ABORTED)) {
+                return "INTERRUPTED";
+            } else {
+                return "FAILED";
+            }
         } else {
             return "FAILED";
         }

@@ -60,7 +60,8 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
         final String buildName = expand(build, theBuild, listener);
         final String promotionLevelName = expand(promotionLevel, theBuild, listener);
         // Only triggers in case of success
-        if (theBuild.getResult().isBetterOrEqualTo(Result.SUCCESS)) {
+        Result result = theBuild.getResult();
+        if (result != null && result.isBetterOrEqualTo(Result.SUCCESS)) {
             try {
                 // Gets the Ontrack connector
                 Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);

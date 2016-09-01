@@ -62,7 +62,8 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
     @Override
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         // Only triggers in case of success
-        if (theBuild.getResult().isBetterOrEqualTo(Result.SUCCESS)) {
+        Result result = theBuild.getResult();
+        if (result != null && result.isBetterOrEqualTo(Result.SUCCESS)) {
             // Expands the expressions into actual values
             String projectName = expand(project, theBuild, listener);
             String branchName = expand(branch, theBuild, listener);

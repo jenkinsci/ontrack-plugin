@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.jenkins;
 
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
@@ -67,13 +66,7 @@ public class OntrackDSLRunCondition extends RunCondition {
 
     protected boolean evaluate(AbstractBuild<?, ?> build, BuildListener listener) throws Exception {
         // Reads the script text
-        String script;
-        if (usingText) {
-            script = scriptText;
-        } else {
-            FilePath path = build.getWorkspace().child(scriptPath);
-            script = path.readToString();
-        }
+        String script = OntrackPluginSupport.readScript(build, usingText, scriptText, scriptPath);
         // Ontrack DSL support
         OntrackDSL dsl = new OntrackDSL(
                 script,

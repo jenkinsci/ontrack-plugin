@@ -10,7 +10,8 @@ import org.kohsuke.stapler.StaplerRequest;
 public class OntrackConfiguration extends GlobalConfiguration {
 
     public static OntrackConfiguration getOntrackConfiguration() {
-        return (OntrackConfiguration) Jenkins.getInstance().getDescriptor(OntrackConfiguration.class);
+        Jenkins instance = Jenkins.getInstance();
+        return instance != null ? (OntrackConfiguration) instance.getDescriptor(OntrackConfiguration.class) : null;
     }
 
     private String ontrackConfigurationName;

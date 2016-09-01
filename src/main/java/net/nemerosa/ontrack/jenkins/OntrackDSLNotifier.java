@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.jenkins;
 
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -71,13 +70,7 @@ public class OntrackDSLNotifier extends Notifier {
     @Override
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         // Reads the script text
-        String script;
-        if (usingText) {
-            script = scriptText;
-        } else {
-            FilePath path = theBuild.getWorkspace().child(scriptPath);
-            script = path.readToString();
-        }
+        String script = OntrackPluginSupport.readScript(theBuild, usingText, scriptText, scriptPath);
         // Ontrack DSL support
         OntrackDSL dsl = new OntrackDSL(
                 script,
