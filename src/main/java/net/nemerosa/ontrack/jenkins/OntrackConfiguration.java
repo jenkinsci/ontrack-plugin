@@ -48,4 +48,19 @@ public class OntrackConfiguration extends GlobalConfiguration {
         return ontrackPassword;
     }
 
+    public void setOntrackConfigurationName(String ontrackConfigurationName) {
+        this.ontrackConfigurationName = ontrackConfigurationName;
+    }
+
+    public void setOntrackUrl(String ontrackUrl) {
+        this.ontrackUrl = ontrackUrl;
+    }
+
+    public void setOntrackUser(String ontrackUser) {
+        this.ontrackUser = ontrackUser;
+    }
+
+    public void setOntrackPassword(String ontrackPassword) {
+        this.ontrackPassword = ontrackPassword;
+    }
 }
