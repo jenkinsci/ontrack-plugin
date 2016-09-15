@@ -14,5 +14,11 @@
         <f:entry title="Password">
             <f:password name="ontrack.ontrackPassword" value="${descriptor.getOntrackPassword()}"/>
         </f:entry>
+        <f:entry title="Max tries">
+            <f:textbox name="ontrack.ontrackMaxTries" value="${descriptor.getOntrackMaxTries()}"/>
+        </f:entry>
+        <f:entry title="Retry delay (s)">
+            <f:textbox name="ontrack.ontrackRetryDelaySeconds" value="${descriptor.getOntrackRetryDelaySeconds()}"/>
+        </f:entry>
     </f:section>
 </j:jelly>

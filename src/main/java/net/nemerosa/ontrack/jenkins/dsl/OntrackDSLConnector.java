@@ -31,6 +31,12 @@ public class OntrackDSLConnector {
                     config.getOntrackPassword()
             );
         }
+        // Retries
+        if (config.getOntrackMaxTries() > 1) {
+            connection = connection
+                    .maxTries(config.getOntrackMaxTries())
+                    .retryDelaySeconds(config.getOntrackRetryDelaySeconds());
+        }
         // Building the Ontrack root
         return connection.build();
     }

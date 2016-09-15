@@ -18,6 +18,8 @@ public class OntrackConfiguration extends GlobalConfiguration {
     private String ontrackUrl;
     private String ontrackUser;
     private String ontrackPassword;
+    private int ontrackMaxTries = 1;
+    private int ontrackRetryDelaySeconds = 10000;
 
     public OntrackConfiguration() {
         load();
@@ -29,6 +31,8 @@ public class OntrackConfiguration extends GlobalConfiguration {
         ontrackUrl = json.getString("ontrackUrl");
         ontrackUser = json.getString("ontrackUser");
         ontrackPassword = json.getString("ontrackPassword");
+        ontrackMaxTries = json.getInt("ontrackMaxTries");
+        ontrackRetryDelaySeconds = json.getInt("ontrackRetryDelaySeconds");
         save();
         return super.configure(req, json);
     }
@@ -63,5 +67,21 @@ public class OntrackConfiguration extends GlobalConfiguration {
 
     public void setOntrackPassword(String ontrackPassword) {
         this.ontrackPassword = ontrackPassword;
+    }
+
+    public int getOntrackMaxTries() {
+        return ontrackMaxTries;
+    }
+
+    public void setOntrackMaxTries(int ontrackMaxTries) {
+        this.ontrackMaxTries = ontrackMaxTries;
+    }
+
+    public int getOntrackRetryDelaySeconds() {
+        return ontrackRetryDelaySeconds;
+    }
+
+    public void setOntrackRetryDelaySeconds(int ontrackRetryDelaySeconds) {
+        this.ontrackRetryDelaySeconds = ontrackRetryDelaySeconds;
     }
 }
