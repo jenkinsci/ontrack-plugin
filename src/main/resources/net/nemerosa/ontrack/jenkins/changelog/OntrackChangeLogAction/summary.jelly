@@ -35,7 +35,7 @@
                                         ${commit.author}
                                     </td>
                                     <td>
-                                        ${commit.formattedMessage}
+                                        ${commit.message}
                                     </td>
                                 </tr>
                             </j:forEach>
