@@ -10,10 +10,14 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     scm {
         git {
             remote {
-                url 'git@github.com:jenkinsci/ontrack-plugin.git'
-                branch "origin/master"
+                url PROJECT_SCM_URL
+                branch "origin/${BRANCH}"
+                credentials 'jenkins'
             }
-            localBranch "master"
+            extensions {
+                wipeOutWorkspace()
+                localBranch "${BRANCH}"
+            }
         }
     }
     triggers {
@@ -47,11 +51,14 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
     scm {
         git {
             remote {
-                url 'git@github.com:jenkinsci/ontrack-plugin.git'
-                branch "origin/master"
+                url PROJECT_SCM_URL
+                branch "origin/${BRANCH}"
+                credentials 'jenkins'
             }
-            wipeOutWorkspace true
-            localBranch "master"
+            extensions {
+                wipeOutWorkspace()
+                localBranch "${BRANCH}"
+            }
         }
     }
     wrappers {
