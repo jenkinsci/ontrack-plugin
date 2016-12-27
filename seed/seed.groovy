@@ -79,11 +79,18 @@ mvn clean deploy
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${NEXT_VERSION}-SNAPSHOT
 
 git commit -am "Starting \${NEXT_VERSION}"
-git push origin ${BRANCH}
-git push origin "\${VERSION}"
 """
     }
     publishers {
+        git {
+            pushOnlyIfSuccess()
+            branch('origin', BRANCH)
+            tag('origin', '${VERSION}') {
+                message('Release ${VERSION}')
+                create()
+                update()
+            }
+        }
         tasks(
                 '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
                 '**/target/**,seed/**',
