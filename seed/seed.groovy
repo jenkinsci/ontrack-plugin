@@ -65,22 +65,23 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
         toolenv('Maven-3.2.x')
     }
     steps {
-        shell '''\
-export PATH=${MAVEN_3_2_X_HOME}/bin:$PATH
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${VERSION}
-git commit -am "Release ${VERSION}"
-git tag "${VERSION}"
+        shell """\
+export PATH=\${MAVEN_3_2_X_HOME}/bin:\$PATH
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${VERSION}
 
-git push origin master
-git push origin "${VERSION}"
+git config --local user.email "jenkins@nemerosa.net"
+git config --local user.name "Jenkins"
+git commit -am "Release \${VERSION}"
+git tag "\${VERSION}"
 
 mvn clean deploy
 
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}-SNAPSHOT
-git commit -am "Starting ${NEXT_VERSION}"
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${NEXT_VERSION}-SNAPSHOT
 
-git push origin master
-'''
+git commit -am "Starting \${NEXT_VERSION}"
+git push origin ${BRANCH}
+git push origin "\${VERSION}"
+"""
     }
     publishers {
         tasks(
