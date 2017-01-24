@@ -47,7 +47,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
         stringParam('VERSION', '', '')
         stringParam('NEXT_VERSION', '', '')
     }
-    jdk 'JDK8u20'
+    jdk 'JDK7'
     scm {
         git {
             remote {

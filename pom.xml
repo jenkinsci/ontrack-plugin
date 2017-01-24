@@ -75,10 +75,6 @@
             <version>2.28.0</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-all</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.projectlombok</groupId>
                     <artifactId>lombok</artifactId>
                 </exclusion>
