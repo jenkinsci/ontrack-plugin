@@ -73,11 +73,15 @@ git config --local user.email "jenkins@nemerosa.net"
 git config --local user.name "Jenkins"
 git commit -am "Release \${VERSION}"
 git tag "\${VERSION}"
-
-mvn clean deploy
-
+"""
+        maven {
+            mavenInstallation('Maven-3.2.x')
+            goals('clean deploy')
+            providedSettings('JenkinsIOSettings')
+        }
+        shell """\
+export PATH=\${MAVEN_3_2_X_HOME}/bin:\$PATH
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${NEXT_VERSION}-SNAPSHOT
-
 git commit -am "Starting \${NEXT_VERSION}"
 """
     }
