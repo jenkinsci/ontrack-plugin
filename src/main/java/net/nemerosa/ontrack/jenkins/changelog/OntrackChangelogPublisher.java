@@ -343,7 +343,7 @@ public class OntrackChangelogPublisher extends Notifier {
 
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
-        return BuildStepMonitor.BUILD;
+        return BuildStepMonitor.NONE;
     }
 
     @Extension
