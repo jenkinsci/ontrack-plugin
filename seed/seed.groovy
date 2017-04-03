@@ -67,7 +67,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
     steps {
         shell """\
 export PATH=\${MAVEN_3_2_X_HOME}/bin:\$PATH
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${VERSION}
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${VERSION} --batch-mode
 
 git config --local user.email "jenkins@nemerosa.net"
 git config --local user.name "Jenkins"
@@ -76,12 +76,12 @@ git tag "\${VERSION}"
 """
         maven {
             mavenInstallation('Maven-3.2.x')
-            goals('clean deploy')
+            goals('clean deploy --batch-mode')
             providedSettings('JenkinsIOSettings')
         }
         shell """\
 export PATH=\${MAVEN_3_2_X_HOME}/bin:\$PATH
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${NEXT_VERSION}-SNAPSHOT
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${NEXT_VERSION}-SNAPSHOT --batch-mode
 git commit -am "Starting \${NEXT_VERSION}"
 """
     }
