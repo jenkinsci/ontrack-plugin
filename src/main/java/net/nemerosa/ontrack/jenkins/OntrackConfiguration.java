@@ -11,7 +11,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
 
     public static OntrackConfiguration getOntrackConfiguration() {
         Jenkins instance = Jenkins.getInstance();
-        return instance != null ? (OntrackConfiguration) instance.getDescriptor(OntrackConfiguration.class) : null;
+        return (OntrackConfiguration) instance.getDescriptor(OntrackConfiguration.class);
     }
 
     private String ontrackConfigurationName;
