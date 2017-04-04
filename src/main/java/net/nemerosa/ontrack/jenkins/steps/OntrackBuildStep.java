@@ -55,7 +55,7 @@ public class OntrackBuildStep extends AbstractStepImpl {
     @Extension
     public static class DescriptorImpl extends AbstractStepDescriptorImpl {
 
-        protected DescriptorImpl() {
+        public DescriptorImpl() {
             super(Execution.class);
         }
 
