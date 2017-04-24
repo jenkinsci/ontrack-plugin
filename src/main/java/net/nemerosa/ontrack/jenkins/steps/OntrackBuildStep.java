@@ -1,13 +1,11 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
-import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepExecutionImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
@@ -18,6 +16,7 @@ import javax.annotation.Nonnull;
 /**
  * Steps to create a build
  */
+@SuppressWarnings("unused")
 public class OntrackBuildStep extends AbstractStepImpl {
 
     /**
@@ -81,10 +80,6 @@ public class OntrackBuildStep extends AbstractStepImpl {
 
         @Override
         public boolean start() throws Exception {
-            // Checks
-            if (StringUtils.isBlank(step.project) || StringUtils.isBlank(step.branch) || StringUtils.isBlank(step.build)) {
-                throw new AbortException("Ontrack build not created. All mandatory properties must be supplied ('project', 'branch', 'build').");
-            }
             // Expansion
             @SuppressWarnings("ConstantConditions")
             String projectName = getContext().get(EnvVars.class).expand(step.getProject());

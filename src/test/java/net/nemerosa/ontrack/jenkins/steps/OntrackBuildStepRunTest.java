@@ -20,7 +20,7 @@ public class OntrackBuildStepRunTest {
         job.setDefinition(new CpsFlowDefinition("ontrackBuild(branch: 'master', build: '1')", true));
 
         WorkflowRun run = jenkinsRule.assertBuildStatus(Result.FAILURE, job.scheduleBuild2(0).get());
-        jenkinsRule.assertLogContains("Ontrack build not created. All mandatory properties must be supplied ('project', 'branch', 'build').", run);
+        jenkinsRule.assertLogContains("Argument for @Nonnull parameter 'project' of net/nemerosa/ontrack/jenkins/steps/OntrackBuildStep.<init> must not be null", run);
     }
 
 }
