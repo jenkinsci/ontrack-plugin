@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
 import hudson.AbortException;
-import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Branch;
@@ -87,12 +86,11 @@ public class OntrackBuildStep extends AbstractStepImpl {
                 throw new AbortException("Ontrack build not created. All mandatory properties must be supplied ('project', 'branch', 'build').");
             }
             // Expansion
+            String projectName = step.getProject();
             @SuppressWarnings("ConstantConditions")
-            String projectName = getContext().get(EnvVars.class).expand(step.getProject());
+            String branchName = step.getBranch();
             @SuppressWarnings("ConstantConditions")
-            String branchName = getContext().get(EnvVars.class).expand(step.getBranch());
-            @SuppressWarnings("ConstantConditions")
-            String buildName = getContext().get(EnvVars.class).expand(step.getBuild());
+            String buildName = step.getBuild();
             // Build description
             String buildDescription = String.format("Build %s", buildName);
             // Gets the Ontrack connector
