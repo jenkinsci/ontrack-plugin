@@ -97,13 +97,13 @@ public class OntrackPromoteStep extends Step {
 
         @Override
         public String getFunctionName() {
-            return "ontrackBuild";
+            return "ontrackPromote";
         }
 
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Creates an Ontrack build";
+            return "Promotes an Ontrack build";
         }
     }
 

@@ -112,13 +112,13 @@ public class OntrackValidateStep extends Step {
 
         @Override
         public String getFunctionName() {
-            return "ontrackBuild";
+            return "ontrackValidate";
         }
 
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Creates an Ontrack build";
+            return "Validates an Ontrack build";
         }
     }
 
