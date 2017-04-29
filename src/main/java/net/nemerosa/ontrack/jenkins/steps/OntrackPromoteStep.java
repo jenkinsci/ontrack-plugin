@@ -16,7 +16,7 @@ import java.util.Set;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
- * Steps to validate a build
+ * Steps to promote a build
  */
 @SuppressWarnings("unused")
 public class OntrackPromoteStep extends Step {
