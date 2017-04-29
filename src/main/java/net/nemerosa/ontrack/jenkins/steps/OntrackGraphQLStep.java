@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
 import com.google.common.collect.ImmutableSet;
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.model.TaskListener;
@@ -16,17 +14,16 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
- * Step to run a DSL script
+ * Step run a GraphQL script
  */
 @SuppressWarnings("unused")
-public class OntrackScriptStep extends Step {
+public class OntrackGraphQLStep extends Step {
 
     /**
      * Script to run
@@ -38,13 +35,8 @@ public class OntrackScriptStep extends Step {
      */
     private Map<String, Object> bindings = Collections.emptyMap();
 
-    /**
-     * Logging
-     */
-    private boolean logging = false;
-
     @DataBoundConstructor
-    public OntrackScriptStep(String script) {
+    public OntrackGraphQLStep(String script) {
         this.script = script;
     }
 
@@ -56,18 +48,9 @@ public class OntrackScriptStep extends Step {
         return bindings;
     }
 
-    public boolean isLogging() {
-        return logging;
-    }
-
     @DataBoundSetter
     public void setBindings(Map<String, Object> bindings) {
         this.bindings = bindings;
-    }
-
-    @DataBoundSetter
-    public void setLogging(boolean logging) {
-        this.logging = logging;
     }
 
     @Override
@@ -85,24 +68,10 @@ public class OntrackScriptStep extends Step {
                 assert listener != null;
                 // Gets the Ontrack connector
                 Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
-                // Values to bind
-                Map<String, Object> values = new HashMap<>(bindings);
-                // Binding
-                values.put("ontrack", ontrack);
-                values.put("out", listener.getLogger());
-                Binding binding = new Binding(values);
-                // Groovy shell
-                GroovyShell shell = new GroovyShell(binding);
-                // Runs the script
-                listener.getLogger().format("[ontrack] DSL script running...%n");
-                Object shellResult = shell.evaluate(script);
-                if (logging) {
-                    listener.getLogger().format("[ontrack] DSL script returned result: %s%n", shellResult);
-                } else {
-                    listener.getLogger().format("[ontrack] DSL script returned result.%n");
-                }
+                // Query
+                Object result = ontrack.graphQLQuery(script, bindings);
                 // Returns result as JSON
-                return JSONSerializer.toJSON(shellResult);
+                return JSONSerializer.toJSON(result);
             }
         };
     }
@@ -117,13 +86,13 @@ public class OntrackScriptStep extends Step {
 
         @Override
         public String getFunctionName() {
-            return "ontrackScript";
+            return "ontrackGraphQL";
         }
 
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Runs some Ontrack DSL script";
+            return "Runs some Ontrack GraphQL script";
         }
     }
 
