@@ -10,9 +10,11 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepExecutionImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 /**
  * Steps to create a build
@@ -75,7 +77,9 @@ public class OntrackBuildStep extends AbstractStepImpl {
 
         private final OntrackBuildStep step;
 
-        public Execution(OntrackBuildStep step) {
+        @Inject
+        public Execution(StepContext stepContext, OntrackBuildStep step) {
+            super(stepContext);
             this.step = step;
         }
 

@@ -45,7 +45,6 @@ public class OntrackBuildStepRunTest {
     }
 
     @Test
-    @Ignore
     public void test_blank_project() throws Exception {
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
         // leave out the subject
