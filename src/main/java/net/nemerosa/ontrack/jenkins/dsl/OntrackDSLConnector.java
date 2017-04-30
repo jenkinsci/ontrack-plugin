@@ -42,7 +42,16 @@ public class OntrackDSLConnector {
     }
 
     public static Ontrack createOntrackConnector(final TaskListener listener) {
-        return createOntrackConnector(listener != null ? listener.getLogger() : null);
+        return ontrack != null ? ontrack : createOntrackConnector(listener != null ? listener.getLogger() : null);
+    }
+
+    private static Ontrack ontrack = null;
+
+    /**
+     * Used for test only - injection of a test instance to connect to Ontrack
+     */
+    public static void setOntrack(Ontrack test) {
+        ontrack = test;
     }
 
 }
