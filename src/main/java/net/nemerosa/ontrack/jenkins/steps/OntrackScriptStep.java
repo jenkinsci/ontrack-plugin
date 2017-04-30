@@ -15,6 +15,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,9 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  * Step to run a DSL script
  */
 @SuppressWarnings("unused")
-public class OntrackScriptStep extends Step {
+public class OntrackScriptStep extends Step implements Serializable {
+
+    private static final long serialVersionUID = 42L;
 
     /**
      * Script to run
