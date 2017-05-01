@@ -13,6 +13,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +24,9 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  * Step run a GraphQL script
  */
 @SuppressWarnings("unused")
-public class OntrackGraphQLStep extends Step {
+public class OntrackGraphQLStep extends Step implements Serializable {
+
+    private static final long serialVersionUID = 42L;
 
     /**
      * Script to run
