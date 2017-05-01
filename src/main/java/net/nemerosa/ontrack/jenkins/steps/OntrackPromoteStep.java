@@ -69,8 +69,6 @@ public class OntrackPromoteStep extends Step {
         if (isBlank(project) || isBlank(branch) || isBlank(build) || isBlank(promotionLevel)) {
             throw new AbortException("Ontrack promotion run not created. All mandatory properties must be supplied ('project', 'branch', 'build', 'promotionLevel').");
         }
-        // Build description
-        final String buildDescription = String.format("Build %s", this.build);
         // OK
         return new SynchronousStepExecution<Void>(context) {
             @Override

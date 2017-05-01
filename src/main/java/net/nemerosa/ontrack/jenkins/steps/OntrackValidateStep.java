@@ -84,8 +84,6 @@ public class OntrackValidateStep extends Step {
         if (isBlank(project) || isBlank(branch) || isBlank(build) || isBlank(validationStamp)) {
             throw new AbortException("Ontrack validation run not created. All mandatory properties must be supplied ('project', 'branch', 'build', 'validationStamp').");
         }
-        // Build description
-        final String buildDescription = String.format("Build %s", this.build);
         // OK
         return new SynchronousStepExecution<Void>(context) {
             @Override
