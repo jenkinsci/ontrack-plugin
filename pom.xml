@@ -118,6 +118,18 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xmx2048m</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
     <repositories>
         <repository>
