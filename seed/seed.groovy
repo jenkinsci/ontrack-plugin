@@ -26,8 +26,8 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     }
     steps {
         maven {
-            goals 'clean verify'
-            mavenInstallation 'Maven-3.2.x'
+            goals 'clean verify --batch-mode'
+            mavenInstallation 'Maven-3.3.9'
         }
     }
     publishers {
@@ -64,7 +64,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
         }
     }
     wrappers {
-        toolenv('Maven-3.2.x')
+        toolenv('Maven-3.3.9')
     }
     steps {
         shell """\
@@ -77,7 +77,7 @@ git commit -am "Release \${VERSION}"
 git tag "\${VERSION}"
 """
         maven {
-            mavenInstallation('Maven-3.2.x')
+            mavenInstallation('Maven-3.3.9')
             goals('clean deploy --batch-mode')
             providedSettings('JenkinsIOSettings')
         }
