@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.dsl.Project;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import net.sf.json.JSON;
 import net.sf.json.JSONSerializer;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -34,6 +35,11 @@ public class OntrackBranchSetupStep extends Step implements Serializable {
     private static final long serialVersionUID = 42L;
 
     /**
+     * Default replacement sequence
+     */
+    private static final String BRANCH_CHARACTERS = "[^A-Za-z0-9._\\-]";
+
+    /**
      * Project name
      */
     private final String project;
@@ -52,6 +58,16 @@ public class OntrackBranchSetupStep extends Step implements Serializable {
      * Logging
      */
     private boolean logging = false;
+
+    /**
+     * Regex for the branch name
+     */
+    private String branchRegex = BRANCH_CHARACTERS;
+
+    /**
+     * Replacement expression
+     */
+    private String branchReplacement = "-";
 
     /**
      * Additional bindings
@@ -95,6 +111,24 @@ public class OntrackBranchSetupStep extends Step implements Serializable {
         this.logging = logging;
     }
 
+    public String getBranchRegex() {
+        return branchRegex;
+    }
+
+    @DataBoundSetter
+    public void setBranchRegex(String branchRegex) {
+        this.branchRegex = branchRegex;
+    }
+
+    public String getBranchReplacement() {
+        return branchReplacement;
+    }
+
+    @DataBoundSetter
+    public void setBranchReplacement(String branchReplacement) {
+        this.branchReplacement = branchReplacement;
+    }
+
     @Override
     public StepExecution start(final StepContext context) throws Exception {
         // Checks
@@ -112,8 +146,13 @@ public class OntrackBranchSetupStep extends Step implements Serializable {
                 Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
                 // Gets the project
                 Project ontrackProject = ontrack.project(project);
+                // Escaping the branch name
+                String branchName = branch;
+                if (StringUtils.isNotBlank(branchRegex)) {
+                    branchName = branchName.replaceAll(branchRegex, branchReplacement);
+                }
                 // Gets the branch and creates it if it does not exist
-                Branch ontrackBranch = ontrackProject.branch(branch, "", true);
+                Branch ontrackBranch = ontrackProject.branch(branchName, "", true);
                 // Values to bind
                 Map<String, Object> values = new HashMap<>(bindings);
                 // Binding
