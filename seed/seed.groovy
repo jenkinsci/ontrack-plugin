@@ -37,6 +37,9 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
                 '**/target/**,seed/**',
                 'FIXME', 'TODO', '@Deprecated', true
         )
+        archiveArtifacts {
+            pattern 'target/*.hpi'
+        }
     }
 }
 
