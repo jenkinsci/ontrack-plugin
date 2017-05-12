@@ -13,16 +13,13 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             remote {
                 url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
-                credentials 'jenkins'
+                credentials GITHUB
             }
             extensions {
                 wipeOutWorkspace()
                 localBranch "${BRANCH}"
             }
         }
-    }
-    triggers {
-        scm 'H/5 * * * *'
     }
     steps {
         maven {
