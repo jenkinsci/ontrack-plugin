@@ -13,7 +13,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             remote {
                 url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
-                credentials GITHUB
+                credentials 'GITHUB'
             }
             extensions {
                 wipeOutWorkspace()
