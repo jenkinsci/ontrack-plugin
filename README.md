@@ -67,7 +67,7 @@ See [Ontrack DSL](ONTRACK_DSL.md) for details about using the Ontrack DSL.
 
 Add _Ontrack: DSL_ in the _Post build actions_ in order to run the Ontrack DSL in the post build actions.
 
-See below for details about using the DSL.
+See [Ontrack DSL](ONTRACK_DSL.md) for details about using the Ontrack DSL.
 
 ### Parameter
 
@@ -122,92 +122,13 @@ Following variables are bound to the script context:
 
 ## Job DSL for Ontrack
 
-The Ontrack plug-in provides the following extensions to the [Job DSL](https://github.com/nemerosa/ontrack/wiki/DSL).
-
-### Build notifier
-
-```groovy
-job(...) {
-   publishers {
-      ontrackBuild(project, branch, buildName)
-   }
-}
-```
-
-### Promotion notifier
-
-```groovy
-job(...) {
-   publishers {
-      ontrackPromotion(project, branch, build, promotionLevel)
-   }
-}
-```
-
-### Validation notifier
-
-```groovy
-job(...) {
-   publishers {
-      ontrackValidation(project, branch, build, validationStamp)
-   }
-}
-```
-
-### DSL notifier
-
-```groovy
-job(...) {
-   publishers {
-      ontrackDsl {
-         // Path to the DSL (relative to workspace)
-         path(String value)
-         // Ontrack DSL script
-         script(String value)
-         // Injects environment variables
-         // Can be called several times
-         environment(String... names)
-         // Inject property values
-         properties(String properties)
-         // Enables or disables the log
-         log(boolean enabled = true)
-      }
-   }
-}
-```
-
-### DSL step
-
-```groovy
-job(...) {
-   steps {
-      ontrackDsl {
-         // Path to the DSL (relative to workspace)
-         path(String value)
-         // Ontrack DSL script
-         script(String value)
-         // Injects environment variables
-         // Can be called several times
-         environment(String... names)
-         // Inject property values
-         properties(String properties)
-         // Enables or disables the log
-         log(boolean enabled = true)
-      }
-   }
-}
-```
-
-### Future extensions
-
-> Future versions of the Ontrack plug-in will bring Job DSL extensions to support:
-> * environment contributions
-> * parameters
->
-> This mostly depend on the version of the Job DSL which the Ontrack DSL must support (1.35 as of now).
+See [Job DSL](JOB_DSL.md) for details about the integration with
+the [Job DSL plug-in](https://github.com/nemerosa/ontrack/wiki/DSL).
 
 ## Implementation notes
 
-All the plug-in actions rely themselves on the DSL language. Only the most basic and common actions (build creation, promotion, validation) have been extracted as separate actions.
+All the plug-in actions rely themselves on the [DSL](ONTRACK_DSL.md) language.
+Only the most basic and common actions (build creation, promotion, 
+validation) have been extracted as separate actions.
 
 Everything else should be encoded using the DSL step or action.
