@@ -7,7 +7,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     logRotator(numToKeep = 40)
     deliveryPipelineConfiguration('Commit', 'CI')
     jdk 'JDK7'
-    label 'master'
+    label 'docker'
     scm {
         git {
             remote {
