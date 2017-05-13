@@ -5,11 +5,13 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Branch;
+import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -33,6 +35,11 @@ public class OntrackBuildStep extends Step {
      */
     private final String build;
 
+    /**
+     * Optional Git commit property to associate with the build
+     */
+    private String gitCommit;
+
     @DataBoundConstructor
     public OntrackBuildStep(@Nonnull String project, @Nonnull String branch, @Nonnull String build) {
         this.project = project;
@@ -52,6 +59,15 @@ public class OntrackBuildStep extends Step {
         return build;
     }
 
+    public String getGitCommit() {
+        return gitCommit;
+    }
+
+    @DataBoundSetter
+    public void setGitCommit(String gitCommit) {
+        this.gitCommit = gitCommit;
+    }
+
     @Override
     public StepExecution start(final StepContext context) throws Exception {
         // Checks
@@ -69,7 +85,11 @@ public class OntrackBuildStep extends Step {
                 // Gets the branch...
                 Branch ontrackBranch = ontrack.branch(project, branch);
                 // ... and creates a build
-                ontrackBranch.build(build, buildDescription, true);
+                Build ontrackBuild = ontrackBranch.build(OntrackBuildStep.this.build, buildDescription, true);
+                // ... and associates a Git commit
+                if (StringUtils.isNotBlank(gitCommit)) {
+                    ontrackBuild.getConfig().gitCommit(gitCommit);
+                }
                 // Done
                 return null;
             }
