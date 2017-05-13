@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.jenkins.steps;
 import com.google.common.collect.ImmutableSet;
 import hudson.AbortException;
 import hudson.Extension;
+import hudson.model.Result;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
@@ -45,6 +46,11 @@ public class OntrackValidateStep extends Step {
      */
     private String validationStatus = "PASSED";
 
+    /**
+     * Build result to translate into a validation status if defined
+     */
+    private Result buildResult;
+
     @DataBoundConstructor
     public OntrackValidateStep(@Nonnull String project, @Nonnull String branch, @Nonnull String build, @Nonnull String validationStamp) {
         this.project = project;
@@ -78,6 +84,15 @@ public class OntrackValidateStep extends Step {
         return validationStatus;
     }
 
+    public Result getBuildResult() {
+        return buildResult;
+    }
+
+    @DataBoundSetter
+    public void setBuildResult(Result buildResult) {
+        this.buildResult = buildResult;
+    }
+
     @Override
     public StepExecution start(final StepContext context) throws Exception {
         // Checks
@@ -92,8 +107,25 @@ public class OntrackValidateStep extends Step {
                 Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(context.get(TaskListener.class));
                 // Gets the build...
                 Build ontrackBuild = ontrack.build(project, branch, build);
+                // Validation status from the build result if defined
+                String actualStatus;
+                if (buildResult != null) {
+                    if (buildResult.equals(Result.SUCCESS)) {
+                        actualStatus = "PASSED";
+                    } else if (buildResult.equals(Result.UNSTABLE)) {
+                        actualStatus = "UNSTABLE";
+                    } else if (buildResult.equals(Result.FAILURE)) {
+                        actualStatus = "FAILED";
+                    } else if (buildResult.equals(Result.ABORTED)) {
+                        actualStatus = "INTERRUPTED";
+                    } else {
+                        actualStatus = validationStatus;
+                    }
+                } else {
+                    actualStatus = validationStatus;
+                }
                 // ... and creates a validation run
-                ontrackBuild.validate(validationStamp, validationStatus);
+                ontrackBuild.validate(validationStamp, actualStatus);
                 // Done
                 return null;
             }
