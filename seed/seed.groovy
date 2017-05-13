@@ -25,6 +25,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         maven {
             goals 'clean verify --batch-mode'
             mavenInstallation 'Maven-3.3.9'
+            properties(argLine: '-Xmx512m')
         }
     }
     publishers {
