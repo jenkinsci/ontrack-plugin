@@ -1,11 +1,11 @@
 Ontrack DSL
 ===========
 
-The [Ontrack DSL](https://github.com/nemerosa/ontrack/wiki/DSL) allows you to pilot Ontrack using a simple script language.
+The [Ontrack DSL](http://nemerosa.github.io/ontrack/release/latest/doc/index.html#dsl) allows you to pilot Ontrack using a simple script language.
 
 The script is written using Groovy with Ontrack and Jenkins specific extensions.
 
-An `ontrack` object is made available - please look in the [Ontrack DSL documentation](https://github.com/nemerosa/ontrack/wiki/DSL) for the details of what you can do.
+An `ontrack` object is made available - please look in the [Ontrack DSL documentation](http://nemerosa.github.io/ontrack/release/latest/doc/index.html#dsl) for the details of what you can do.
 
 A `jenkins` object is made available, in order to allow you to have access to the current build. This object has the following methods and properties:
 
