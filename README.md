@@ -31,3 +31,4 @@ Five individual plug-ins are provided by the general _Ontrack plug-in_.
 * [Job components](JOB_COMPONENTS.md)
 * [Job DSL plug-in integration](JOB_DSL.md)
 * [Ontrack DSL](ONTRACK_DSL.md) notes
+* [Pipeline plug-in integration](PIPELINE.md)
