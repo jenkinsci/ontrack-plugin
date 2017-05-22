@@ -12,16 +12,23 @@ import java.io.PrintStream;
 public class OntrackDSLConnector {
 
     public static Ontrack createOntrackConnector(final PrintStream logger) {
+        return createOntrackConnector(new OntrackLogger() {
+            @Override
+            public void trace(String message) {
+                logger.println(message);
+            }
+        });
+    }
+
+    public static Ontrack createOntrackConnector(final OntrackLogger logger) {
         OntrackConfiguration config = OntrackConfiguration.getOntrackConfiguration();
+        if (config == null) {
+            throw new IllegalStateException("Could not find any Ontrack configuration.");
+        }
         OntrackConnection connection = OntrackConnection.create(config.getOntrackUrl());
         // Logging
         if (logger != null) {
-            connection = connection.logger(new OntrackLogger() {
-                @Override
-                public void trace(String message) {
-                    logger.println(message);
-                }
-            });
+            connection = connection.logger(logger);
         }
         // Authentication
         String user = config.getOntrackUser();
