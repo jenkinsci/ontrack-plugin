@@ -7,6 +7,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     logRotator(numToKeep = 40)
     deliveryPipelineConfiguration('Commit', 'CI')
     jdk 'JDK7'
+    label 'docker'
     scm {
         git {
             remote {
@@ -48,6 +49,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
         stringParam('NEXT_VERSION', '', '')
     }
     jdk 'JDK7'
+    label 'docker'
     scm {
         git {
             remote {
