@@ -13,7 +13,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             remote {
                 url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
-                credentials 'jenkins'
+                credentials PROJECT_SCM_CREDENTIALS
             }
             extensions {
                 wipeOutWorkspace()
@@ -58,7 +58,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
             remote {
                 url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
-                credentials 'jenkins'
+                credentials PROJECT_SCM_CREDENTIALS
             }
             extensions {
                 wipeOutWorkspace()
