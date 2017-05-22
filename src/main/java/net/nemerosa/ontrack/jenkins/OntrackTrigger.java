@@ -133,7 +133,8 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         // Gets any previous build
         Run lastBuild = job.getLastBuild();
         if (lastBuild != null) {
-            if (lastBuild.getResult().isWorseThan(Result.SUCCESS) && lastBuild.getResult().isCompleteBuild()) {
+            Result result = lastBuild.getResult();
+            if (result == null || (result.isWorseThan(Result.SUCCESS) && result.isCompleteBuild())) {
                 LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Last build was failed or unsuccessful", job.getFullName()));
                 firing = true;
             } else {
