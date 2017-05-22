@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 public class OntrackDSL {
 
     private final String script;
@@ -32,7 +33,7 @@ public class OntrackDSL {
         // Connector to Jenkins
         JenkinsConnector jenkins = new JenkinsConnector(theBuild, listener);
         // Values to bind
-        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, Object> values = new HashMap<>();
         // Gets the environment
         String[] names = injectEnvironment.split(",");
         for (String name : names) {
