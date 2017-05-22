@@ -69,6 +69,11 @@ Add _Ontrack: DSL_ in the _Post build actions_ in order to run the Ontrack DSL i
 
 See below for details about using the DSL.
 
+### Triggers
+
+Use the _Ontrack: Trigger_ to add a trigger which fires the job
+according to the indicated setup.
+
 ### Parameter
 
 The DSL can be used to allow the computation of a parameter for the

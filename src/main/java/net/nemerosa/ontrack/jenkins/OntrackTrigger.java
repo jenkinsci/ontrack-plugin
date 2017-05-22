@@ -1,0 +1,214 @@
+package net.nemerosa.ontrack.jenkins;
+
+import antlr.ANTLRException;
+import com.google.common.collect.ImmutableMap;
+import hudson.Extension;
+import hudson.model.*;
+import hudson.triggers.Trigger;
+import hudson.triggers.TriggerDescriptor;
+import hudson.util.LogTaskListener;
+import net.nemerosa.ontrack.dsl.Branch;
+import net.nemerosa.ontrack.dsl.Build;
+import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Trigger based on builds and promotions.
+ */
+public class OntrackTrigger extends Trigger<AbstractProject> {
+
+    private static final Logger LOGGER = Logger.getLogger(OntrackTrigger.class.getName());
+
+    private static final Level LOG_LEVEL = Level.FINE;
+
+    /**
+     * Ontrack project name
+     */
+    private final String project;
+
+    /**
+     * Ontrack branch name
+     */
+    private final String branch;
+
+    /**
+     * The Ontrack promotion level to take into account.
+     */
+    private final String promotion;
+
+    /**
+     * Name of the parameter which contains the name of the build
+     */
+    private final String parameterName;
+
+    /**
+     * Constructor.
+     *
+     * @param spec          CRON specification
+     * @param project       Ontrack project
+     * @param branch        Ontrack branch
+     * @param promotion     Ontrack promotion
+     * @param parameterName Name of the parameter which contains the name of the build   @throws ANTLRException If CRON expression is not correct
+     */
+    @DataBoundConstructor
+    public OntrackTrigger(String spec, String project, String branch, String promotion, String parameterName) throws ANTLRException {
+        super(spec);
+        this.project = project;
+        this.branch = branch;
+        this.promotion = promotion;
+        this.parameterName = parameterName;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public String getPromotion() {
+        return promotion;
+    }
+
+    public String getParameterName() {
+        return parameterName;
+    }
+
+    @Override
+    public void run() {
+        // Logging
+        LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Check %s promotion trigger", job.getFullName(), promotion));
+
+        // Ontrack accessor
+        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(System.out);
+
+        // Gets the Ontrack branch
+        Branch ontrackBranch = ontrack.branch(project, this.branch);
+
+        // Gets the last builds
+        List<Build> ontrackBuilds;
+        if (StringUtils.isBlank(promotion)) {
+            ontrackBuilds = ontrackBranch.standardFilter(ImmutableMap.of(
+                    "count", 1
+            ));
+        }
+        // Gets the last promoted build
+        else if ("*".equals(promotion)) {
+            ontrackBuilds = ontrackBranch.getLastPromotedBuilds();
+        }
+        // Gets the last build with promotion
+        else {
+            ontrackBuilds = ontrackBranch.standardFilter(ImmutableMap.of(
+                    "count", 1,
+                    "withPromotionLevel", promotion
+            ));
+        }
+
+        // Nothing eligible
+        if (ontrackBuilds.isEmpty()) {
+            LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] No build eligible", job.getFullName()));
+            return;
+        }
+
+        // Gets the last version
+        String lastVersion = ontrackBuilds.get(0).getName();
+        LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Last available build: %s", job.getFullName(), lastVersion));
+
+        // Version parameter name
+        String parameterNameValue = this.parameterName;
+        if (StringUtils.isBlank(parameterNameValue)) {
+            parameterNameValue = "VERSION";
+        }
+
+        // Firing the job?
+        boolean firing;
+        // Gets any previous build
+        Run lastBuild = job.getLastBuild();
+        if (lastBuild != null) {
+            if (lastBuild.getResult().isWorseThan(Result.SUCCESS) && lastBuild.getResult().isCompleteBuild()) {
+                LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Last build was failed or unsuccessful", job.getFullName()));
+                firing = true;
+            } else {
+                // Log listener
+                TaskListener taskListener = new LogTaskListener(
+                        LOGGER,
+                        Level.FINER
+                );
+                // Gets the last build name
+                try {
+                    String lastBuildName = lastBuild.getEnvironment(taskListener).get(parameterNameValue, null);
+                    LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Version for last build: %s", job.getFullName(), lastBuildName));
+                    // Identical to last version
+                    if (StringUtils.equals(lastBuildName, lastVersion)) {
+                        LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] No new version available", job.getFullName()));
+                        firing = false;
+                    }
+                    // Not equal
+                    else {
+                        LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] New version available", job.getFullName()));
+                        firing = true;
+                    }
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(
+                            String.format("[ontrack][trigger][%s] Could not compute the trigger condition because %s environment variable could not be accessed", job.getFullName(), parameterNameValue),
+                            e
+                    );
+                }
+            }
+        } else {
+            LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] No previous build, firing", job.getFullName()));
+            firing = true;
+        }
+
+        // Summary
+        if (!firing) {
+            LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] For one of the reasons mentioned above, not firing", job.getFullName()));
+        } else {
+            LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Firing with %s = %s", job.getFullName(), parameterNameValue, lastVersion));
+            // Scheduling
+            job.scheduleBuild2(
+                    0,
+                    new OntrackTriggerCause(),
+                    new ParametersAction(
+                            new StringParameterValue(parameterNameValue, lastVersion)
+                    )
+            );
+        }
+
+    }
+
+    @Extension
+    public static class DescriptorImpl extends TriggerDescriptor {
+
+        @Override
+        public boolean isApplicable(Item item) {
+            return item instanceof AbstractProject;
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Ontrack: trigger";
+        }
+    }
+
+    public static class OntrackTriggerCause extends Cause {
+        @Override
+        public String getShortDescription() {
+            return "Triggered by Ontrack.";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof OntrackTriggerCause;
+        }
+
+    }
+}
