@@ -1,21 +1,20 @@
 package net.nemerosa.ontrack.jenkins.dsl;
 
-public class OntrackDSLResult {
+import hudson.model.Result;
 
-    private final Object shellResult;
-    private final JenkinsConnector connector;
+public final class OntrackDSLResult {
 
-    public OntrackDSLResult(Object shellResult, JenkinsConnector connector) {
-        this.shellResult = shellResult;
-        this.connector = connector;
+    private OntrackDSLResult() {
     }
 
-    public Object getShellResult() {
-        return shellResult;
-    }
-
-    public JenkinsConnector getConnector() {
-        return connector;
+    public static Result toJenkinsResult(Object shellResult) {
+        if (shellResult instanceof String && !shellResult.equals("")) {
+            return Result.FAILURE;
+        } else if (shellResult instanceof Boolean) {
+            return (Boolean) shellResult ? Result.SUCCESS : Result.FAILURE;
+        } else {
+            return Result.SUCCESS;
+        }
     }
 
 }

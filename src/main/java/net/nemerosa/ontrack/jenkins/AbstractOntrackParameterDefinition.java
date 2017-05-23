@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.jenkins;
 
 import hudson.model.ParameterDefinition;
+import jenkins.model.Jenkins;
 import net.nemerosa.ontrack.jenkins.dsl.DSLRunner;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLRunner;
 import org.apache.commons.beanutils.BeanUtils;
@@ -17,7 +18,7 @@ public abstract class AbstractOntrackParameterDefinition extends ParameterDefini
                 description,
                 dsl,
                 valueProperty,
-                OntrackDSLRunner.INSTANCE
+                null
         );
     }
 
@@ -37,8 +38,16 @@ public abstract class AbstractOntrackParameterDefinition extends ParameterDefini
     }
 
     protected Object runDSL() {
-        DSLRunner runner = dslRunner != null ? dslRunner : OntrackDSLRunner.INSTANCE;
+        DSLRunner runner = dslRunner != null ? dslRunner : createDSLRunner();
         return runner.run(dsl);
+    }
+
+    protected DSLRunner createDSLRunner() {
+        OntrackDSLRunner runner = new OntrackDSLRunner();
+        // Security
+        runner.setSecurityEnabled(Jenkins.getInstance().isUseSecurity());
+        // TODO runner.setSandbox();
+        return runner;
     }
 
     protected String getProperty(Object any, String property) {

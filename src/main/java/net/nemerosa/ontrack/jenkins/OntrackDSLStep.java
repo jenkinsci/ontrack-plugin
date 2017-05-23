@@ -5,10 +5,12 @@ import hudson.Launcher;
 import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
+import jenkins.model.Jenkins;
 import net.nemerosa.ontrack.dsl.http.OTHttpClientException;
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
-import net.nemerosa.ontrack.jenkins.dsl.OntrackDSL;
+import net.nemerosa.ontrack.jenkins.dsl.JenkinsConnector;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLResult;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLRunner;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
@@ -36,26 +38,32 @@ public class OntrackDSLStep extends Builder {
         this.ontrackLog = ontrackLog;
     }
 
+    @SuppressWarnings("unused")
     public boolean isUsingText() {
         return usingText;
     }
 
+    @SuppressWarnings("unused")
     public String getScriptPath() {
         return scriptPath;
     }
 
+    @SuppressWarnings("unused")
     public String getScriptText() {
         return scriptText;
     }
 
+    @SuppressWarnings("unused")
     public String getInjectEnvironment() {
         return injectEnvironment;
     }
 
+    @SuppressWarnings("unused")
     public String getInjectProperties() {
         return injectProperties;
     }
 
+    @SuppressWarnings("unused")
     public boolean isOntrackLog() {
         return ontrackLog;
     }
@@ -65,21 +73,28 @@ public class OntrackDSLStep extends Builder {
         // Reads the script text
         String script = OntrackPluginSupport.readScript(theBuild, usingText, scriptText, scriptPath);
         // Ontrack DSL support
-        OntrackDSL dsl = new OntrackDSL(
-                script,
-                injectEnvironment,
-                injectProperties,
-                ontrackLog
-        );
+        OntrackDSLRunner dsl = new OntrackDSLRunner();
+        dsl.setOntrackLogger(listener);
+        dsl.injectEnvironment(injectEnvironment, theBuild, listener);
+        dsl.injectProperties(injectProperties, theBuild, listener);
+        dsl.setLogging(ontrackLog);
+        // Security
+        dsl.setSecurityEnabled(Jenkins.getInstance().isUseSecurity());
+        // TODO sandBox
+        // Connector to Jenkins
+        JenkinsConnector jenkins = new JenkinsConnector(theBuild, listener);
+        dsl.addBinding("jenkins", jenkins);
+        // Output
+        dsl.addBinding("out", listener.getLogger());
         // Runs the script
         try {
-            OntrackDSLResult dslResult = dsl.run(theBuild, listener);
+            Object dslResult = dsl.run(script);
             // Result
-            Result result = OntrackDSL.toJenkinsResult(dslResult.getShellResult());
+            Result result = OntrackDSLResult.toJenkinsResult(dslResult);
             listener.getLogger().format("Ontrack DSL script result evaluated to %s%n", result);
             setBuildResult(theBuild, result);
             // Environment
-            for (Map.Entry<String, String> entry : dslResult.getConnector().env().entrySet()) {
+            for (Map.Entry<String, String> entry : jenkins.env().entrySet()) {
                 String name = entry.getKey();
                 String value = entry.getValue();
                 listener.getLogger().format("Ontrack DSL: setting %s = %s%n", name, value);

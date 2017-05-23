@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.jenkins;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -62,7 +64,7 @@ public final class OntrackPluginSupport {
         }
     }
 
-    public static Map<String, String> parseProperties(String text, AbstractBuild<?, ?> theBuild, BuildListener listener) {
+    public static Map<String, String> parseProperties(String text, Run<?, ?> theBuild, TaskListener listener) throws IOException, InterruptedException {
         Map<String, String> properties = new LinkedHashMap<String, String>();
         String[] lines = StringUtils.split(text, "\n\r");
         for (String line : lines) {
@@ -73,7 +75,7 @@ public final class OntrackPluginSupport {
                     if (pos > 0) {
                         String name = line.substring(0, pos).trim();
                         String value = line.substring(pos + 1).trim();
-                        String expandedValue = expand(value, theBuild, listener);
+                        String expandedValue = theBuild.getEnvironment(listener).expand(value);
                         properties.put(name, expandedValue);
                     }
                 }
