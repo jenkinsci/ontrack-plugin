@@ -156,13 +156,18 @@ public class OntrackDSLRunner implements DSLRunner {
      */
     public static OntrackDSLRunner getRunnerForBuild(Item run, TaskListener listener) {
         return new OntrackDSLRunner()
-                .setSecurityEnabled(Jenkins.getInstance().isUseSecurity())
+                .setSecurityEnabled(isUseSecurity())
                 .setOntrackLogger(listener)
                 .setSource(run);
     }
 
+    private static boolean isUseSecurity() {
+        Jenkins jenkins = Jenkins.getInstance();
+        return jenkins != null && jenkins.isUseSecurity();
+    }
+
     public static DSLRunner getRunner() {
         return new OntrackDSLRunner()
-                .setSecurityEnabled(Jenkins.getInstance().isUseSecurity());
+                .setSecurityEnabled(isUseSecurity());
     }
 }
