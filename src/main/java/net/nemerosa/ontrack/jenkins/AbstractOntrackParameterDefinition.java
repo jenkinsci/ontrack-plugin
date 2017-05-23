@@ -43,11 +43,7 @@ public abstract class AbstractOntrackParameterDefinition extends ParameterDefini
     }
 
     protected DSLRunner createDSLRunner() {
-        OntrackDSLRunner runner = new OntrackDSLRunner();
-        // Security
-        runner.setSecurityEnabled(Jenkins.getInstance().isUseSecurity());
-        // TODO runner.setSandbox();
-        return runner;
+        return OntrackDSLRunner.getRunner();
     }
 
     protected String getProperty(Object any, String property) {

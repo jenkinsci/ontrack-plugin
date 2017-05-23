@@ -10,7 +10,6 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
-import jenkins.model.Jenkins;
 import net.nemerosa.ontrack.dsl.http.OTHttpClientException;
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.jenkins.dsl.JenkinsConnector;
@@ -79,19 +78,17 @@ public class OntrackDSLNotifier extends Notifier {
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         // Reads the script text
         String script = OntrackPluginSupport.readScript(theBuild, usingText, scriptText, scriptPath);
-        // Ontrack DSL support
-        OntrackDSLRunner dsl = new OntrackDSLRunner();
-        dsl.setOntrackLogger(listener);
-        dsl.injectEnvironment(injectEnvironment, theBuild, listener);
-        dsl.injectProperties(injectProperties, theBuild, listener);
-        // Security
-        dsl.setSecurityEnabled(Jenkins.getInstance().isUseSecurity());
-        // TODO sandBox
         // Connector to Jenkins
         JenkinsConnector jenkins = new JenkinsConnector(theBuild, listener);
-        dsl.addBinding("jenkins", jenkins);
-        // Output
-        dsl.addBinding("out", listener.getLogger());
+        // Ontrack DSL support
+        OntrackDSLRunner dsl = OntrackDSLRunner.getRunnerForBuild(theBuild.getProject(), listener)
+                .injectEnvironment(injectEnvironment, theBuild, listener)
+                .injectProperties(injectProperties, theBuild, listener)
+                // TODO sandBox
+                // Connector to Jenkins
+                .addBinding("jenkins", jenkins)
+                // Output
+                .addBinding("out", listener.getLogger());
         // Runs the script
         try {
             dsl.run(script);

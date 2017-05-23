@@ -4,6 +4,7 @@ import groovy.lang.Binding;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import jenkins.model.Jenkins;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.OntrackLogger;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
@@ -49,6 +50,9 @@ public class OntrackDSLRunner implements DSLRunner {
         }
     };
 
+    protected OntrackDSLRunner() {
+    }
+
     @Override
     public Object run(String dsl) {
         // Connection to Ontrack
@@ -88,28 +92,33 @@ public class OntrackDSLRunner implements DSLRunner {
         return shellResult;
     }
 
-    public void setBindings(Map<String, Object> bindings) {
-        this.bindings = bindings;
-    }
-
-    public void setSecurityEnabled(boolean securityEnabled) {
+    public OntrackDSLRunner setSecurityEnabled(boolean securityEnabled) {
         this.securityEnabled = securityEnabled;
+        return this;
     }
 
-    public void setSandbox(boolean sandbox) {
+    public OntrackDSLRunner setSandbox(boolean sandbox) {
         this.sandbox = sandbox;
+        return this;
     }
 
-    public void setLogging(boolean logging) {
+    public OntrackDSLRunner setLogging(boolean logging) {
         this.logging = logging;
+        return this;
     }
 
-    public void setOntrackLogger(OntrackLogger ontrackLogger) {
+    public OntrackDSLRunner setSource(Item source) {
+        this.source = source;
+        return this;
+    }
+
+    public OntrackDSLRunner setOntrackLogger(OntrackLogger ontrackLogger) {
         this.ontrackLogger = ontrackLogger;
+        return this;
     }
 
-    public void setOntrackLogger(final TaskListener taskListener) {
-        setOntrackLogger(
+    public OntrackDSLRunner setOntrackLogger(final TaskListener taskListener) {
+        return setOntrackLogger(
                 new OntrackLogger() {
                     @Override
                     public void trace(String message) {
@@ -119,7 +128,7 @@ public class OntrackDSLRunner implements DSLRunner {
         );
     }
 
-    public void injectEnvironment(String environmentVariables, Run run, TaskListener listener) throws IOException, InterruptedException {
+    public OntrackDSLRunner injectEnvironment(String environmentVariables, Run run, TaskListener listener) throws IOException, InterruptedException {
         String[] names = environmentVariables.split(",");
         for (String name : names) {
             name = name.trim();
@@ -128,14 +137,32 @@ public class OntrackDSLRunner implements DSLRunner {
                 bindings.put(name, value);
             }
         }
+        return this;
     }
 
-    public void injectProperties(String propertyValues, Run run, TaskListener listener) throws IOException, InterruptedException {
+    public OntrackDSLRunner injectProperties(String propertyValues, Run run, TaskListener listener) throws IOException, InterruptedException {
         Map<String, String> properties = OntrackPluginSupport.parseProperties(propertyValues, run, listener);
         bindings.putAll(properties);
+        return this;
     }
 
-    public void addBinding(String name, Object value) {
+    public OntrackDSLRunner addBinding(String name, Object value) {
         bindings.put(name, value);
+        return this;
+    }
+
+    /**
+     * Creates a DSL runner for a build environment
+     */
+    public static OntrackDSLRunner getRunnerForBuild(Item run, TaskListener listener) {
+        return new OntrackDSLRunner()
+                .setSecurityEnabled(Jenkins.getInstance().isUseSecurity())
+                .setOntrackLogger(listener)
+                .setSource(run);
+    }
+
+    public static DSLRunner getRunner() {
+        return new OntrackDSLRunner()
+                .setSecurityEnabled(Jenkins.getInstance().isUseSecurity());
     }
 }
