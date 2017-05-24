@@ -14,6 +14,7 @@ public class OntrackDslContext implements Context {
     private List<String> environment = new ArrayList<String>();
     private String injectProperties = "";
     private boolean log = false;
+    private boolean sandbox = false;
 
     /**
      * Using a path
@@ -58,6 +59,20 @@ public class OntrackDslContext implements Context {
     }
 
     /**
+     * Enables the sandbox
+     */
+    public void sandbox() {
+        sandbox(true);
+    }
+
+    /**
+     * Enables or disables the sandbox
+     */
+    public void sandbox(boolean sandbox) {
+        this.sandbox = sandbox;
+    }
+
+    /**
      * Computed location
      */
     public ScriptLocation getScriptLocation() {
@@ -83,5 +98,12 @@ public class OntrackDslContext implements Context {
      */
     public boolean isLog() {
         return log;
+    }
+
+    /**
+     * Sandbox
+     */
+    public boolean isSandbox() {
+        return sandbox;
     }
 }

@@ -23,15 +23,17 @@ public class OntrackDSLStep extends Builder {
     private final boolean usingText;
     private final String scriptPath;
     private final String scriptText;
+    private final boolean sandbox;
     private final String injectEnvironment;
     private final String injectProperties;
     private final boolean ontrackLog;
 
     @DataBoundConstructor
-    public OntrackDSLStep(ScriptLocation ontrackScriptLocation, String injectEnvironment, String injectProperties, boolean ontrackLog) {
+    public OntrackDSLStep(ScriptLocation ontrackScriptLocation, boolean sandbox, String injectEnvironment, String injectProperties, boolean ontrackLog) {
         this.usingText = ontrackScriptLocation == null || ontrackScriptLocation.isUsingText();
         this.scriptPath = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptPath();
         this.scriptText = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptText();
+        this.sandbox = sandbox;
         this.injectEnvironment = injectEnvironment;
         this.injectProperties = injectProperties;
         this.ontrackLog = ontrackLog;
@@ -67,6 +69,10 @@ public class OntrackDSLStep extends Builder {
         return ontrackLog;
     }
 
+    public boolean isSandbox() {
+        return sandbox;
+    }
+
     @Override
     public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         // Reads the script text
@@ -78,6 +84,7 @@ public class OntrackDSLStep extends Builder {
                 .injectEnvironment(injectEnvironment, theBuild, listener)
                 .injectProperties(injectProperties, theBuild, listener)
                 .setLogging(ontrackLog)
+                .setSandbox(sandbox)
                 // Jenkins connector
                 .addBinding("jenkins", jenkins)
                 // Output

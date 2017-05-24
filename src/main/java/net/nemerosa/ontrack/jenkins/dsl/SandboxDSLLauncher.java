@@ -35,7 +35,7 @@ public class SandboxDSLLauncher extends AbstractDSLLauncher {
     protected Object run(Script groovyScript) {
         if (ACL.SYSTEM.equals(Jenkins.getAuthentication())) {
             // The build must run as an actual user
-            throw new AccessDeniedException("The Ontrack script must run with an actual user.");
+            throw new AccessDeniedException("The Ontrack script must not run with the system user.");
         }
         try {
             return GroovySandbox.run(groovyScript, new ProxyWhitelist(Whitelist.all(), new OntrackDSLWhitelist()));
