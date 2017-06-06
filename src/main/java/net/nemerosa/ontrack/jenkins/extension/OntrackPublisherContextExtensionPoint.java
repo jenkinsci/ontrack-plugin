@@ -45,7 +45,7 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
         executeInContext(closure, context);
         return new OntrackDSLNotifier(
                 context.getScriptLocation(),
-                context.getInjectEnvironment(),
+                sandbox, context.getInjectEnvironment(),
                 context.getInjectProperties(),
                 context.isLog()
         );

@@ -26,15 +26,17 @@ public class OntrackDSLNotifier extends Notifier {
     private final boolean usingText;
     private final String scriptPath;
     private final String scriptText;
+    private final boolean sandbox;
     private final String injectEnvironment;
     private final String injectProperties;
     private final boolean ontrackLog;
 
     @DataBoundConstructor
-    public OntrackDSLNotifier(ScriptLocation ontrackScriptLocation, String injectEnvironment, String injectProperties, boolean ontrackLog) {
+    public OntrackDSLNotifier(ScriptLocation ontrackScriptLocation, boolean sandbox, String injectEnvironment, String injectProperties, boolean ontrackLog) {
         this.usingText = ontrackScriptLocation == null || ontrackScriptLocation.isUsingText();
         this.scriptPath = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptPath();
         this.scriptText = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptText();
+        this.sandbox = sandbox;
         this.injectEnvironment = injectEnvironment;
         this.injectProperties = injectProperties;
         this.ontrackLog = ontrackLog;
@@ -70,6 +72,10 @@ public class OntrackDSLNotifier extends Notifier {
         return ontrackLog;
     }
 
+    public boolean isSandbox() {
+        return sandbox;
+    }
+
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
     }
@@ -84,7 +90,7 @@ public class OntrackDSLNotifier extends Notifier {
         OntrackDSLRunner dsl = OntrackDSLRunner.getRunnerForBuild(theBuild.getProject(), listener)
                 .injectEnvironment(injectEnvironment, theBuild, listener)
                 .injectProperties(injectProperties, theBuild, listener)
-                // TODO sandBox
+                .setSandbox(sandbox)
                 // Connector to Jenkins
                 .addBinding("jenkins", jenkins)
                 // Output
