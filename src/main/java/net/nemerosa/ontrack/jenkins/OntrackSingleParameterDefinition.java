@@ -12,12 +12,12 @@ import org.kohsuke.stapler.StaplerRequest;
 public class OntrackSingleParameterDefinition extends AbstractOntrackParameterDefinition {
 
     @DataBoundConstructor
-    public OntrackSingleParameterDefinition(String name, String description, String dsl, String valueProperty) {
-        super(name, description, dsl, valueProperty);
+    public OntrackSingleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty) {
+        super(name, description, dsl, sandbox, valueProperty);
     }
 
-    public OntrackSingleParameterDefinition(String name, String description, String dsl, String valueProperty, DSLRunner dslRunner) {
-        super(name, description, dsl, valueProperty, dslRunner);
+    public OntrackSingleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty, DSLRunner dslRunner) {
+        super(name, description, dsl, sandbox, valueProperty, dslRunner);
     }
 
     /**

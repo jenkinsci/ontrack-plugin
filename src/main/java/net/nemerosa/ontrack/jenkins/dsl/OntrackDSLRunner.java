@@ -166,7 +166,7 @@ public class OntrackDSLRunner implements DSLRunner {
         return jenkins != null && jenkins.isUseSecurity();
     }
 
-    public static DSLRunner getRunner() {
+    public static OntrackDSLRunner getRunner() {
         return new OntrackDSLRunner()
                 .setSecurityEnabled(isUseSecurity());
     }
