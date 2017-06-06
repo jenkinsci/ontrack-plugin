@@ -18,15 +18,17 @@ public class OntrackDSLRunCondition extends RunCondition {
     private final boolean usingText;
     private final String scriptPath;
     private final String scriptText;
+    private final boolean sandbox;
     private final String injectEnvironment;
     private final String injectProperties;
     private final boolean ontrackLog;
 
     @DataBoundConstructor
-    public OntrackDSLRunCondition(ScriptLocation ontrackScriptLocation, String injectEnvironment, String injectProperties, boolean ontrackLog) {
+    public OntrackDSLRunCondition(ScriptLocation ontrackScriptLocation, boolean sandbox, String injectEnvironment, String injectProperties, boolean ontrackLog) {
         this.usingText = ontrackScriptLocation == null || ontrackScriptLocation.isUsingText();
         this.scriptPath = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptPath();
         this.scriptText = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptText();
+        this.sandbox = sandbox;
         this.injectEnvironment = injectEnvironment;
         this.injectProperties = injectProperties;
         this.ontrackLog = ontrackLog;
@@ -62,6 +64,10 @@ public class OntrackDSLRunCondition extends RunCondition {
         return ontrackLog;
     }
 
+    public boolean isSandbox() {
+        return sandbox;
+    }
+
     @Override
     public boolean runPrebuild(AbstractBuild<?, ?> build, BuildListener listener) throws Exception {
         return true;
@@ -82,7 +88,7 @@ public class OntrackDSLRunCondition extends RunCondition {
                 .injectEnvironment(injectEnvironment, build, listener)
                 .injectProperties(injectProperties, build, listener)
                 // Connector to Jenkins
-                // TODO sandBox
+                .setSandbox(sandbox)
                 .addBinding("jenkins", jenkins)
                 // Output
                 .addBinding("out", listener.getLogger());
