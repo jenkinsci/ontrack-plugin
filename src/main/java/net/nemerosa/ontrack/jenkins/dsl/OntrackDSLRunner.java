@@ -68,7 +68,7 @@ public class OntrackDSLRunner implements DSLRunner {
             }
             // Using approvals
             else {
-                launcher = new ApprovalBasedDSLLauncher();
+                launcher = new ApprovalBasedDSLLauncher(source);
             }
         }
         // No security, using defaults
