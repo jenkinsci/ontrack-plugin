@@ -260,7 +260,7 @@ job(...) {
 ```groovy
 job(...) {
     triggers {
-        ontrackTrigger 'project', 'branch', 'PROMOTION', 'VERSION'
+        ontrackTrigger '0 0 H/* * *', 'project', 'branch', 'PROMOTION', 'VERSION'
     }
 }
 ```
