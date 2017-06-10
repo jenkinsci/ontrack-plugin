@@ -12,8 +12,8 @@ import java.util.List;
 public class OntrackChoiceParameterDefinition extends AbstractOntrackMultipleParameterDefinition {
 
     @DataBoundConstructor
-    public OntrackChoiceParameterDefinition(String name, String description, String dsl, String valueProperty) {
-        super(name, description, dsl, valueProperty);
+    public OntrackChoiceParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty) {
+        super(name, description, dsl, sandbox, valueProperty);
     }
 
     @Override

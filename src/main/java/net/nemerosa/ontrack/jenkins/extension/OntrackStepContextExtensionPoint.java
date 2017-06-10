@@ -18,6 +18,7 @@ public class OntrackStepContextExtensionPoint extends ContextExtensionPoint {
         executeInContext(closure, context);
         return new OntrackDSLStep(
                 context.getScriptLocation(),
+                context.isSandbox(),
                 context.getInjectEnvironment(),
                 context.getInjectProperties(),
                 context.isLog()

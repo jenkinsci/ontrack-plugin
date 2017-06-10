@@ -7,8 +7,8 @@ import java.util.List;
 
 public abstract class AbstractOntrackMultipleParameterDefinition extends AbstractOntrackParameterDefinition {
 
-    public AbstractOntrackMultipleParameterDefinition(String name, String description, String dsl, String valueProperty) {
-        super(name, description, dsl, valueProperty);
+    public AbstractOntrackMultipleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty) {
+        super(name, description, dsl, sandbox, valueProperty);
     }
 
     /**
