@@ -11,6 +11,9 @@
     <f:entry title="DSL">
         <f:textarea name="parameter.dsl" value="${instance.dsl}" />
     </f:entry>
+    <f:entry title="Use Groovy sandbox">
+        <f:checkbox name="parameter.sandbox" value="${instance.sandbox}" />
+    </f:entry>
     <f:entry title="Value property">
         <f:textbox name="parameter.valueProperty" value="${instance.valueProperty}" />
     </f:entry>

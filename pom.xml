@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>ontrack</artifactId>
-    <version>2.30-SNAPSHOT</version>
+    <version>2.32-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <name>ontrack Jenkins plug-in</name>
@@ -32,7 +32,7 @@
         <connection>scm:git:git@github.com:jenkinsci/ontrack-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/ontrack-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/ontrack-plugin</url>
-      <tag>HEAD</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
@@ -53,13 +53,13 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>job-dsl</artifactId>
             <version>1.35</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-all</artifactId>
-                </exclusion>
-            </exclusions>
             <optional>true</optional>
+        </dependency>
+        <!-- Groovy -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.4.7</version>
         </dependency>
         <!-- Environment injection -->
         <dependency>
@@ -72,13 +72,19 @@
         <dependency>
             <groupId>net.nemerosa.ontrack</groupId>
             <artifactId>ontrack-dsl</artifactId>
-            <version>2.29.5</version>
+            <version>2.30.4</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.projectlombok</groupId>
                     <artifactId>lombok</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- Security plugin -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>script-security</artifactId>
+            <version>1.9</version>
         </dependency>
         <!-- Pipeline Step API -->
         <dependency>

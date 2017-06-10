@@ -13,7 +13,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             remote {
                 url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
-                credentials 'GITHUB'
+                credentials PROJECT_SCM_CREDENTIALS
             }
             extensions {
                 wipeOutWorkspace()
@@ -50,13 +50,13 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
         stringParam('NEXT_VERSION', '', '')
     }
     jdk 'JDK7'
-    label 'master'
+    label 'docker'
     scm {
         git {
             remote {
                 url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
-                credentials 'jenkins'
+                credentials PROJECT_SCM_CREDENTIALS
             }
             extensions {
                 wipeOutWorkspace()

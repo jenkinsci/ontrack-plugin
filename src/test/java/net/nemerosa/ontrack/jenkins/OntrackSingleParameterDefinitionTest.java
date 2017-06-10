@@ -13,6 +13,7 @@ public class OntrackSingleParameterDefinitionTest {
                 "NAME",
                 "My parameter",
                 "",
+                true,
                 "name",
                 new MockDSLRunner(null)
         );
