@@ -30,6 +30,11 @@ UNSTABLE | WARNING
 ABORTED | INTERRUPTED
 _Other_ | FAILED
 
+### Triggers
+
+Use the _Ontrack: Trigger_ to add a trigger which fires the job
+according to the indicated setup.
+
 ### DSL step
 
 Add _Ontrack: DSL_ in the _Build steps_ in order to run the Ontrack DSL in the build steps. The build will fail or succeed according to the result of the DSL.

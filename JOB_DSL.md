@@ -33,6 +33,21 @@ job(...) {
 }
 ```
 
+## Triggers
+
+```groovy
+job(...) {
+    triggers {
+        ontrackTrigger '0 0 H/* * *', 'project', 'branch', 'PROMOTION', 'VERSION'
+    }
+}
+```
+
+and `PROMOTION` can be a valid Ontrack promotion level name or
+
+* _blank_ to mean the last build
+* `*` to mean the last promoted build
+
 ## DSL notifier
 
 ```groovy
