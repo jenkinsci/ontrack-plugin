@@ -12,4 +12,7 @@
   <f:entry title="Promotion level" field="promotionLevel">
     <f:textbox />
   </f:entry>
+  <f:entry title="Ignore failure" field="ignoreFailure">
+    <f:checkbox />
+  </f:entry>
 </j:jelly>
