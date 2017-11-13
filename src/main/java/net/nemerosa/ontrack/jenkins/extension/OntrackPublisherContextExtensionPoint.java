@@ -33,7 +33,15 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackValidationRunNotifier ontrackValidation(String project, String branch, String build, String validationStamp) {
-        return new OntrackValidationRunNotifier(project, branch, build, validationStamp);
+        return new OntrackValidationRunNotifier(project, branch, build, validationStamp, false);
+    }
+
+    /**
+     * Validation with ignoring of the failure option
+     */
+    @DslExtensionMethod(context = PublisherContext.class)
+    public OntrackValidationRunNotifier ontrackValidation(String project, String branch, String build, String validationStamp, boolean ignoreFailure) {
+        return new OntrackValidationRunNotifier(project, branch, build, validationStamp, ignoreFailure);
     }
 
     /**
