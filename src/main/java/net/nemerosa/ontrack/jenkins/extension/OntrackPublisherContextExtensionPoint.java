@@ -17,7 +17,7 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackBuildNotifier ontrackBuild(String project, String branch, String build) {
-        return new OntrackBuildNotifier(project, branch, build);
+        return new OntrackBuildNotifier(project, branch, build, ignoreFailure);
     }
 
     /**

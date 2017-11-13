@@ -39,12 +39,17 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
      * Name of the build to create
      */
     private final String build;
+    /**
+     * Option to ignore failures
+     */
+    private final boolean ignoreFailure;
 
     @DataBoundConstructor
-    public OntrackBuildNotifier(String project, String branch, String build) {
+    public OntrackBuildNotifier(String project, String branch, String build, boolean ignoreFailure) {
         this.project = project;
         this.branch = branch;
         this.build = build;
+        this.ignoreFailure = ignoreFailure;
     }
 
     public String getProject() {
@@ -57,6 +62,10 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
 
     public String getBuild() {
         return build;
+    }
+
+    public boolean isIgnoreFailure() {
+        return ignoreFailure;
     }
 
     @Override
@@ -86,7 +95,9 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                 );
             } catch (OTMessageClientException ex) {
                 listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
-                theBuild.setResult(Result.FAILURE);
+                if (!ignoreFailure) {
+                    theBuild.setResult(Result.FAILURE);
+                }
             }
         } else {
             listener.getLogger().format("[ontrack] No creation of build since it is broken");
