@@ -63,8 +63,8 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
                 context.getScriptLocation(),
                 context.getInjectEnvironment(),
                 context.getInjectProperties(),
-                context.isLog()
-        );
+                context.isLog(),
+                context.isIgnoreFailure());
     }
 
 }

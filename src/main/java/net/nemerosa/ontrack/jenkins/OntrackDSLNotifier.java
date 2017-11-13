@@ -28,15 +28,17 @@ public class OntrackDSLNotifier extends Notifier {
     private final String injectEnvironment;
     private final String injectProperties;
     private final boolean ontrackLog;
+    private final boolean ignoreFailure;
 
     @DataBoundConstructor
-    public OntrackDSLNotifier(ScriptLocation ontrackScriptLocation, String injectEnvironment, String injectProperties, boolean ontrackLog) {
+    public OntrackDSLNotifier(ScriptLocation ontrackScriptLocation, String injectEnvironment, String injectProperties, boolean ontrackLog, boolean ignoreFailure) {
         this.usingText = ontrackScriptLocation == null || ontrackScriptLocation.isUsingText();
         this.scriptPath = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptPath();
         this.scriptText = ontrackScriptLocation == null ? null : ontrackScriptLocation.getScriptText();
         this.injectEnvironment = injectEnvironment;
         this.injectProperties = injectProperties;
         this.ontrackLog = ontrackLog;
+        this.ignoreFailure = ignoreFailure;
     }
 
     public boolean isUsingText() {
@@ -63,6 +65,10 @@ public class OntrackDSLNotifier extends Notifier {
         return ontrackLog;
     }
 
+    public boolean isIgnoreFailure() {
+        return ignoreFailure;
+    }
+
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
     }
@@ -83,13 +89,17 @@ public class OntrackDSLNotifier extends Notifier {
             dsl.run(theBuild, listener);
         } catch (OTMessageClientException ex) {
             listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
-            theBuild.setResult(Result.FAILURE);
+            if (!ignoreFailure) {
+                theBuild.setResult(Result.FAILURE);
+            }
         } catch (OTHttpClientException ex) {
             listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
             if (ontrackLog) {
                 ex.printStackTrace(listener.getLogger());
             }
-            theBuild.setResult(Result.FAILURE);
+            if (!ignoreFailure) {
+                theBuild.setResult(Result.FAILURE);
+            }
         }
         // End
         return true;
