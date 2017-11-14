@@ -29,13 +29,15 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
     private final String branch;
     private final String build;
     private final String validationStamp;
+    private final boolean ignoreFailure;
 
     @DataBoundConstructor
-    public OntrackValidationRunNotifier(String project, String branch, String build, String validationStamp) {
+    public OntrackValidationRunNotifier(String project, String branch, String build, String validationStamp, boolean ignoreFailure) {
         this.project = project;
         this.branch = branch;
         this.build = build;
         this.validationStamp = validationStamp;
+        this.ignoreFailure = ignoreFailure;
     }
 
     public String getProject() {
@@ -52,6 +54,10 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
 
     public String getValidationStamp() {
         return validationStamp;
+    }
+
+    public boolean isIgnoreFailure() {
+        return ignoreFailure;
     }
 
     @Override
@@ -79,7 +85,9 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
             build.validate(validationStampName, runStatus);
         } catch (OTMessageClientException ex) {
             listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
-            theBuild.setResult(Result.FAILURE);
+            if (!ignoreFailure) {
+                theBuild.setResult(Result.FAILURE);
+            }
         }
         // OK
         return true;

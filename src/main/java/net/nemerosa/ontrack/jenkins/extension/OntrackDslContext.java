@@ -15,6 +15,7 @@ public class OntrackDslContext implements Context {
     private String injectProperties = "";
     private boolean log = false;
     private boolean sandbox = false;
+    private boolean ignoreFailure = false;
 
     /**
      * Using a path
@@ -106,4 +107,26 @@ public class OntrackDslContext implements Context {
     public boolean isSandbox() {
         return sandbox;
     }
+
+    /**
+     * Ignoring failure
+     */
+    public boolean isIgnoreFailure() {
+        return ignoreFailure;
+    }
+
+    /**
+     * Ignoring failure
+     */
+    public void ignoreFailure() {
+        ignoreFailure(true);
+    }
+
+    /**
+     * Ignoring failure
+     */
+    public void ignoreFailure(boolean value) {
+        ignoreFailure = value;
+    }
+
 }

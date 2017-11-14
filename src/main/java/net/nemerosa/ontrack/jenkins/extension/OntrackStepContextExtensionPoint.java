@@ -21,8 +21,8 @@ public class OntrackStepContextExtensionPoint extends ContextExtensionPoint {
                 context.isSandbox(),
                 context.getInjectEnvironment(),
                 context.getInjectProperties(),
-                context.isLog()
-        );
+                context.isLog(),
+                context.isIgnoreFailure());
     }
 
 }

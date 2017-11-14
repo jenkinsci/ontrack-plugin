@@ -27,13 +27,15 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
     private final String branch;
     private final String build;
     private final String promotionLevel;
+    private final boolean ignoreFailure;
 
     @DataBoundConstructor
-    public OntrackPromotedRunNotifier(String project, String branch, String build, String promotionLevel) {
+    public OntrackPromotedRunNotifier(String project, String branch, String build, String promotionLevel, boolean ignoreFailure) {
         this.project = project;
         this.branch = branch;
         this.build = build;
         this.promotionLevel = promotionLevel;
+        this.ignoreFailure = ignoreFailure;
     }
 
     public String getProject() {
@@ -50,6 +52,10 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
 
     public String getPromotionLevel() {
         return promotionLevel;
+    }
+
+    public boolean isIgnoreFailure() {
+        return ignoreFailure;
     }
 
     @Override
@@ -72,7 +78,9 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
                 build.promote(promotionLevelName);
             } catch (OTMessageClientException ex) {
                 listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
-                theBuild.setResult(Result.FAILURE);
+                if (!ignoreFailure) {
+                    theBuild.setResult(Result.FAILURE);
+                }
             }
         } else {
             listener.getLogger().format("[ontrack] No promotion to %s since build is broken", promotionLevelName);
