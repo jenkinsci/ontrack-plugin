@@ -49,6 +49,11 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
     private final String parameterName;
 
     /**
+     * Minimum result of previous run
+     */
+    private final Result minimumResult;
+
+    /**
      * Constructor.
      *
      * @param spec          CRON specification
@@ -58,12 +63,15 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
      * @param parameterName Name of the parameter which contains the name of the build   @throws ANTLRException If CRON expression is not correct
      */
     @DataBoundConstructor
-    public OntrackTrigger(String spec, String project, String branch, String promotion, String parameterName) throws ANTLRException {
+    public OntrackTrigger(String spec, String project, String branch, String promotion, String parameterName, String minimumResult) throws ANTLRException {
         super(spec);
         this.project = project;
         this.branch = branch;
         this.promotion = promotion;
         this.parameterName = parameterName;
+        if(minimumResult==null||minimumResult.isEmpty()) minimumResult = "SUCCESS";
+        // if 'minimumResult' contains an invalid value, the fromString method will return Result.FAILURE
+        this.minimumResult = Result.fromString(minimumResult);
     }
 
     public String getProject() {
@@ -80,6 +88,10 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
 
     public String getParameterName() {
         return parameterName;
+    }
+
+    public Result getMinimumResult() {
+        return minimumResult;
     }
 
     @Override
@@ -139,7 +151,7 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         Run lastBuild = job.getLastBuild();
         if (lastBuild != null) {
             Result result = lastBuild.getResult();
-            if (result == null || (result.isWorseThan(Result.SUCCESS) && result.isCompleteBuild())) {
+            if (result == null || (result.isWorseThan(minimumResult) && result.isCompleteBuild())) {
                 LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Last build was failed or unsuccessful", job.getFullName()));
                 firing = true;
             } else {
