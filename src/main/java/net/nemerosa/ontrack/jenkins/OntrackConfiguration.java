@@ -20,6 +20,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
     private String ontrackPassword;
     private int ontrackMaxTries = 1;
     private int ontrackRetryDelaySeconds = 10000;
+    private OntrackSecurityMode securityMode = OntrackSecurityMode.DEFAULT;
 
     public OntrackConfiguration() {
         load();
@@ -33,6 +34,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
         ontrackPassword = json.getString("ontrackPassword");
         ontrackMaxTries = json.getInt("ontrackMaxTries");
         ontrackRetryDelaySeconds = json.getInt("ontrackRetryDelaySeconds");
+        securityMode = OntrackSecurityMode.valueOf(json.getString("securityMode"));
         save();
         return super.configure(req, json);
     }
@@ -51,6 +53,14 @@ public class OntrackConfiguration extends GlobalConfiguration {
 
     public String getOntrackPassword() {
         return ontrackPassword;
+    }
+
+    public OntrackSecurityMode getSecurityMode() {
+        return securityMode;
+    }
+
+    public void setSecurityMode(OntrackSecurityMode securityMode) {
+        this.securityMode = securityMode;
     }
 
     public void setOntrackConfigurationName(String ontrackConfigurationName) {
