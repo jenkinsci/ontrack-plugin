@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.jenkins;
 
 import hudson.Extension;
+import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -59,22 +60,27 @@ public class OntrackConfiguration extends GlobalConfiguration {
         return securityMode;
     }
 
+    @SuppressWarnings("unused")
     public void setSecurityMode(OntrackSecurityMode securityMode) {
         this.securityMode = securityMode;
     }
 
+    @SuppressWarnings("unused")
     public void setOntrackConfigurationName(String ontrackConfigurationName) {
         this.ontrackConfigurationName = ontrackConfigurationName;
     }
 
+    @SuppressWarnings("unused")
     public void setOntrackUrl(String ontrackUrl) {
         this.ontrackUrl = ontrackUrl;
     }
 
+    @SuppressWarnings("unused")
     public void setOntrackUser(String ontrackUser) {
         this.ontrackUser = ontrackUser;
     }
 
+    @SuppressWarnings("unused")
     public void setOntrackPassword(String ontrackPassword) {
         this.ontrackPassword = ontrackPassword;
     }
@@ -83,6 +89,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
         return ontrackMaxTries;
     }
 
+    @SuppressWarnings("unused")
     public void setOntrackMaxTries(int ontrackMaxTries) {
         this.ontrackMaxTries = ontrackMaxTries;
     }
@@ -91,7 +98,17 @@ public class OntrackConfiguration extends GlobalConfiguration {
         return ontrackRetryDelaySeconds;
     }
 
+    @SuppressWarnings("unused")
     public void setOntrackRetryDelaySeconds(int ontrackRetryDelaySeconds) {
         this.ontrackRetryDelaySeconds = ontrackRetryDelaySeconds;
+    }
+
+    @SuppressWarnings("unused")
+    public ListBoxModel doFillSecurityModeItems() {
+        ListBoxModel items = new ListBoxModel();
+        for (OntrackSecurityMode mode : OntrackSecurityMode.values()) {
+            items.add(mode.getDisplayName(), mode.name());
+        }
+        return items;
     }
 }
