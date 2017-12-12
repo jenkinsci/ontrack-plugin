@@ -14,4 +14,7 @@
     <f:entry title="Value property">
         <f:textbox name="parameter.valueProperty" value="${instance.valueProperty}" />
     </f:entry>
+    <f:entry title="Multi selection" field="multiSelect">
+        <f:checkbox />
+    </f:entry>
 </j:jelly>
