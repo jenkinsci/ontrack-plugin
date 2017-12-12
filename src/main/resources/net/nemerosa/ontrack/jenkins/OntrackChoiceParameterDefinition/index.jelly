@@ -8,7 +8,7 @@
 			<j:choose>
                 <j:when test="${it.isMultiSelect()}">
                     <j:forEach var="value" items="${it.choices}">
-                        <f:checkbox selected="false"/>${value}<f:br/>
+                        <f:checkbox selected="false"/>${value}<br/>
                     </j:forEach>
                 </j:when>
                 <j:otherwise>
