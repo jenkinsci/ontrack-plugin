@@ -11,17 +11,9 @@ import java.util.List;
 
 public class OntrackChoiceParameterDefinition extends AbstractOntrackMultipleParameterDefinition {
 
-    private final boolean multiSelect;
-
     @DataBoundConstructor
     public OntrackChoiceParameterDefinition(String name, String description, String dsl, String valueProperty) {
-        this(name,description,dsl,valueProperty,false);
-    }
-
-    @DataBoundConstructor
-    public OntrackChoiceParameterDefinition(String name, String description, String dsl, String valueProperty, boolean multiSelect) {
         super(name, description, dsl, valueProperty);
-        this.multiSelect = multiSelect;
     }
 
     @Override
@@ -73,9 +65,5 @@ public class OntrackChoiceParameterDefinition extends AbstractOntrackMultiplePar
         public String getHelpFile() {
             return "/help/ontrack/parameter-choice.html";
         }
-    }
-
-    public boolean isMultiSelect() {
-        return multiSelect;
     }
 }
