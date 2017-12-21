@@ -15,4 +15,7 @@
     <f:entry title="Parameter name" field="parameterName" default="VERSION">
         <f:textbox />
     </f:entry>
+    <f:entry title="Minimum Result" field="minimumResult" default="SUCCESS">
+        <f:textbox />
+    </f:entry>
 </j:jelly>
