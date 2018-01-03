@@ -6,7 +6,7 @@
 		<div name="parameter">
 			<input type="hidden" name="name" value="${it.name}" />
 			<j:forEach var="value" items="${it.choices}">
-				<f:checkbox selected="false"/>${value}<br/>
+				<input type="checkbox" name="value">${value}</input><br/>
 			</j:forEach>
 		</div>
 	</f:entry>

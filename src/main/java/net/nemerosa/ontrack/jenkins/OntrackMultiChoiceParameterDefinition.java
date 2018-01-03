@@ -3,10 +3,13 @@ package net.nemerosa.ontrack.jenkins;
 import hudson.Extension;
 import hudson.model.ParameterValue;
 import hudson.model.StringParameterValue;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OntrackMultiChoiceParameterDefinition extends AbstractOntrackMultipleParameterDefinition {
@@ -18,39 +21,33 @@ public class OntrackMultiChoiceParameterDefinition extends AbstractOntrackMultip
 
     @Override
     public ParameterValue createValue(StaplerRequest req, JSONObject jo) {
-        StringParameterValue value = req.bindJSON(StringParameterValue.class, jo);
-        value.setDescription(getDescription());
+        JSONArray jsonArray = (JSONArray)jo.get("value");
+        List<String> choices = getChoices();
+        List<String> selectionList = new ArrayList<>();
+        for(int i=0;i<choices.size();i++){
+            String hostName = choices.get(i);
+            Object checked = jsonArray.get(i);
+            Boolean checkedBoolean = (Boolean)checked;
+            if(checkedBoolean){
+                selectionList.add(hostName);
+            }
+        }
+        String selections = StringUtils.join(selectionList, ',');
+        StringParameterValue value = new StringParameterValue(getName(), selections, getDescription());
         return value;
     }
 
     @Override
+//    @Deprecated ???
     public ParameterValue createValue(StaplerRequest req) {
         String[] value = req.getParameterValues(getName());
-        if (value == null) {
-            return getDefaultParameterValue();
-        } else if (value.length != 1) {
-            throw new IllegalArgumentException(String.format(
-                    "Illegal number of parameter values for %s: %d",
-                    getName(),
-                    value.length));
-        } else {
-            List<String> choices = getChoices();
-            if (choices.contains(value[0])) {
-                return new StringParameterValue(getName(), value[0], getDescription());
-            } else {
-                throw new IllegalArgumentException(String.format(
-                        "Value %s for parameter %s is not a valid choice.",
-                        value[0],
-                        getName()));
-            }
-        }
+        String selections = StringUtils.join(value, ',');
+        return new StringParameterValue(getName(), selections, getDescription());
     }
 
     @Override
     public StringParameterValue getDefaultParameterValue() {
-        List<String> choices = getChoices();
-        String value = choices.isEmpty() ? "" : choices.get(0);
-        return new StringParameterValue(getName(), value, getDescription());
+        return new StringParameterValue(getName(), "", getDescription());
     }
 
     @Extension
