@@ -25,11 +25,9 @@ public class OntrackMultiChoiceParameterDefinition extends AbstractOntrackMultip
         List<String> choices = getChoices();
         List<String> selectionList = new ArrayList<>();
         for(int i=0;i<choices.size();i++){
-            String hostName = choices.get(i);
-            Object checked = jsonArray.get(i);
-            Boolean checkedBoolean = (Boolean)checked;
-            if(checkedBoolean){
-                selectionList.add(hostName);
+            String choice = choices.get(i);
+            if((Boolean)jsonArray.get(i)){
+                selectionList.add(choice);
             }
         }
         String selections = StringUtils.join(selectionList, ',');
