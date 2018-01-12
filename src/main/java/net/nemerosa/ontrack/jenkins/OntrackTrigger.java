@@ -27,6 +27,7 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
     private static final Logger LOGGER = Logger.getLogger(OntrackTrigger.class.getName());
 
     private static final Level LOG_LEVEL = Level.FINE;
+    public static final String SUCCESS = "SUCCESS";
 
     /**
      * Ontrack project name
@@ -51,7 +52,7 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
     /**
      * Minimum result of previous run
      */
-    private final Result minimumResult;
+    private final String minimumResult;
 
     /**
      * Constructor.
@@ -69,9 +70,7 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         this.branch = branch;
         this.promotion = promotion;
         this.parameterName = parameterName;
-        if(minimumResult==null||minimumResult.isEmpty()) minimumResult = "SUCCESS";
-        // if 'minimumResult' contains an invalid value, the fromString method will return Result.FAILURE
-        this.minimumResult = Result.fromString(minimumResult);
+        this.minimumResult = minimumResult!=null?minimumResult:SUCCESS;
     }
 
     public String getProject() {
@@ -90,7 +89,7 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         return parameterName;
     }
 
-    public Result getMinimumResult() {
+    public String getMinimumResult() {
         return minimumResult;
     }
 
@@ -146,7 +145,8 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         Run lastBuild = job.getLastBuild();
         if (lastBuild != null) {
             Result result = lastBuild.getResult();
-            if (result == null || (result.isWorseThan(minimumResult) && result.isCompleteBuild())) {
+            Result minimum = Result.fromString(minimumResult);
+            if (result == null || (result.isWorseThan(minimum) && result.isCompleteBuild())) {
                 LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Last build was failed or unsuccessful", job.getFullName()));
                 firing = true;
             } else {
