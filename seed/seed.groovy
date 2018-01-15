@@ -69,7 +69,7 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
     }
     steps {
         shell """\
-export PATH=\${MAVEN_3_2_X_HOME}/bin:\$PATH
+export PATH=\${MAVEN_3_3_9_HOME}/bin:\$PATH
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${VERSION} --batch-mode
 
 git config --local user.email "jenkins@nemerosa.net"
@@ -83,7 +83,7 @@ git tag "\${VERSION}"
             providedSettings('JenkinsIOSettings')
         }
         shell """\
-export PATH=\${MAVEN_3_2_X_HOME}/bin:\$PATH
+export PATH=\${MAVEN_3_3_9_HOME}/bin:\$PATH
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${NEXT_VERSION}-SNAPSHOT --batch-mode
 git commit -am "Starting \${NEXT_VERSION}"
 """
