@@ -18,7 +18,7 @@
     <f:entry name="minimumResult" title="Minimum Result" field="minimumResult">
         <select name="minimumResult">
             <j:forEach var="key" items="${instance.choices}">
-                <f:option value="${key}">${key}</f:option>
+                <f:option value="${key}" selected="${key==instance.minimumResult}">${key}</f:option>
             </j:forEach>
         </select>
     </f:entry>
