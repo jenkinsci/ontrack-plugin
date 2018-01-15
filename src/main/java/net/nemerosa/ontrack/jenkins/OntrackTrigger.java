@@ -96,6 +96,11 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
 
     @Override
     public void run() {
+        // Checks for null
+        if (job == null) {
+            LOGGER.log(Level.WARNING, "[ontrack][trigger] Cannot run because of job being null.");
+            return;
+        }
         // Logging
         LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Check %s promotion trigger", job.getFullName(), promotion));
 

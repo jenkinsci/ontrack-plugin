@@ -24,7 +24,11 @@ public final class OntrackPluginSupport {
             FilePath workspace = build.getWorkspace();
             if (workspace != null) {
                 FilePath path = workspace.child(scriptPath);
-                return path.readToString();
+                try {
+                    return path.readToString();
+                } catch (InterruptedException e) {
+                    throw new IOException("Cannot read from " + scriptPath, e);
+                }
             } else {
                 throw new IOException("Cannot get a workspace to get the script path at " + scriptPath);
             }

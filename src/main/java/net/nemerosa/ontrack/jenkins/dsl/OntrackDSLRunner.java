@@ -7,7 +7,9 @@ import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.OntrackLogger;
+import net.nemerosa.ontrack.jenkins.OntrackConfiguration;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
+import net.nemerosa.ontrack.jenkins.OntrackSecurityMode;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -58,23 +60,43 @@ public class OntrackDSLRunner implements DSLRunner {
         // Connection to Ontrack
         Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLogger);
 
+        // Gets the configured security mode
+        OntrackSecurityMode securityMode = getSecurityMode();
+
         // Launcher
         DSLLauncher launcher;
-        // Security enabled
-        if (securityEnabled) {
-            // Using a sandbox
-            if (sandbox) {
-                launcher = new SandboxDSLLauncher(source);
+
+        // No specific setup or default mode
+        if (securityMode == null || securityMode == OntrackSecurityMode.DEFAULT) {
+            // Security enabled
+            if (securityEnabled) {
+                // Using a sandbox
+                if (sandbox) {
+                    launcher = new SandboxDSLLauncher(source);
+                }
+                // Using approvals
+                else {
+                    launcher = new ApprovalBasedDSLLauncher(source);
+                }
             }
-            // Using approvals
+            // No security, using defaults
             else {
-                launcher = new ApprovalBasedDSLLauncher(source);
+                launcher = new DefaultDSLLauncher();
             }
         }
-        // No security, using defaults
-        else {
+        // No security
+        else if (securityMode == OntrackSecurityMode.NONE) {
             launcher = new DefaultDSLLauncher();
         }
+        // Sandbox
+        else if (securityMode == OntrackSecurityMode.SANDBOX) {
+            launcher = new SandboxDSLLauncher(source);
+        }
+        // Anomaly
+        else {
+            throw new IllegalStateException("Unknown Ontrack security mode: " + securityMode);
+        }
+
 
         // Binding
         Binding binding = new Binding(bindings);
@@ -164,6 +186,15 @@ public class OntrackDSLRunner implements DSLRunner {
     private static boolean isUseSecurity() {
         Jenkins jenkins = Jenkins.getInstance();
         return jenkins != null && jenkins.isUseSecurity();
+    }
+
+    private static OntrackSecurityMode getSecurityMode() {
+        OntrackConfiguration ontrackConfiguration = OntrackConfiguration.getOntrackConfiguration();
+        OntrackSecurityMode securityMode = null;
+        if (ontrackConfiguration != null) {
+            securityMode = ontrackConfiguration.getSecurityMode();
+        }
+        return securityMode;
     }
 
     public static OntrackDSLRunner getRunner() {

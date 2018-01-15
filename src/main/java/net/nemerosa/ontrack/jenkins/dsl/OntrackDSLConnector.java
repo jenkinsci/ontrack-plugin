@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.jenkins.dsl;
 
-import hudson.model.BuildListener;
+import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.OntrackConnection;
 import net.nemerosa.ontrack.dsl.OntrackLogger;
@@ -48,8 +48,17 @@ public class OntrackDSLConnector {
         return connection.build();
     }
 
-    public static Ontrack createOntrackConnector(final BuildListener listener) {
-        return createOntrackConnector(listener != null ? listener.getLogger() : null);
+    public static Ontrack createOntrackConnector(final TaskListener listener) {
+        return ontrack != null ? ontrack : createOntrackConnector(listener != null ? listener.getLogger() : null);
+    }
+
+    private static Ontrack ontrack = null;
+
+    /**
+     * Used for test only - injection of a test instance to connect to Ontrack
+     */
+    public static void setOntrack(Ontrack test) {
+        ontrack = test;
     }
 
 }

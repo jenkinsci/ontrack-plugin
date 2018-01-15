@@ -20,5 +20,8 @@
         <f:entry title="Retry delay (s)">
             <f:textbox name="ontrack.ontrackRetryDelaySeconds" value="${descriptor.getOntrackRetryDelaySeconds()}"/>
         </f:entry>
+        <f:entry field="securityMode" title="Security mode">
+            <f:select/>
+        </f:entry>
     </f:section>
 </j:jelly>

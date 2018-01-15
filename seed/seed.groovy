@@ -21,13 +21,11 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             }
         }
     }
-    triggers {
-        scm 'H/5 * * * *'
-    }
     steps {
         maven {
-            goals 'clean verify'
-            mavenInstallation 'Maven-3.2.x'
+            goals 'clean verify --batch-mode'
+            mavenInstallation 'Maven-3.3.9'
+            properties(argLine: '-Xmx512m')
         }
     }
     publishers {
@@ -67,12 +65,12 @@ freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-release") {
         }
     }
     wrappers {
-        toolenv('Maven-3.2.x')
+        toolenv('Maven-3.3.9')
     }
     steps {
         shell """\
 export PATH=\${MAVEN_3_2_X_HOME}/bin:\$PATH
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${VERSION}
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${VERSION} --batch-mode
 
 git config --local user.email "jenkins@nemerosa.net"
 git config --local user.name "Jenkins"
@@ -80,13 +78,13 @@ git commit -am "Release \${VERSION}"
 git tag "\${VERSION}"
 """
         maven {
-            mavenInstallation('Maven-3.2.x')
-            goals('clean deploy')
+            mavenInstallation('Maven-3.3.9')
+            goals('clean deploy --batch-mode')
             providedSettings('JenkinsIOSettings')
         }
         shell """\
 export PATH=\${MAVEN_3_2_X_HOME}/bin:\$PATH
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${NEXT_VERSION}-SNAPSHOT
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=\${NEXT_VERSION}-SNAPSHOT --batch-mode
 git commit -am "Starting \${NEXT_VERSION}"
 """
     }
