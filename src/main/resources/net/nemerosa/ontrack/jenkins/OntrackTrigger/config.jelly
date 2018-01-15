@@ -17,9 +17,9 @@
     </f:entry>
     <f:entry name="minimumResult" title="Minimum Result" field="minimumResult">
         <select name="minimumResult">
-            <f:option value="SUCCESS">SUCCESS</f:option>
-            <f:option value="UNSTABLE">UNSTABLE</f:option>
-            <f:option value="FAILURE">FAILURE</f:option>
+            <j:forEach var="key" items="${instance.choices}">
+                <f:option value="${key}">${key}</f:option>
+            </j:forEach>
         </select>
     </f:entry>
 </j:jelly>
