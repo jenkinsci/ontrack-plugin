@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.jenkins;
 
 import antlr.ANTLRException;
-import hudson.model.Result;
 import org.junit.Test;
 
 public class OntrackTriggerTest {
@@ -41,7 +40,7 @@ public class OntrackTriggerTest {
 
             e.printStackTrace();
         }
-        assert trigger.getMinimumResult() == Result.SUCCESS;
+        assert trigger.getMinimumResult() == OntrackTrigger.SUCCESS;
     }
 
     @Test
@@ -79,7 +78,7 @@ public class OntrackTriggerTest {
 
             e.printStackTrace();
         }
-        assert trigger.getMinimumResult() == Result.FAILURE;
+        assert trigger.getMinimumResult() == OntrackTrigger.FAILURE;
     }
 
     @Test
@@ -98,6 +97,6 @@ public class OntrackTriggerTest {
 
             e.printStackTrace();
         }
-        assert trigger.getMinimumResult() == Result.UNSTABLE;
+        assert trigger.getMinimumResult() == OntrackTrigger.UNSTABLE;
     }
 }
