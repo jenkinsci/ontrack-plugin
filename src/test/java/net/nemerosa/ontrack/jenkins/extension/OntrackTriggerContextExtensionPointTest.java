@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.jenkins.extension;
 
-import antlr.ANTLRException;
-import hudson.model.Result;
 import net.nemerosa.ontrack.jenkins.OntrackTrigger;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class OntrackTriggerContextExtensionPointTest {
 
@@ -15,97 +15,38 @@ public class OntrackTriggerContextExtensionPointTest {
     public static final String PARAMETER_NAME = "parameterName";
 
     @Test
-    public void set_custom_minimum_result(){
-        OntrackTriggerContextExtensionPoint extensionPoint = new OntrackTriggerContextExtensionPoint();
-        OntrackTrigger trigger = null;
-        try {
-            trigger = extensionPoint.ontrackTrigger(
-                    VALID_SPEC,
-                    PROJECT,
-                    BRANCH,
-                    PROMOTION,
-                    PARAMETER_NAME,
-                    "UNSTABLE"
-            );
-        } catch (ANTLRException e) {
-            e.printStackTrace();
-        }
-        assert trigger.getMinimumResult() == Result.UNSTABLE;
-    }
-
-
-    @Test
-    public void invalid_value_results_in_failure(){
-        OntrackTriggerContextExtensionPoint extensionPoint = new OntrackTriggerContextExtensionPoint();
-        OntrackTrigger trigger = null;
-        try {
-            trigger = extensionPoint.ontrackTrigger(
-                    VALID_SPEC,
-                    PROJECT,
-                    BRANCH,
-                    PROMOTION,
-                    PARAMETER_NAME,
-                    "BROL"
-            );
-        } catch (ANTLRException e) {
-            e.printStackTrace();
-        }
-        assert trigger.getMinimumResult() == Result.FAILURE;
+    public void minimumResultIsFailureForInvalidInput() throws Exception {
+        testMinimumResult("BROL", OntrackTrigger.FAILURE);
     }
 
     @Test
-    public void default_value_is_success_for_null(){
-        OntrackTriggerContextExtensionPoint extensionPoint = new OntrackTriggerContextExtensionPoint();
-        OntrackTrigger trigger = null;
-        try {
-            trigger = extensionPoint.ontrackTrigger(
-                    VALID_SPEC,
-                    PROJECT,
-                    BRANCH,
-                    PROMOTION,
-                    PARAMETER_NAME,
-                    null
-            );
-        } catch (ANTLRException e) {
-            e.printStackTrace();
-        }
-        assert trigger.getMinimumResult() == Result.SUCCESS;
+    public void minimumResultIsSuccessForEmptyInput() throws Exception {
+        testMinimumResult("", OntrackTrigger.SUCCESS);
     }
 
     @Test
-    public void default_value_is_success_for_empty(){
-        OntrackTriggerContextExtensionPoint extensionPoint = new OntrackTriggerContextExtensionPoint();
-        OntrackTrigger trigger = null;
-        try {
-            trigger = extensionPoint.ontrackTrigger(
-                    VALID_SPEC,
-                    PROJECT,
-                    BRANCH,
-                    PROMOTION,
-                    PARAMETER_NAME,
-                    ""
-            );
-        } catch (ANTLRException e) {
-            e.printStackTrace();
-        }
-        assert trigger.getMinimumResult() == Result.SUCCESS;
+    public void minimumResultIsSuccessForNullInput() throws Exception {
+        testMinimumResult(null, OntrackTrigger.SUCCESS);
     }
 
     @Test
-    public void default_value_is_success_if_missing_parameter(){
-        OntrackTriggerContextExtensionPoint extensionPoint = new OntrackTriggerContextExtensionPoint();
-        OntrackTrigger trigger = null;
-        try {
-            trigger = extensionPoint.ontrackTrigger(
-                    VALID_SPEC,
-                    PROJECT,
-                    BRANCH,
-                    PROMOTION,
-                    PARAMETER_NAME
-            );
-        } catch (ANTLRException e) {
-            e.printStackTrace();
-        }
-        assert trigger.getMinimumResult() == Result.SUCCESS;
+    public void useValidValuesForMinimumResult() throws Exception {
+        testMinimumResult(OntrackTrigger.SUCCESS, OntrackTrigger.SUCCESS);
+        testMinimumResult(OntrackTrigger.UNSTABLE, OntrackTrigger.UNSTABLE);
+        testMinimumResult(OntrackTrigger.FAILURE, OntrackTrigger.FAILURE);
     }
+
+    public void testMinimumResult(String givenResult, String expectedResult) throws Exception {
+        OntrackTriggerContextExtensionPoint extensionPoint = new OntrackTriggerContextExtensionPoint();
+        OntrackTrigger trigger = extensionPoint.ontrackTrigger(
+                VALID_SPEC,
+                PROJECT,
+                BRANCH,
+                PROMOTION,
+                PARAMETER_NAME,
+                givenResult
+        );
+        assertEquals(expectedResult, trigger.getMinimumResult());
+    }
+
 }

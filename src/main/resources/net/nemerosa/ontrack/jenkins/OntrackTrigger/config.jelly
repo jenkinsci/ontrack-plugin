@@ -15,7 +15,11 @@
     <f:entry title="Parameter name" field="parameterName" default="VERSION">
         <f:textbox />
     </f:entry>
-    <f:entry title="Minimum Result" field="minimumResult" default="SUCCESS">
-        <f:textbox />
+    <f:entry name="minimumResult" title="Minimum Result" field="minimumResult">
+        <select name="minimumResult">
+            <j:forEach var="key" items="${instance.choices}">
+                <f:option value="${key}" selected="${key==instance.minimumResult}">${key}</f:option>
+            </j:forEach>
+        </select>
     </f:entry>
 </j:jelly>

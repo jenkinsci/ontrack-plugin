@@ -1,0 +1,20 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+	xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+	<f:entry title="Name">
+		<f:textbox name="parameter.name" value="${instance.name}" />
+	</f:entry>
+    <f:entry title="Description">
+        <f:textarea name="parameter.description" value="${instance.description}" />
+    </f:entry>
+    <f:entry title="DSL">
+        <f:textarea name="parameter.dsl" value="${instance.dsl}" />
+    </f:entry>
+    <f:entry title="Use Groovy sandbox">
+        <f:checkbox name="parameter.sandbox" value="${instance.sandbox}" />
+    </f:entry>
+    <f:entry title="Value property">
+        <f:textbox name="parameter.valueProperty" value="${instance.valueProperty}" />
+    </f:entry>
+</j:jelly>
