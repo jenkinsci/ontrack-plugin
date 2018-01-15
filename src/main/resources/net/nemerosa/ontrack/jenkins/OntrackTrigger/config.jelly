@@ -15,7 +15,11 @@
     <f:entry title="Parameter name" field="parameterName" default="VERSION">
         <f:textbox />
     </f:entry>
-    <f:entry title="Minimum Result" field="minimumResult" default="SUCCESS">
-        <f:textbox />
+    <f:entry name="minimumResult" title="Minimum Result" field="minimumResult">
+        <select name="minimumResult">
+            <f:option value="SUCCESS">SUCCESS</f:option>
+            <f:option value="UNSTABLE">UNSTABLE</f:option>
+            <f:option value="FAILURE">FAILURE</f:option>
+        </select>
     </f:entry>
 </j:jelly>

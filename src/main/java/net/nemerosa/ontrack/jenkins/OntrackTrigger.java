@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +29,8 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
 
     private static final Level LOG_LEVEL = Level.FINE;
     public static final String SUCCESS = "SUCCESS";
+    public static final String FAILURE = "FAILURE";
+    public static final String UNSTABLE = "UNSTABLE";
 
     /**
      * Ontrack project name
@@ -61,7 +64,9 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
      * @param project       Ontrack project
      * @param branch        Ontrack branch
      * @param promotion     Ontrack promotion
-     * @param parameterName Name of the parameter which contains the name of the build   @throws ANTLRException If CRON expression is not correct
+     * @param parameterName Name of the parameter which contains the name of the build
+     * @param minimumResult Minimum Result of the previous build
+     * @throws ANTLRException If CRON expression is not correct
      */
     @DataBoundConstructor
     public OntrackTrigger(String spec, String project, String branch, String promotion, String parameterName, String minimumResult) throws ANTLRException {
@@ -70,7 +75,11 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         this.branch = branch;
         this.promotion = promotion;
         this.parameterName = parameterName;
-        this.minimumResult = minimumResult!=null?minimumResult:SUCCESS;
+        // First we parse the given String 'minimumResult'
+        // Hence 'minimumResult' will be
+        // - 'SUCCESS' if the input is null or an empty String
+        // - 'FAILURE' if the input contains an invalid value
+        this.minimumResult = (minimumResult!=null&&!minimumResult.isEmpty())?Result.fromString(minimumResult).toString():SUCCESS;
     }
 
     public String getProject() {
@@ -91,6 +100,14 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
 
     public String getMinimumResult() {
         return minimumResult;
+    }
+
+    public List<String> getChoices(){
+        List<String> list = new ArrayList<>();
+        list.add(SUCCESS);
+        list.add(UNSTABLE);
+        list.add(FAILURE);
+        return list;
     }
 
     @Override
