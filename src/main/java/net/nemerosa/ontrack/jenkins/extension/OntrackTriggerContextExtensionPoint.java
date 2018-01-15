@@ -23,7 +23,7 @@ public class OntrackTriggerContextExtensionPoint extends ContextExtensionPoint {
      */
     @DslExtensionMethod(context = TriggerContext.class)
     public OntrackTrigger ontrackTrigger(String spec, String project, String branch, String promotion, String parameterName) throws ANTLRException {
-        return new OntrackTrigger(spec, project, branch, promotion, parameterName, "SUCCESS");
+        return ontrackTrigger(spec, project, branch, promotion, parameterName, null);
     }
 
     /**
