@@ -113,7 +113,7 @@ public class OntrackValidateStep extends Step {
                     if (buildResult.equals(Result.SUCCESS)) {
                         actualStatus = "PASSED";
                     } else if (buildResult.equals(Result.UNSTABLE)) {
-                        actualStatus = "UNSTABLE";
+                        actualStatus = "WARNING";
                     } else if (buildResult.equals(Result.FAILURE)) {
                         actualStatus = "FAILED";
                     } else if (buildResult.equals(Result.ABORTED)) {
