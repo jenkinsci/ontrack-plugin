@@ -58,6 +58,20 @@ Enter a DSL which returns one object and extracts a property of this
 object using the _Value property_ field. The resulting string will
 be used as the value for the parameter.
 
+In [Declarative Pipeline Syntax](https://jenkins.io/doc/book/pipeline/syntax/#declarative-pipeline), parameters can be specified as in the example below,
+
+```groovy
+    parameters {
+        ontrackSingleParam(name: 'RELEASE_NUMBER', description: 'Release number', dsl: "ontrack.branch('PRJ', 'BRANCH')", valueProperty: 'name')
+    }
+```
+
+and then used as in the example below.
+
+```groovy
+    params.RELEASE_NUMBER
+```
+
 ### Parameter choice
 
 The DSL can be used to allow the selection among a list of values
@@ -69,6 +83,20 @@ Enter a DSL which returns a list of objects (a single object would
    be converted into a singleton list) and extracts a property of
    each item using the _Value property_ field. The resulting list of
    strings is then used for the selection.
+
+In [Declarative Pipeline Syntax](https://jenkins.io/doc/book/pipeline/syntax/#declarative-pipeline), parameters can be specified as in the example below,
+
+```groovy
+    parameters {
+        ontrackChoiceParam(name: 'RELEASE_NUMBER', description: 'Release number', dsl: "ontrack.branch('PRJ', 'BRANCH').standardFilter(count: 5)", valueProperty: 'name')
+    }
+```
+
+and then used as in the example below.
+
+```groovy
+    params.RELEASE_NUMBER
+```
 
 ### Run condition
 

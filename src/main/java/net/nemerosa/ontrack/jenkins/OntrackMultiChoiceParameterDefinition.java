@@ -5,6 +5,7 @@ import hudson.model.ParameterValue;
 import hudson.model.StringParameterValue;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -49,6 +50,7 @@ public class OntrackMultiChoiceParameterDefinition extends AbstractOntrackMultip
     }
 
     @Extension
+    @Symbol("ontrackMultiChoiceParam")
     public static class DescriptorImpl extends ParameterDescriptor {
 
         @Override
