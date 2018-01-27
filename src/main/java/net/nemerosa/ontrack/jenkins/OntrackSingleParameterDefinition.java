@@ -5,6 +5,7 @@ import hudson.model.ParameterValue;
 import hudson.model.StringParameterValue;
 import net.nemerosa.ontrack.jenkins.dsl.DSLRunner;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -51,6 +52,7 @@ public class OntrackSingleParameterDefinition extends AbstractOntrackParameterDe
     }
 
     @Extension
+    @Symbol("ontrackSingleParam")
     public static class DescriptorImpl extends ParameterDescriptor {
 
         @Override
