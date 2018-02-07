@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +28,9 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
     private static final Logger LOGGER = Logger.getLogger(OntrackTrigger.class.getName());
 
     private static final Level LOG_LEVEL = Level.FINE;
+    public static final String SUCCESS = "SUCCESS";
+    public static final String FAILURE = "FAILURE";
+    public static final String UNSTABLE = "UNSTABLE";
 
     /**
      * Ontrack project name
@@ -51,7 +55,7 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
     /**
      * Minimum result of previous run
      */
-    private final Result minimumResult;
+    private final String minimumResult;
 
     /**
      * Constructor.
@@ -60,7 +64,9 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
      * @param project       Ontrack project
      * @param branch        Ontrack branch
      * @param promotion     Ontrack promotion
-     * @param parameterName Name of the parameter which contains the name of the build   @throws ANTLRException If CRON expression is not correct
+     * @param parameterName Name of the parameter which contains the name of the build
+     * @param minimumResult Minimum Result of the previous build
+     * @throws ANTLRException If CRON expression is not correct
      */
     @DataBoundConstructor
     public OntrackTrigger(String spec, String project, String branch, String promotion, String parameterName, String minimumResult) throws ANTLRException {
@@ -69,9 +75,11 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         this.branch = branch;
         this.promotion = promotion;
         this.parameterName = parameterName;
-        if(minimumResult==null||minimumResult.isEmpty()) minimumResult = "SUCCESS";
-        // if 'minimumResult' contains an invalid value, the fromString method will return Result.FAILURE
-        this.minimumResult = Result.fromString(minimumResult);
+        // First we parse the given String 'minimumResult'
+        // Hence 'minimumResult' will be
+        // - 'SUCCESS' if the input is null or an empty String
+        // - 'FAILURE' if the input contains an invalid value
+        this.minimumResult = (minimumResult!=null&&!minimumResult.isEmpty())?Result.fromString(minimumResult).toString():SUCCESS;
     }
 
     public String getProject() {
@@ -90,8 +98,16 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         return parameterName;
     }
 
-    public Result getMinimumResult() {
+    public String getMinimumResult() {
         return minimumResult;
+    }
+
+    public List<String> getChoices(){
+        List<String> list = new ArrayList<>();
+        list.add(SUCCESS);
+        list.add(UNSTABLE);
+        list.add(FAILURE);
+        return list;
     }
 
     @Override
@@ -146,7 +162,8 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         Run lastBuild = job.getLastBuild();
         if (lastBuild != null) {
             Result result = lastBuild.getResult();
-            if (result == null || (result.isWorseThan(minimumResult) && result.isCompleteBuild())) {
+            Result minimum = Result.fromString(minimumResult);
+            if (result == null || (result.isWorseThan(minimum) && result.isCompleteBuild())) {
                 LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Last build was failed or unsuccessful", job.getFullName()));
                 firing = true;
             } else {
