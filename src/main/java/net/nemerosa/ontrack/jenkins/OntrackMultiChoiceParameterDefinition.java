@@ -22,13 +22,22 @@ public class OntrackMultiChoiceParameterDefinition extends AbstractOntrackMultip
 
     @Override
     public ParameterValue createValue(StaplerRequest req, JSONObject jo) {
-        JSONArray jsonArray = (JSONArray)jo.get("value");
+        Object object = jo.get("value");
         List<String> choices = getChoices();
         List<String> selectionList = new ArrayList<>();
-        for(int i=0;i<choices.size();i++){
-            String choice = choices.get(i);
-            if((Boolean)jsonArray.get(i)){
-                selectionList.add(choice);
+        if(object instanceof Boolean && !choices.isEmpty()){
+            Boolean selected = (Boolean) object;
+            String firstOption = choices.get(0);
+            if(selected){
+                selectionList.add(firstOption);
+            }
+        } else if (object instanceof JSONArray) {
+            JSONArray jsonArray = (JSONArray) object;
+            for (int i = 0; i < choices.size(); i++) {
+                String choice = choices.get(i);
+                if ((Boolean) jsonArray.get(i)) {
+                    selectionList.add(choice);
+                }
             }
         }
         String selections = StringUtils.join(selectionList, ',');
