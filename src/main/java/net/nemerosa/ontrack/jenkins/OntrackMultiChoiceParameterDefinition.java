@@ -34,7 +34,7 @@ public class OntrackMultiChoiceParameterDefinition extends AbstractOntrackMultip
             JSONArray jsonArray = (JSONArray) object;
             for (int i = 0; i < choices.size(); i++) {
                 String choice = choices.get(i);
-                if ((Boolean) jsonArray.get(i)) {
+                if (i < jsonArray.size() && jsonArray.get(i) instanceof Boolean && (Boolean) jsonArray.get(i)){
                     selectionList.add(choice);
                 }
             }
