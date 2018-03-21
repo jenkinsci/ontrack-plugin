@@ -28,6 +28,7 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
+                    echo "Jenkins branch name = ${BRANCH_NAME}"
                     branchName = ontrackBranchName(BRANCH_NAME)
                     echo "Ontrack branch name = ${branchName}"
                     pr = BRANCH_NAME ==~ 'PR-.*'
