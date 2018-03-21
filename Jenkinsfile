@@ -7,7 +7,12 @@ boolean pr = false
 
 pipeline {
 
-    agent any
+    agent {
+        docker {
+            image 'maven:3-alpine'
+            label 'docker'
+        }
+    }
 
     options {
         // General Jenkins job properties
@@ -47,12 +52,6 @@ pipeline {
         }
 
         stage('Build') {
-            agent {
-                docker {
-                    image 'maven:3-alpine'
-                    label 'docker'
-                }
-            }
             steps {
                 sh '''\
 mvn clean verify --batch-mode 
