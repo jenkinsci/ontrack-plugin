@@ -228,7 +228,7 @@ public class OntrackTrigger extends Trigger<Job> {
 
         @Override
         public boolean isApplicable(Item item) {
-            return item instanceof AbstractProject;
+            return item instanceof Job;
         }
 
         @Override
