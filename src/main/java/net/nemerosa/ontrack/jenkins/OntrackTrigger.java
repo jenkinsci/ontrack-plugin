@@ -7,6 +7,7 @@ import hudson.model.*;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import hudson.util.LogTaskListener;
+import jenkins.model.ParameterizedJobMixIn;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 /**
  * Trigger based on builds and promotions.
  */
-public class OntrackTrigger extends Trigger<AbstractProject> {
+public class OntrackTrigger extends Trigger<Job> {
 
     private static final Logger LOGGER = Logger.getLogger(OntrackTrigger.class.getName());
 
@@ -94,6 +95,7 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         return promotion;
     }
 
+    @SuppressWarnings("unused")
     public String getParameterName() {
         return parameterName;
     }
@@ -209,9 +211,10 @@ public class OntrackTrigger extends Trigger<AbstractProject> {
         } else {
             LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Firing with %s = %s", job.getFullName(), parameterNameValue, lastVersion));
             // Scheduling
-            job.scheduleBuild2(
+            ParameterizedJobMixIn.scheduleBuild2(
+                    job,
                     0,
-                    new OntrackTriggerCause(),
+                    new CauseAction(new OntrackTriggerCause()),
                     new ParametersAction(
                             new StringParameterValue(parameterNameValue, lastVersion)
                     )
