@@ -29,8 +29,6 @@ public class OntrackStepHelper {
         FlowNode flowNode = context.get(FlowNode.class);
         if (flowNode != null) {
             Long durationSeconds = getTiming(flowNode);
-            // TODO Cause
-            // TODO URL
             if (durationSeconds != null) {
                 runInfo.put("runTime", durationSeconds);
             }
