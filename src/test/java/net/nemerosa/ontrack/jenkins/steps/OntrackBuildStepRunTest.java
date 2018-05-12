@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.jenkins.steps;
 
 import hudson.model.Result;
 import net.nemerosa.ontrack.dsl.Branch;
+import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -56,14 +57,17 @@ public class OntrackBuildStepRunTest {
 
         Ontrack ontrack = mock(Ontrack.class);
         Branch mockBranch = mock(Branch.class);
+        Build mockBuild = mock(Build.class);
 
         when(ontrack.branch("prj", "master")).thenReturn(mockBranch);
+        when(mockBranch.build("1", "Build 1", true)).thenReturn(mockBuild);
 
         OntrackDSLConnector.setOntrack(ontrack);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
         verify(mockBranch, times(1)).build("1", "Build 1", true);
+        verify(mockBuild, times(1)).setRunInfo(anyMapOf(String.class, Object.class));
     }
 
 }

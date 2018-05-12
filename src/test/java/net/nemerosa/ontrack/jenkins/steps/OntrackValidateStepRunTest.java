@@ -4,6 +4,7 @@ import hudson.model.Result;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.ValidationRun;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -27,14 +28,17 @@ public class OntrackValidateStepRunTest {
 
         Ontrack ontrack = mock(Ontrack.class);
         Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validate("VS", "PASSED")).thenReturn(mockRun);
 
         OntrackDSLConnector.setOntrack(ontrack);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
         verify(mockBuild, times(1)).validate("VS", "PASSED");
+        verify(mockRun, times(1)).setRunInfo(anyMapOf(String.class, Object.class));
     }
 
     @Test
@@ -45,14 +49,17 @@ public class OntrackValidateStepRunTest {
 
         Ontrack ontrack = mock(Ontrack.class);
         Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validate("VS", "FAILED")).thenReturn(mockRun);
 
         OntrackDSLConnector.setOntrack(ontrack);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
         verify(mockBuild, times(1)).validate("VS", "FAILED");
+        verify(mockRun, times(1)).setRunInfo(anyMapOf(String.class, Object.class));
     }
 
 }
