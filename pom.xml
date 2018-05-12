@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>2.21</version>
+        <version>3.9</version>
     </parent>
 
     <artifactId>ontrack</artifactId>
@@ -14,8 +14,8 @@
     <name>ontrack Jenkins plug-in</name>
 
     <properties>
-        <jenkins.version>2.7.4</jenkins.version>
-        <java.level>7</java.level>
+        <jenkins.version>2.107.3</jenkins.version>
+        <java.level>8</java.level>
     </properties>
 
     <developers>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.3.3</version>
+            <version>4.5.3</version>
         </dependency>
         <!-- Run condition -->
         <dependency>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.4.7</version>
+            <version>2.4.12</version>
         </dependency>
         <!-- Environment injection -->
         <dependency>
@@ -83,8 +83,18 @@
         <!-- Pipeline Step API -->
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-support</artifactId>
+            <version>2.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-api</artifactId>
+            <version>2.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-step-api</artifactId>
-            <version>2.7</version>
+            <version>2.9</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -95,7 +105,7 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-cps</artifactId>
-            <version>2.7</version>
+            <version>2.19</version>
             <scope>test</scope>
         </dependency>
         <dependency>
