@@ -17,7 +17,7 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackBuildNotifier ontrackBuild(String project, String branch, String build) {
-        return new OntrackBuildNotifier(project, branch, build, false);
+        return new OntrackBuildNotifier(project, branch, build, false, false);
     }
 
     /**
@@ -25,7 +25,15 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackBuildNotifier ontrackBuild(String project, String branch, String build, boolean ignoreFailure) {
-        return new OntrackBuildNotifier(project, branch, build, ignoreFailure);
+        return new OntrackBuildNotifier(project, branch, build, ignoreFailure, false);
+    }
+
+    /**
+     * Creation of a build with ignore failure and run info option
+     */
+    @DslExtensionMethod(context = PublisherContext.class)
+    public OntrackBuildNotifier ontrackBuild(String project, String branch, String build, boolean ignoreFailure, boolean runInfo) {
+        return new OntrackBuildNotifier(project, branch, build, ignoreFailure, runInfo);
     }
 
     /**
