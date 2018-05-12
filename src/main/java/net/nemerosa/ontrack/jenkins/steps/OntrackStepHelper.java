@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
+import hudson.model.Run;
+import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 import org.jenkinsci.plugins.workflow.actions.TimingAction;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
@@ -8,7 +10,6 @@ import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +17,14 @@ public class OntrackStepHelper {
 
     public static @Nullable
     Map<String, ?> getRunInfo(StepContext context) throws IOException, InterruptedException {
-        // Collecting run info
-        Map<String, Object> runInfo = new HashMap<>();
+        // Gets the associated run
+        Run run = context.get(Run.class);
+        if (run == null) {
+            // No run? Getting away from there...
+            return null;
+        }
+        // Base run info
+        Map<String, Object> runInfo = OntrackPluginSupport.getRunInfo(run);
         // Gets the (current) duration of the stage
         FlowNode flowNode = context.get(FlowNode.class);
         if (flowNode != null) {
