@@ -9,16 +9,11 @@ import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.workflow.actions.TimingAction;
-import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
-import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -97,19 +92,9 @@ public class OntrackBuildStep extends Step {
                     ontrackBuild.getConfig().gitCommit(gitCommit);
                 }
                 // Collecting run info
-                Map<String, Object> runInfo = new HashMap<>();
-                // Gets the (current) duration of the stage
-                FlowNode flowNode = context.get(FlowNode.class);
-                if (flowNode != null) {
-                    Long durationSeconds = getTiming(flowNode);
-                    // TODO Cause
-                    // TODO URL
-                    if (durationSeconds != null) {
-                        runInfo.put("runTime", durationSeconds);
-                    }
-                }
+                Map<String, ?> runInfo = OntrackStepHelper.getRunInfo(context);
                 // If not empty, send the runtime
-                if (!runInfo.isEmpty()) {
+                if (runInfo != null && !runInfo.isEmpty()) {
                     ontrackBuild.setRunInfo(runInfo);
                 }
                 // Done
@@ -117,36 +102,6 @@ public class OntrackBuildStep extends Step {
             }
         };
     }
-
-    // org.jenkinsci.plugins.workflow.support.steps.StageStep
-    protected Long getTiming(FlowNode node) {
-        if (node instanceof StepStartNode) {
-            StepStartNode stepNode = (StepStartNode) node;
-            StepDescriptor stepDescriptor = stepNode.getDescriptor();
-            if (stepDescriptor != null) {
-                String stepDescriptorId = stepDescriptor.getId();
-                if ("org.jenkinsci.plugins.workflow.support.steps.StageStep".equals(stepDescriptorId)) {
-                    TimingAction timingAction = node.getAction(TimingAction.class);
-                    if (timingAction != null) {
-                        long startTime = timingAction.getStartTime();
-                        return (System.currentTimeMillis() - startTime) / 1000;
-                    }
-                }
-            }
-        }
-        return getTiming(node.getParents());
-    }
-
-    private Long getTiming(List<FlowNode> nodes) {
-        for (FlowNode node : nodes) {
-            Long durationSeconds = getTiming(node);
-            if (durationSeconds != null) {
-                return durationSeconds;
-            }
-        }
-        return null;
-    }
-
 
     @Extension
     public static class DescriptorImpl extends StepDescriptor {

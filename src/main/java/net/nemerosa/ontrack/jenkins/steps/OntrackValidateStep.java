@@ -7,12 +7,14 @@ import hudson.model.Result;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.ValidationRun;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 import java.util.Set;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -125,7 +127,13 @@ public class OntrackValidateStep extends Step {
                     actualStatus = validationStatus;
                 }
                 // ... and creates a validation run
-                ontrackBuild.validate(validationStamp, actualStatus);
+                ValidationRun validationRun = ontrackBuild.validate(validationStamp, actualStatus);
+                // Collecting run info
+                Map<String, ?> runInfo = OntrackStepHelper.getRunInfo(context);
+                // If not empty, send the runtime
+                if (runInfo != null && !runInfo.isEmpty()) {
+                    validationRun.setRunInfo(runInfo);
+                }
                 // Done
                 return null;
             }
