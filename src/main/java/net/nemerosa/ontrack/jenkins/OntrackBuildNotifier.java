@@ -126,7 +126,12 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                     }
                     // Gets the duration of this build
                     long durationMs = theBuild.getDuration();
-                    long durationSeconds = durationMs / 1000;
+                    long durationSeconds;
+                    if (durationMs > 0) {
+                        durationSeconds = durationMs / 1000;
+                    } else {
+                        durationSeconds = (System.currentTimeMillis() - theBuild.getStartTimeInMillis()) / 1000;
+                    }
                     // Creates the run info
                     Map<String, Object> runInfo = new HashMap<>();
                     runInfo.put("sourceType", "jenkins");
@@ -135,7 +140,9 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                         runInfo.put("triggerType", triggerType);
                         runInfo.put("triggerData", triggerData);
                     }
-                    runInfo.put("runTime", durationSeconds);
+                    if (durationSeconds > 0) {
+                        runInfo.put("runTime", durationSeconds);
+                    }
                     build.setRunInfo(runInfo);
                 }
             } catch (OTMessageClientException ex) {
