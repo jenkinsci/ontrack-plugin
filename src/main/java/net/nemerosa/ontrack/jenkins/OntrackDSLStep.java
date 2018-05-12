@@ -84,7 +84,8 @@ public class OntrackDSLStep extends Builder {
         // Reads the script text
         String script = OntrackPluginSupport.readScript(theBuild, usingText, scriptText, scriptPath);
         // Connector to Jenkins
-        JenkinsConnector jenkins = new JenkinsConnector(theBuild, listener);
+        JenkinsConnector jenkins = new JenkinsConnector(theBuild, listener, runInfo -> {
+        });
         // Ontrack DSL support
         OntrackDSLRunner dsl = OntrackDSLRunner.getRunnerForBuild(theBuild.getProject(), listener)
                 .injectEnvironment(injectEnvironment, theBuild, listener)

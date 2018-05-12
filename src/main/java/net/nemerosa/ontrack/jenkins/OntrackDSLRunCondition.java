@@ -82,7 +82,7 @@ public class OntrackDSLRunCondition extends RunCondition {
         // Reads the script text
         String script = OntrackPluginSupport.readScript(build, usingText, scriptText, scriptPath);
         // Connector to Jenkins
-        JenkinsConnector jenkins = new JenkinsConnector(build, listener);
+        JenkinsConnector jenkins = new JenkinsConnector(build, listener, runInfo -> {});
         // Ontrack DSL support
         OntrackDSLRunner dsl = OntrackDSLRunner.getRunnerForBuild(build.getProject(), listener)
                 .injectEnvironment(injectEnvironment, build, listener)

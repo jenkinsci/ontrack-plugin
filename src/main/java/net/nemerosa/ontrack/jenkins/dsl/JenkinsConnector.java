@@ -3,23 +3,40 @@ package net.nemerosa.ontrack.jenkins.dsl;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class JenkinsConnector {
 
     private final Map<String, String> env = new LinkedHashMap<>();
     private final Run build;
     private final TaskListener listener;
+    private final Consumer<Map<String, Object>> runInfoAdapter;
 
-    public JenkinsConnector(Run build, TaskListener listener) {
+    public JenkinsConnector(Run build, TaskListener listener, Consumer<Map<String, Object>> runInfoAdapter) {
         this.build = build;
         this.listener = listener;
+        this.runInfoAdapter = runInfoAdapter;
     }
 
     public void env(String name, String value) {
         env.put(name, value);
+    }
+
+    /**
+     * Gets the current run info, associated to the build or the current stage
+     * for a pipeline.
+     * <p>
+     * The returned map can be directly as a run info parameter for a build
+     * or a validation run.
+     */
+    public Map<String, ?> getRunInfo() {
+        Map<String, Object> runInfo = OntrackPluginSupport.getRunInfo(build);
+        runInfoAdapter.accept(runInfo);
+        return runInfo;
     }
 
     /**

@@ -15,6 +15,8 @@ A `jenkins` object is made available, in order to allow you to have access to th
 * `success` - `true` if the current status of the build is SUCCESS
 * `unstable` - `true` if the current status of the build is UNSTABLE
 * `failure` - `true` if the current status of the build is FAILURE
+* `runInfo` - a run info map, ready to be set on builds or validation runs, or `null`
+  if no run info can be computed
 
 All DSL steps and actions take additional parameters other than the DSL script itself.
 

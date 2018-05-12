@@ -17,6 +17,8 @@ import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLRunner;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Notifier that allows to call the Ontrack DSL.
@@ -91,7 +93,7 @@ public class OntrackDSLNotifier extends Notifier {
         // Reads the script text
         String script = OntrackPluginSupport.readScript(theBuild, usingText, scriptText, scriptPath);
         // Connector to Jenkins
-        JenkinsConnector jenkins = new JenkinsConnector(theBuild, listener);
+        JenkinsConnector jenkins = new JenkinsConnector(theBuild, listener, runInfo -> {});
         // Ontrack DSL support
         OntrackDSLRunner dsl = OntrackDSLRunner.getRunnerForBuild(theBuild.getProject(), listener)
                 .injectEnvironment(injectEnvironment, theBuild, listener)

@@ -25,19 +25,28 @@ public class OntrackStepHelper {
         }
         // Base run info
         Map<String, Object> runInfo = OntrackPluginSupport.getRunInfo(run);
-        // Gets the (current) duration of the stage
-        FlowNode flowNode = context.get(FlowNode.class);
-        if (flowNode != null) {
-            Long durationSeconds = getTiming(flowNode);
-            if (durationSeconds != null) {
-                runInfo.put("runTime", durationSeconds);
-            }
-        }
+        // Adaptation
+        adaptRunInfo(context, runInfo);
         // Run info if not empty
         if (runInfo.isEmpty()) {
             return null;
         } else {
             return runInfo;
+        }
+    }
+
+    public static void adaptRunInfo(StepContext context, Map<String, Object> runInfo) {
+        // Gets the (current) duration of the stage
+        FlowNode flowNode = null;
+        try {
+            flowNode = context.get(FlowNode.class);
+        } catch (IOException | InterruptedException ignored) {
+        }
+        if (flowNode != null) {
+            Long durationSeconds = getTiming(flowNode);
+            if (durationSeconds != null) {
+                runInfo.put("runTime", durationSeconds);
+            }
         }
     }
 

@@ -96,7 +96,9 @@ public class OntrackScriptStep extends Step implements Serializable {
                 Run run = context.get(Run.class);
                 if (run != null) {
                     values.put("jenkins", new JenkinsConnector(
-                            run, listener
+                            run,
+                            listener,
+                            runInfo -> OntrackStepHelper.adaptRunInfo(context, runInfo)
                     ));
                 }
                 // Binding
