@@ -1,19 +1,19 @@
 package net.nemerosa.ontrack.jenkins.dsl;
 
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class JenkinsConnector {
 
-    private final Map<String, String> env = new LinkedHashMap<String, String>();
-    private final AbstractBuild build;
-    private final BuildListener listener;
+    private final Map<String, String> env = new LinkedHashMap<>();
+    private final Run build;
+    private final TaskListener listener;
 
-    public JenkinsConnector(AbstractBuild build, BuildListener listener) {
+    public JenkinsConnector(Run build, TaskListener listener) {
         this.build = build;
         this.listener = listener;
     }
@@ -36,7 +36,7 @@ public class JenkinsConnector {
      *
      * @return Associated build
      */
-    public AbstractBuild getBuild() {
+    public Run getBuild() {
         return build;
     }
 
@@ -45,7 +45,7 @@ public class JenkinsConnector {
      *
      * @return Build listener
      */
-    public BuildListener getListener() {
+    public TaskListener getListener() {
         return listener;
     }
 

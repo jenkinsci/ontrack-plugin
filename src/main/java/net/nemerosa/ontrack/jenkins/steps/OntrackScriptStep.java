@@ -5,8 +5,10 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import hudson.AbortException;
 import hudson.Extension;
+import hudson.model.Run;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.dsl.JenkinsConnector;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import net.sf.json.JSON;
 import net.sf.json.JSONSerializer;
@@ -90,6 +92,13 @@ public class OntrackScriptStep extends Step implements Serializable {
                 Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
                 // Values to bind
                 Map<String, Object> values = new HashMap<>(bindings);
+                // Jenkins connector
+                Run run = context.get(Run.class);
+                if (run != null) {
+                    values.put("jenkins", new JenkinsConnector(
+                            run, listener
+                    ));
+                }
                 // Binding
                 values.put("ontrack", ontrack);
                 values.put("out", listener.getLogger());

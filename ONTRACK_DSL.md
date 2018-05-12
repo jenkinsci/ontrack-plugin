@@ -9,8 +9,8 @@ An `ontrack` object is made available - please look in the [Ontrack DSL document
 
 A `jenkins` object is made available, in order to allow you to have access to the current build. This object has the following methods and properties:
 
-* `build` - access to the [current build](http://javadoc.jenkins-ci.org/hudson/model/AbstractBuild.html)
-* `listener` - access to the [build listener](http://javadoc.jenkins-ci.org/hudson/model/BuildListener.html)
+* `build` - access to the [current build](http://javadoc.jenkins-ci.org/hudson/model/Run.html)
+* `listener` - access to the [build listener](http://javadoc.jenkins-ci.org/hudson/model/TaskListener.html)
 * `env(String name, String value)` - sets an environment variable in the current build
 * `success` - `true` if the current status of the build is SUCCESS
 * `unstable` - `true` if the current status of the build is UNSTABLE
