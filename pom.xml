@@ -72,7 +72,7 @@
         <dependency>
             <groupId>net.nemerosa.ontrack</groupId>
             <artifactId>ontrack-dsl</artifactId>
-            <version>feature-600-run-info-ccbdb45</version>
+            <version>feature-600-run-info-04ab67b</version>
         </dependency>
         <!-- Security plugin -->
         <dependency>

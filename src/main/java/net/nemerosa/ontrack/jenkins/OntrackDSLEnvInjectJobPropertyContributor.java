@@ -59,7 +59,7 @@ public class OntrackDSLEnvInjectJobPropertyContributor extends EnvInjectJobPrope
         Map<String, Object> values = new HashMap<String, Object>();
         // Binding
         values.put("ontrack", ontrack);
-        values.put("jenkins", Jenkins.getInstance());
+        values.put("jenkins", Jenkins.getInstanceOrNull());
         values.put("build", build);
         values.put("out", listener.getLogger());
         try {

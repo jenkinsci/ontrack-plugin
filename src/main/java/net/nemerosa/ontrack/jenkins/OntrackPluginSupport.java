@@ -87,7 +87,19 @@ public final class OntrackPluginSupport {
     }
 
     public static Map<String, Object> getRunInfo(Run theBuild) {
-        // TODO Checks the version of Ontrack
+        // Checks the version of Ontrack
+        OntrackConfiguration configuration = OntrackConfiguration.getOntrackConfiguration();
+        if (configuration != null) {
+            Version version = configuration.getVersion();
+            if (version != null && version.isValid()) {
+                int major = version.getMajor();
+                int minor = version.getMinor();
+                boolean versionOk = (major == 2 && minor >= 35) || (major == 3 && minor >= 35) || (major > 3);
+                if (!versionOk) {
+                    return Collections.emptyMap();
+                }
+            }
+        }
         // Gets the URL of this build
         Jenkins jenkins = Jenkins.getInstanceOrNull();
         if (jenkins == null) {

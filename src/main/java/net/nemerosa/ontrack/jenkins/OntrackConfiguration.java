@@ -4,7 +4,9 @@ import hudson.Extension;
 import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
+import net.nemerosa.ontrack.dsl.OntrackConnection;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nullable;
@@ -25,9 +27,16 @@ public class OntrackConfiguration extends GlobalConfiguration {
     private int ontrackMaxTries = 1;
     private int ontrackRetryDelaySeconds = 10000;
     private OntrackSecurityMode securityMode = OntrackSecurityMode.DEFAULT;
+    private Version version = null;
 
     public OntrackConfiguration() {
         load();
+    }
+
+    @Override
+    public synchronized void load() {
+        super.load();
+        loadVersion();
     }
 
     @Override
@@ -40,7 +49,38 @@ public class OntrackConfiguration extends GlobalConfiguration {
         ontrackRetryDelaySeconds = json.getInt("ontrackRetryDelaySeconds");
         securityMode = OntrackSecurityMode.valueOf(json.getString("securityMode"));
         save();
-        return super.configure(req, json);
+        boolean ok = super.configure(req, json);
+        // Getting the version from Ontrack
+        loadVersion();
+        // OK
+        return ok;
+    }
+
+    private synchronized Version loadVersion() {
+        try {
+            OntrackConnection connection = OntrackConnection.create(ontrackUrl);
+            String user = ontrackUser;
+            if (StringUtils.isNotBlank(user)) {
+                connection = connection.authenticate(
+                        user,
+                        ontrackPassword
+                );
+            }
+            String versionString = connection.build().getVersion();
+            version = Version.of(versionString);
+        } catch (Exception ignored) {
+            version = null;
+        }
+        return version;
+    }
+
+    public @Nullable
+    Version getVersion() {
+        if (version != null) {
+            return version;
+        } else {
+            return loadVersion();
+        }
     }
 
     public String getOntrackConfigurationName() {
