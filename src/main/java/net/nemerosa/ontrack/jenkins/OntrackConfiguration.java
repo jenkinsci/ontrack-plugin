@@ -7,12 +7,15 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
+import javax.annotation.Nullable;
+
 @Extension
 public class OntrackConfiguration extends GlobalConfiguration {
 
-    public static OntrackConfiguration getOntrackConfiguration() {
-        Jenkins instance = Jenkins.getInstance();
-        return (OntrackConfiguration) instance.getDescriptor(OntrackConfiguration.class);
+    public static @Nullable
+    OntrackConfiguration getOntrackConfiguration() {
+        Jenkins instance = Jenkins.getInstanceOrNull();
+        return instance != null ? (OntrackConfiguration) instance.getDescriptor(OntrackConfiguration.class) : null;
     }
 
     private String ontrackConfigurationName;

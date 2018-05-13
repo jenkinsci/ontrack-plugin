@@ -18,7 +18,6 @@ import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import java.io.IOException;
 import java.util.Map;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
@@ -80,7 +79,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+    public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) {
         // Only triggers in case of success
         Result result = theBuild.getResult();
         if (result != null && result.isBetterOrEqualTo(Result.SUCCESS)) {
@@ -99,11 +98,14 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                 Build build = branch.build(buildName, buildDescription, true);
                 // Sets the Jenkins build property
                 // Note: cannot use the Groovy DSL here, using internal classes
-                new BuildProperties(ontrack, build).jenkinsBuild(
-                        OntrackConfiguration.getOntrackConfiguration().getOntrackConfigurationName(),
-                        getProjectPath(theBuild),
-                        theBuild.getNumber()
-                );
+                OntrackConfiguration ontrackConfiguration = OntrackConfiguration.getOntrackConfiguration();
+                if (ontrackConfiguration != null) {
+                    new BuildProperties(ontrack, build).jenkinsBuild(
+                            ontrackConfiguration.getOntrackConfigurationName(),
+                            getProjectPath(theBuild),
+                            theBuild.getNumber()
+                    );
+                }
                 // Run info
                 if (runInfo) {
                     Map<String, Object> runInfo = getRunInfo(theBuild);
@@ -132,7 +134,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
      */
     protected String getProjectPath(AbstractBuild<?, ?> theBuild) {
         return StringUtils.replace(
-                theBuild.getProject().getRelativeNameFrom(Jenkins.getInstance()),
+                theBuild.getProject().getRelativeNameFrom(Jenkins.getInstanceOrNull()),
                 "/",
                 "/job/"
         );

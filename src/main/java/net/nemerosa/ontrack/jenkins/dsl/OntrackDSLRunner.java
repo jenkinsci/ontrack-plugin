@@ -184,7 +184,7 @@ public class OntrackDSLRunner implements DSLRunner {
     }
 
     private static boolean isUseSecurity() {
-        Jenkins jenkins = Jenkins.getInstance();
+        Jenkins jenkins = Jenkins.getInstanceOrNull();
         return jenkins != null && jenkins.isUseSecurity();
     }
 

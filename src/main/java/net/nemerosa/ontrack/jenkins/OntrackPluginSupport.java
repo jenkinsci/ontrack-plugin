@@ -7,16 +7,13 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class OntrackPluginSupport {
 
-    public static final String REGEX_ENV_VARIABLE = "\\$\\{([a-zA-Z0-9_]+)\\}";
+    public static final String REGEX_ENV_VARIABLE = "\\$\\{([a-zA-Z0-9_]+)}";
 
     public static String readScript(AbstractBuild build, boolean usingText, String scriptText, String scriptPath) throws IOException {
         if (usingText) {
@@ -70,7 +67,7 @@ public final class OntrackPluginSupport {
     }
 
     public static Map<String, String> parseProperties(String text, Run<?, ?> theBuild, TaskListener listener) throws IOException, InterruptedException {
-        Map<String, String> properties = new LinkedHashMap<String, String>();
+        Map<String, String> properties = new LinkedHashMap<>();
         String[] lines = StringUtils.split(text, "\n\r");
         for (String line : lines) {
             if (!StringUtils.isBlank(line)) {
@@ -92,10 +89,15 @@ public final class OntrackPluginSupport {
     public static Map<String, Object> getRunInfo(Run theBuild) {
         // TODO Checks the version of Ontrack
         // Gets the URL of this build
-        String url = Jenkins.getInstance().getRootUrl() + theBuild.getUrl();
+        Jenkins jenkins = Jenkins.getInstanceOrNull();
+        if (jenkins == null) {
+            return Collections.emptyMap();
+        }
+        String url = jenkins.getRootUrl() + theBuild.getUrl();
         // Gets the cause of this build
         String triggerType = null;
         String triggerData = null;
+        @SuppressWarnings("unchecked")
         List<Cause> causes = theBuild.getCauses();
         if (!causes.isEmpty()) {
             Cause cause = causes.get(0);
