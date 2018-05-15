@@ -18,6 +18,7 @@ import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
@@ -79,7 +80,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) {
+    public boolean perform(AbstractBuild<?, ?> theBuild, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         // Only triggers in case of success
         Result result = theBuild.getResult();
         if (result != null && result.isBetterOrEqualTo(Result.SUCCESS)) {
@@ -108,7 +109,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                 }
                 // Run info
                 if (runInfo) {
-                    Map<String, Object> runInfo = getRunInfo(theBuild);
+                    Map<String, Object> runInfo = getRunInfo(theBuild, listener);
                     if (runInfo != null) {
                         build.setRunInfo(runInfo);
                     }

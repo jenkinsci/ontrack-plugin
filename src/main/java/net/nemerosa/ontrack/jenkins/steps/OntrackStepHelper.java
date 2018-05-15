@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
 import hudson.model.Run;
+import hudson.model.TaskListener;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 import org.jenkinsci.plugins.workflow.actions.TimingAction;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
@@ -16,7 +17,7 @@ import java.util.Map;
 public class OntrackStepHelper {
 
     public static @Nullable
-    Map<String, ?> getRunInfo(StepContext context) throws IOException, InterruptedException {
+    Map<String, ?> getRunInfo(StepContext context, TaskListener taskListener) throws IOException, InterruptedException {
         // Gets the associated run
         Run run = context.get(Run.class);
         if (run == null) {
@@ -24,7 +25,7 @@ public class OntrackStepHelper {
             return null;
         }
         // Base run info
-        Map<String, Object> runInfo = OntrackPluginSupport.getRunInfo(run);
+        Map<String, Object> runInfo = OntrackPluginSupport.getRunInfo(run, taskListener);
         // Adaptation
         adaptRunInfo(context, runInfo);
         // Run info if not empty

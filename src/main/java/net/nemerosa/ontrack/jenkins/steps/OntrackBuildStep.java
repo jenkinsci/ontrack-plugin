@@ -81,8 +81,13 @@ public class OntrackBuildStep extends Step {
         return new SynchronousStepExecution<Void>(context) {
             @Override
             protected Void run() throws Exception {
+                // Gets the current listener
+                TaskListener taskListener = context.get(TaskListener.class);
+                if (taskListener == null) {
+                    throw new IllegalStateException("Cannot get any task listener.");
+                }
                 // Gets the Ontrack connector
-                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(context.get(TaskListener.class));
+                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(taskListener);
                 // Gets the branch...
                 Branch ontrackBranch = ontrack.branch(project, branch);
                 // ... and creates a build
@@ -92,7 +97,7 @@ public class OntrackBuildStep extends Step {
                     ontrackBuild.getConfig().gitCommit(gitCommit);
                 }
                 // Collecting run info
-                Map<String, ?> runInfo = OntrackStepHelper.getRunInfo(context);
+                Map<String, ?> runInfo = OntrackStepHelper.getRunInfo(context, taskListener);
                 // If not empty, send the runtime
                 if (runInfo != null && !runInfo.isEmpty()) {
                     ontrackBuild.setRunInfo(runInfo);

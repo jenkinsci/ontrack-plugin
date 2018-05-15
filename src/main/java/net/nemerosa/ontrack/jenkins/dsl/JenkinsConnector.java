@@ -5,6 +5,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -33,8 +34,8 @@ public class JenkinsConnector {
      * The returned map can be directly as a run info parameter for a build
      * or a validation run.
      */
-    public Map<String, ?> getRunInfo() {
-        Map<String, Object> runInfo = OntrackPluginSupport.getRunInfo(build);
+    public Map<String, ?> getRunInfo() throws IOException, InterruptedException {
+        Map<String, Object> runInfo = OntrackPluginSupport.getRunInfo(build, listener);
         runInfoAdapter.accept(runInfo);
         return runInfo;
     }

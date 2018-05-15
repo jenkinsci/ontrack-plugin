@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.jenkins;
 
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.*;
 import hudson.triggers.SCMTrigger;
@@ -86,7 +87,7 @@ public final class OntrackPluginSupport {
         return properties;
     }
 
-    public static Map<String, Object> getRunInfo(Run theBuild) {
+    public static Map<String, Object> getRunInfo(Run theBuild, TaskListener taskListener) throws IOException, InterruptedException {
         // Checks the version of Ontrack
         OntrackConfiguration configuration = OntrackConfiguration.getOntrackConfiguration();
         if (configuration != null) {
@@ -115,8 +116,18 @@ public final class OntrackPluginSupport {
             Cause cause = causes.get(0);
             if (cause instanceof SCMTrigger.SCMTriggerCause) {
                 triggerType = "scm";
-                // TODO Finds the associated commit
-                triggerData = cause.getShortDescription();
+                EnvVars environment = theBuild.getEnvironment(taskListener);
+                String git_commit = environment.get("GIT_COMMIT");
+                if (StringUtils.isNotBlank(git_commit)) {
+                    triggerData = git_commit;
+                } else {
+                    String svn_revision = environment.get("SVN_REVISION");
+                    if (StringUtils.isNotBlank(svn_revision)) {
+                        triggerData = svn_revision;
+                    } else {
+                        triggerData = "n/a";
+                    }
+                }
             } else if (cause instanceof Cause.UserIdCause) {
                 triggerType = "user";
                 triggerData = ((Cause.UserIdCause) cause).getUserId();

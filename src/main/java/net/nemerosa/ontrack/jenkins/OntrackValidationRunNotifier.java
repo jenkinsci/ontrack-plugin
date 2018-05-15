@@ -96,7 +96,7 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
             ValidationRun validationRun = build.validate(validationStampName, runStatus);
             // Run info
             if (runInfo) {
-                Map<String, Object> runInfo = getRunInfo(theBuild);
+                Map<String, Object> runInfo = getRunInfo(theBuild, listener);
                 if (runInfo != null) {
                     validationRun.setRunInfo(runInfo);
                 }

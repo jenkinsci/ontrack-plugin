@@ -105,8 +105,13 @@ public class OntrackValidateStep extends Step {
         return new SynchronousStepExecution<Void>(context) {
             @Override
             protected Void run() throws Exception {
+                // Gets the current listener
+                TaskListener taskListener = context.get(TaskListener.class);
+                if (taskListener == null) {
+                    throw new IllegalStateException("Cannot get any task listener.");
+                }
                 // Gets the Ontrack connector
-                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(context.get(TaskListener.class));
+                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(taskListener);
                 // Gets the build...
                 Build ontrackBuild = ontrack.build(project, branch, build);
                 // Validation status from the build result if defined
@@ -129,7 +134,7 @@ public class OntrackValidateStep extends Step {
                 // ... and creates a validation run
                 ValidationRun validationRun = ontrackBuild.validate(validationStamp, actualStatus);
                 // Collecting run info
-                Map<String, ?> runInfo = OntrackStepHelper.getRunInfo(context);
+                Map<String, ?> runInfo = OntrackStepHelper.getRunInfo(context, taskListener);
                 // If not empty, send the runtime
                 if (runInfo != null && !runInfo.isEmpty()) {
                     validationRun.setRunInfo(runInfo);
