@@ -10,11 +10,13 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.ValidationRun;
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
 
@@ -31,13 +33,19 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
     private final String validationStamp;
     private final boolean ignoreFailure;
 
+    /**
+     * Option to send the run info for this build.
+     */
+    private final boolean runInfo;
+
     @DataBoundConstructor
-    public OntrackValidationRunNotifier(String project, String branch, String build, String validationStamp, boolean ignoreFailure) {
+    public OntrackValidationRunNotifier(String project, String branch, String build, String validationStamp, boolean ignoreFailure, boolean runInfo) {
         this.project = project;
         this.branch = branch;
         this.build = build;
         this.validationStamp = validationStamp;
         this.ignoreFailure = ignoreFailure;
+        this.runInfo = runInfo;
     }
 
     public String getProject() {
@@ -58,6 +66,10 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
 
     public boolean isIgnoreFailure() {
         return ignoreFailure;
+    }
+
+    public boolean isRunInfo() {
+        return runInfo;
     }
 
     @Override
@@ -82,7 +94,14 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
                     branchName,
                     projectName
             );
-            build.validate(validationStampName, runStatus);
+            ValidationRun validationRun = build.validate(validationStampName, runStatus);
+            // Run info
+            if (runInfo) {
+                Map<String, Object> runInfo = getRunInfo(theBuild, listener);
+                if (runInfo != null) {
+                    validationRun.setRunInfo(runInfo);
+                }
+            }
         } catch (OTMessageClientException ex) {
             listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
             if (!ignoreFailure) {

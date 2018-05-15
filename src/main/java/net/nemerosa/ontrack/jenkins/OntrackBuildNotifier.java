@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
 
@@ -44,12 +45,18 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
      */
     private final boolean ignoreFailure;
 
+    /**
+     * Option to send the run info for this build.
+     */
+    private final boolean runInfo;
+
     @DataBoundConstructor
-    public OntrackBuildNotifier(String project, String branch, String build, boolean ignoreFailure) {
+    public OntrackBuildNotifier(String project, String branch, String build, boolean ignoreFailure, boolean runInfo) {
         this.project = project;
         this.branch = branch;
         this.build = build;
         this.ignoreFailure = ignoreFailure;
+        this.runInfo = runInfo;
     }
 
     public String getProject() {
@@ -66,6 +73,10 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
 
     public boolean isIgnoreFailure() {
         return ignoreFailure;
+    }
+
+    public boolean isRunInfo() {
+        return runInfo;
     }
 
     @Override
@@ -93,6 +104,13 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                         getProjectPath(theBuild),
                         theBuild.getNumber()
                 );
+                // Run info
+                if (runInfo) {
+                    Map<String, Object> runInfo = getRunInfo(theBuild, listener);
+                    if (runInfo != null) {
+                        build.setRunInfo(runInfo);
+                    }
+                }
             } catch (OTMessageClientException ex) {
                 listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
                 if (!ignoreFailure) {
