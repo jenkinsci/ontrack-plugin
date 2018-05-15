@@ -23,6 +23,12 @@ To configure the build, go in _Manage Jenkins > Configure System_ and enter the 
 * _Configuration name in ontrack_ — name of the Jenkins configuration _in Ontrack_ ; this configuration will be used to generated back links to the Jenkins instance you are configuring. This will be used by the _Build notifier_.
 * _URL_ — base URL to the Ontrack instance
 * _User_ and _Password_ — user used for the connection to Ontrack - this user must have enough rights for the actions it has to carry from within Jenkins. Usually, giving a _Controller_ role should be enough.
+* _Max tries_ - number of times a call to Ontrack must be repeated in case of failure
+* _Retry delay_ - number of seconds between each retry attempt
+* _Remote Ontrack version cache_ - number of seconds we consider the version from Ontrack being valid. This
+  version is used by some plugin services which need to ensure backward 
+  compatibility
+* _Security mode_ - defines how the security must be enforced
 
 Five individual plug-ins are provided by the general _Ontrack plug-in_.
 

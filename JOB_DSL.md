@@ -8,7 +8,7 @@ The Ontrack plug-in provides the following extensions to the [Job DSL](https://g
 ```groovy
 job(...) {
    publishers {
-      ontrackBuild(project, branch, buildName)
+      ontrackBuild(project, branch, buildName, ignoreFailure = false, runInfo = false)
    }
 }
 ```
@@ -28,7 +28,7 @@ job(...) {
 ```groovy
 job(...) {
    publishers {
-      ontrackValidation(project, branch, build, validationStamp)
+      ontrackValidation(project, branch, build, validationStamp, ignoreFailure = false, runInfo = false)
    }
 }
 ```

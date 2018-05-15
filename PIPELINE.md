@@ -187,9 +187,67 @@ pipeline {
 }
 ```
 
+Note that a run info will always be associated with the build if
+the version of the remote Ontrack instance is compatible
+(>= 2.35 or >= 3.35).
+
 ### Validation step
 
+The `ontrackValidate` step creates a validation run for a build
+and a validation stamp. The status of the validation may be fixed
+or computed.
+
+Note that a run info will always be associated with the validation if
+the version of the remote Ontrack instance is compatible
+(>= 2.35 or >= 3.35).
+
+Example:
+
+```groovy
+pipeline {
+    stages {
+        stage('Validation') {
+            post {
+                success {
+                    ontrackValidate(
+                        project: 'my-project',
+                        branch: branchName,
+                        build: version,
+                        validationStamp: "my-validation",
+                        buildResult: currentBuild.result
+                    )
+                }
+            }
+        }
+    }
+}
+```
+
 ### Promotion step
+
+The `ontrackPromote` step creates a promotion run for a build
+and a promotion level.
+
+Example:
+
+```groovy
+pipeline {
+    stages {
+        stage('Promotion') {
+            post {
+                success {
+                    ontrackPromote(
+                        project: 'my-project',
+                        branch: branchName,
+                        build: version,
+                        promotionLevel: "my-level"
+                    )
+                }
+            }
+        }
+    }
+}
+```
 
 ### Ontrack DSL step
 

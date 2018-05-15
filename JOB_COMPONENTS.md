@@ -9,6 +9,10 @@ Parameters are the project name, the branch name and the name of the build to cr
 
 The Ontrack build will be associated with a link to the Jenkins build.
 
+If the _Run info_ checkbox is checked, some run info will be associated
+with the build, containing the build execution time, the URL of the build
+and the trigger cause.
+
 ### Promotion notifier
 
 Add _Ontrack: Promoted run creation_ in the _Post build actions_ in order to promote an existing build.
@@ -29,6 +33,10 @@ SUCCESS | PASSED
 UNSTABLE | WARNING
 ABORTED | INTERRUPTED
 _Other_ | FAILED
+
+If the _Run info_ checkbox is checked, some run info will be associated
+with the build, containing the build execution time, the URL of the build
+and the trigger cause.
 
 ### Triggers
 
