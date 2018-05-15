@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.jenkins;
 
 import hudson.Extension;
 import hudson.util.ListBoxModel;
+import jenkins.management.AdministrativeMonitorsConfiguration;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.nemerosa.ontrack.dsl.OntrackConnection;
@@ -11,9 +12,12 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
 @Extension
 public class OntrackConfiguration extends GlobalConfiguration {
+
+    private static Logger LOGGER = Logger.getLogger(OntrackConfiguration.class.getName());
 
     public static @Nullable
     OntrackConfiguration getOntrackConfiguration() {
@@ -79,6 +83,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
     private VersionCache computeVersionCache() {
         Version remoteVersion = getRemoteVersion();
         if (remoteVersion != null) {
+            LOGGER.info("[ontrack] Remote version = " + remoteVersion);
             return new VersionCache(remoteVersion, System.currentTimeMillis());
         } else {
             return null;
