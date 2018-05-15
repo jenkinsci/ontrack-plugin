@@ -16,6 +16,7 @@
     <properties>
         <jenkins.version>2.107.3</jenkins.version>
         <java.level>8</java.level>
+        <ontrack.version>2.35.0</ontrack.version>
     </properties>
 
     <developers>
@@ -72,7 +73,7 @@
         <dependency>
             <groupId>net.nemerosa.ontrack</groupId>
             <artifactId>ontrack-dsl</artifactId>
-            <version>feature-600-run-info-04ab67b</version>
+            <version>${ontrack.version}</version>
         </dependency>
         <!-- Security plugin -->
         <dependency>

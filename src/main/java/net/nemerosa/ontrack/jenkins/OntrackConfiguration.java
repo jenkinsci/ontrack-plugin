@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nullable;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Extension
 public class OntrackConfiguration extends GlobalConfiguration {
@@ -27,7 +28,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
     private int ontrackMaxTries = 1;
     private int ontrackRetryDelaySeconds = 10000;
     private OntrackSecurityMode securityMode = OntrackSecurityMode.DEFAULT;
-    private Version version = null;
+    private final AtomicReference<Version> version = new AtomicReference<>();
 
     public OntrackConfiguration() {
         load();
@@ -56,7 +57,13 @@ public class OntrackConfiguration extends GlobalConfiguration {
         return ok;
     }
 
-    private synchronized Version loadVersion() {
+    private void loadVersion() {
+        version.updateAndGet(
+                ignored -> computeVersion()
+        );
+    }
+
+    private Version computeVersion() {
         try {
             OntrackConnection connection = OntrackConnection.create(ontrackUrl);
             String user = ontrackUser;
@@ -67,20 +74,17 @@ public class OntrackConfiguration extends GlobalConfiguration {
                 );
             }
             String versionString = connection.build().getVersion();
-            version = Version.of(versionString);
+            return Version.of(versionString);
         } catch (Exception ignored) {
-            version = null;
+            return null;
         }
-        return version;
     }
 
     public @Nullable
     Version getVersion() {
-        if (version != null) {
-            return version;
-        } else {
-            return loadVersion();
-        }
+        return version.updateAndGet(
+                currentVersion -> currentVersion != null ? currentVersion : computeVersion()
+        );
     }
 
     public String getOntrackConfigurationName() {
