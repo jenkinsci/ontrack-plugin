@@ -27,8 +27,10 @@ public class OntrackConfiguration extends GlobalConfiguration {
     private String ontrackPassword;
     private int ontrackMaxTries = 1;
     private int ontrackRetryDelaySeconds = 10000;
+    private int ontrackVersionCacheExpirationSeconds = 3600;
     private OntrackSecurityMode securityMode = OntrackSecurityMode.DEFAULT;
-    private final AtomicReference<Version> version = new AtomicReference<>();
+
+    private final AtomicReference<VersionCache> version = new AtomicReference<>();
 
     public OntrackConfiguration() {
         load();
@@ -48,6 +50,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
         ontrackPassword = json.getString("ontrackPassword");
         ontrackMaxTries = json.getInt("ontrackMaxTries");
         ontrackRetryDelaySeconds = json.getInt("ontrackRetryDelaySeconds");
+        ontrackVersionCacheExpirationSeconds = json.getInt("ontrackVersionCacheExpirationSeconds");
         securityMode = OntrackSecurityMode.valueOf(json.getString("securityMode"));
         save();
         boolean ok = super.configure(req, json);
@@ -57,13 +60,32 @@ public class OntrackConfiguration extends GlobalConfiguration {
         return ok;
     }
 
-    private void loadVersion() {
-        version.updateAndGet(
-                ignored -> computeVersion()
-        );
+    private VersionCache loadVersion() {
+        return version.updateAndGet(current -> {
+            if (current != null) {
+                long expiredTimeMs = System.currentTimeMillis() - current.getTimestamp();
+                long expiredTimeSeconds = expiredTimeMs / 1000;
+                if (expiredTimeSeconds >= ontrackVersionCacheExpirationSeconds) {
+                    return computeVersionCache();
+                } else {
+                    return current;
+                }
+            } else {
+                return computeVersionCache();
+            }
+        });
     }
 
-    private Version computeVersion() {
+    private VersionCache computeVersionCache() {
+        Version remoteVersion = getRemoteVersion();
+        if (remoteVersion != null) {
+            return new VersionCache(remoteVersion, System.currentTimeMillis());
+        } else {
+            return null;
+        }
+    }
+
+    private Version getRemoteVersion() {
         try {
             OntrackConnection connection = OntrackConnection.create(ontrackUrl);
             String user = ontrackUser;
@@ -82,12 +104,11 @@ public class OntrackConfiguration extends GlobalConfiguration {
 
     public @Nullable
     Version getVersion() {
-        return version.updateAndGet(
-                currentVersion -> currentVersion != null ? currentVersion : computeVersion()
-        );
+        VersionCache versionCache = loadVersion();
+        return versionCache != null ? versionCache.getValue() : null;
     }
 
-    public String getOntrackConfigurationName() {
+    String getOntrackConfigurationName() {
         return ontrackConfigurationName;
     }
 
@@ -151,11 +172,39 @@ public class OntrackConfiguration extends GlobalConfiguration {
     }
 
     @SuppressWarnings("unused")
+    public int getOntrackVersionCacheExpirationSeconds() {
+        return ontrackVersionCacheExpirationSeconds;
+    }
+
+    @SuppressWarnings("unused")
+    public void setOntrackVersionCacheExpirationSeconds(int ontrackVersionCacheExpirationSeconds) {
+        this.ontrackVersionCacheExpirationSeconds = ontrackVersionCacheExpirationSeconds;
+    }
+
+    @SuppressWarnings("unused")
     public ListBoxModel doFillSecurityModeItems() {
         ListBoxModel items = new ListBoxModel();
         for (OntrackSecurityMode mode : OntrackSecurityMode.values()) {
             items.add(mode.getDisplayName(), mode.name());
         }
         return items;
+    }
+
+    private static class VersionCache {
+        private final Version value;
+        private final long timestamp;
+
+        private VersionCache(Version value, long timestamp) {
+            this.value = value;
+            this.timestamp = timestamp;
+        }
+
+        public Version getValue() {
+            return value;
+        }
+
+        long getTimestamp() {
+            return timestamp;
+        }
     }
 }
