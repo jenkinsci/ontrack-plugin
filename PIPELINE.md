@@ -251,5 +251,13 @@ pipeline {
 
 ### Ontrack DSL step
 
+The `ontrackScript` step runs an Ontrack DSL script.
+
+Example:
+
+```groovy
+ontrackScript logging: true, script: ' ... ', bindings: [VERSION: '1.0.0']
+```
+
 ### Ontrack GraphQL step
 
