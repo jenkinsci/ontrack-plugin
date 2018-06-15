@@ -34,7 +34,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
     private int ontrackVersionCacheExpirationSeconds = 3600;
     private OntrackSecurityMode securityMode = OntrackSecurityMode.DEFAULT;
 
-    private final AtomicReference<VersionCache> version = new AtomicReference<>();
+    private final transient AtomicReference<VersionCache> version = new AtomicReference<>();
 
     public OntrackConfiguration() {
         load();
@@ -113,7 +113,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
         return versionCache != null ? versionCache.getValue() : null;
     }
 
-    String getOntrackConfigurationName() {
+    public String getOntrackConfigurationName() {
         return ontrackConfigurationName;
     }
 
