@@ -95,6 +95,34 @@ public class OntrackStepHelper {
         }
     }
 
+    private static Long getTiming(FlowNode node) {
+        if (node instanceof StepStartNode) {
+            StepStartNode stepNode = (StepStartNode) node;
+            StepDescriptor stepDescriptor = stepNode.getDescriptor();
+            if (stepDescriptor != null) {
+                String stepDescriptorId = stepDescriptor.getId();
+                if ("org.jenkinsci.plugins.workflow.support.steps.StageStep".equals(stepDescriptorId)) {
+                    TimingAction timingAction = node.getAction(TimingAction.class);
+                    if (timingAction != null) {
+                        long startTime = timingAction.getStartTime();
+                        return (System.currentTimeMillis() - startTime) / 1000;
+                    }
+                }
+            }
+        }
+        return getTiming(node.getParents());
+    }
+
+    private static Long getTiming(List<FlowNode> nodes) {
+        for (FlowNode node : nodes) {
+            Long durationSeconds = getTiming(node);
+            if (durationSeconds != null) {
+                return durationSeconds;
+            }
+        }
+        return null;
+    }
+
     private static Result getStageStatusAsResult(FlowNode node) {
         Result current = toResult(FlowNodeUtil.getStatus(node));
         List<FlowNode> otherNodes = FlowNodeUtil.getStageNodes(node);
@@ -132,19 +160,6 @@ public class OntrackStepHelper {
                     return null;
             }
         }
-    }
-
-    private static @Nullable
-    Long getTiming(FlowNode node) {
-        FlowNode stage = getStage(node);
-        if (stage != null) {
-            TimingAction timingAction = node.getAction(TimingAction.class);
-            if (timingAction != null) {
-                long startTime = timingAction.getStartTime();
-                return (System.currentTimeMillis() - startTime) / 1000;
-            }
-        }
-        return null;
     }
 
     private static @Nullable
