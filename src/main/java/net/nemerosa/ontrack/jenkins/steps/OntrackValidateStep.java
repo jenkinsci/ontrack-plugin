@@ -44,14 +44,14 @@ public class OntrackValidateStep extends Step {
     private final String validationStamp;
 
     /**
-     * Validation status, defaults to PASSED
+     * Validation status, defaults to null, for making it computed
      */
-    private String validationStatus = "PASSED";
+    private String validationStatus = null;
 
     /**
      * Build result to translate into a validation status if defined
      */
-    private Result buildResult;
+    private Result buildResult = null;
 
     @DataBoundConstructor
     public OntrackValidateStep(@Nonnull String project, @Nonnull String branch, @Nonnull String build, @Nonnull String validationStamp) {
@@ -115,21 +115,13 @@ public class OntrackValidateStep extends Step {
                 // Gets the build...
                 Build ontrackBuild = ontrack.build(project, branch, build);
                 // Validation status from the build result if defined
-                String actualStatus;
+                String actualStatus = validationStatus;
                 if (buildResult != null) {
-                    if (buildResult.equals(Result.SUCCESS)) {
-                        actualStatus = "PASSED";
-                    } else if (buildResult.equals(Result.UNSTABLE)) {
-                        actualStatus = "WARNING";
-                    } else if (buildResult.equals(Result.FAILURE)) {
-                        actualStatus = "FAILED";
-                    } else if (buildResult.equals(Result.ABORTED)) {
-                        actualStatus = "INTERRUPTED";
-                    } else {
-                        actualStatus = validationStatus;
-                    }
-                } else {
-                    actualStatus = validationStatus;
+                    actualStatus = OntrackStepHelper.toValidationRunStatus(buildResult);
+                }
+                // Computation from current stage if needed
+                if (actualStatus == null) {
+                    actualStatus = OntrackStepHelper.getValidationRunStatusFromStage(context);
                 }
                 // ... and creates a validation run
                 ValidationRun validationRun = ontrackBuild.validate(validationStamp, actualStatus);
