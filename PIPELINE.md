@@ -261,3 +261,25 @@ ontrackScript logging: true, script: ' ... ', bindings: [VERSION: '1.0.0']
 
 ### Ontrack GraphQL step
 
+### Ontrack trigger
+
+The `ontrackTrigger` can be used as trigger.
+
+Example:
+
+```groovy
+pipeline {
+    triggers {
+        ontrackTrigger spec: '@nightly', project: 'my-project', branch: 'master', promotion: 'SILVER', parameterName: 'VERSION'
+    }
+}
+```
+
+This example sets a trigger which checks every night (`@nightly`)
+if there is a _new_ `PLATINUM` version for the given project / branch.
+
+If there is a new one, the pipeline is fired, and the `VERSION` parameter
+contains the build name.
+
+Other Ontrack steps can then be used to retrieve additional information.
+ 

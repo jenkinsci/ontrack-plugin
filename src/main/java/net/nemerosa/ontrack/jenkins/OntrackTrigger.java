@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
@@ -224,6 +225,7 @@ public class OntrackTrigger extends Trigger<Job> {
     }
 
     @Extension
+    @Symbol("ontrackTrigger")
     public static class DescriptorImpl extends TriggerDescriptor {
 
         @Override
