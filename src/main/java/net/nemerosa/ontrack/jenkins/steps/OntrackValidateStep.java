@@ -53,6 +53,16 @@ public class OntrackValidateStep extends Step {
      */
     private Result buildResult = null;
 
+    /**
+     * Fraction data
+     */
+    private Map<String, Integer> fraction = null;
+
+    /**
+     * Data validation
+     */
+    private boolean dataValidation = true;
+
     @DataBoundConstructor
     public OntrackValidateStep(@Nonnull String project, @Nonnull String branch, @Nonnull String build, @Nonnull String validationStamp) {
         this.project = project;
@@ -64,6 +74,24 @@ public class OntrackValidateStep extends Step {
     @DataBoundSetter
     public void setValidationStatus(String validationStatus) {
         this.validationStatus = validationStatus;
+    }
+
+    public Map<String, Integer> getFraction() {
+        return fraction;
+    }
+
+    @DataBoundSetter
+    public void setFraction(Map<String, Integer> fraction) {
+        this.fraction = fraction;
+    }
+
+    public boolean isDataValidation() {
+        return dataValidation;
+    }
+
+    @DataBoundSetter
+    public void setDataValidation(boolean dataValidation) {
+        this.dataValidation = dataValidation;
     }
 
     public String getProject() {
@@ -116,7 +144,7 @@ public class OntrackValidateStep extends Step {
                 Build ontrackBuild = ontrack.build(project, branch, build);
                 // Validation status from the build result if defined
                 String actualStatus = validationStatus;
-                if (buildResult != null) {
+                if (actualStatus == null && buildResult != null) {
                     actualStatus = OntrackStepHelper.toValidationRunStatus(buildResult);
                 }
                 // Computation from current stage if needed
@@ -124,7 +152,17 @@ public class OntrackValidateStep extends Step {
                     actualStatus = OntrackStepHelper.getValidationRunStatusFromStage(context);
                 }
                 // ... and creates a validation run
-                ValidationRun validationRun = ontrackBuild.validate(validationStamp, actualStatus);
+                ValidationRun validationRun;
+                if (fraction != null) {
+                    validationRun = ontrackBuild.validateWithFraction(
+                        validationStamp,
+                        get(fraction, "numerator"),
+                        get(fraction, "denominator"),
+                        dataValidation ? validationStatus : actualStatus
+                    );
+                } else {
+                    validationRun = ontrackBuild.validate(validationStamp, actualStatus);
+                }
                 // Collecting run info
                 Map<String, ?> runInfo = OntrackStepHelper.getRunInfo(context, taskListener);
                 // If not empty, send the runtime
@@ -135,6 +173,15 @@ public class OntrackValidateStep extends Step {
                 return null;
             }
         };
+    }
+
+    private <T> T get(Map<String, T> map, String field) {
+        T value = map.get(field);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing field " + field);
+        } else {
+            return value;
+        }
     }
 
     @Extension

@@ -62,4 +62,44 @@ public class OntrackValidateStepRunTest {
         verify(mockRun, times(1)).setRunInfo(anyMapOf(String.class, Object.class));
     }
 
+    @Test
+    public void test_validate_with_fraction_data() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', fraction: [numerator: 99, denominator: 100])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithFraction("VS", 99, 100, null)).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithFraction("VS", 99, 100, null);
+    }
+
+    @Test
+    public void test_validate_with_fraction_data_and_status() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', fraction: [numerator: 99, denominator: 100])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithFraction("VS", 99, 100, "FAILED")).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithFraction("VS", 99, 100, "FAILED");
+    }
+
 }
