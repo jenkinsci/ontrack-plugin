@@ -99,4 +99,44 @@ public class OntrackValidateStepRunTest {
         verify(mockBuild, times(1)).validateWithFraction("VS", 99, 100, "FAILED");
     }
 
+    @Test
+    public void test_validate_with_chml_data() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'chml', data: [critical: 12, high: 100])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithCHML(anyString(), anyInt(), anyInt(), anyInt(), anyInt(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithCHML("VS", 12, 100, 0, 0, null);
+    }
+
+    @Test
+    public void test_validate_with_chml_data_and_status() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'chml', data: [critical: 12, high: 100])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithCHML(anyString(), anyInt(), anyInt(), anyInt(), anyInt(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithCHML("VS", 12, 100, 0, 0, "FAILED");
+    }
+
 }
