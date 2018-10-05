@@ -1,14 +1,11 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
-import hudson.model.Result;
-import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.ValidationRun;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -66,14 +63,14 @@ public class OntrackValidateStepRunTest {
     public void test_validate_with_fraction_data() throws Exception {
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
         // leave out the subject
-        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', fraction: [numerator: 99, denominator: 100])", true));
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'fraction', data: [numerator: 99, denominator: 100])", true));
 
         Ontrack ontrack = mock(Ontrack.class);
         Build mockBuild = mock(Build.class);
         ValidationRun mockRun = mock(ValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
-        when(mockBuild.validateWithFraction("VS", 99, 100, null)).thenReturn(mockRun);
+        when(mockBuild.validateWithFraction(anyString(), anyInt(), anyInt(), anyString())).thenReturn(mockRun);
 
         OntrackDSLConnector.setOntrack(ontrack);
 
@@ -86,14 +83,14 @@ public class OntrackValidateStepRunTest {
     public void test_validate_with_fraction_data_and_status() throws Exception {
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
         // leave out the subject
-        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', fraction: [numerator: 99, denominator: 100])", true));
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'fraction', data: [numerator: 99, denominator: 100])", true));
 
         Ontrack ontrack = mock(Ontrack.class);
         Build mockBuild = mock(Build.class);
         ValidationRun mockRun = mock(ValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
-        when(mockBuild.validateWithFraction("VS", 99, 100, "FAILED")).thenReturn(mockRun);
+        when(mockBuild.validateWithFraction(anyString(), anyInt(), anyInt(), anyString())).thenReturn(mockRun);
 
         OntrackDSLConnector.setOntrack(ontrack);
 

@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.ValidationRun;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -54,9 +55,14 @@ public class OntrackValidateStep extends Step {
     private Result buildResult = null;
 
     /**
-     * Fraction data
+     * Run data
      */
-    private Map<String, Integer> fraction = null;
+    private Map<String, ?> data = null;
+
+    /**
+     * Data type
+     */
+    private String dataType = null;
 
     /**
      * Data validation
@@ -76,13 +82,22 @@ public class OntrackValidateStep extends Step {
         this.validationStatus = validationStatus;
     }
 
-    public Map<String, Integer> getFraction() {
-        return fraction;
+    public Map<String, ?> getData() {
+        return data;
     }
 
     @DataBoundSetter
-    public void setFraction(Map<String, Integer> fraction) {
-        this.fraction = fraction;
+    public void setData(Map<String, ?> data) {
+        this.data = data;
+    }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    @DataBoundSetter
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public boolean isDataValidation() {
@@ -153,13 +168,49 @@ public class OntrackValidateStep extends Step {
                 }
                 // ... and creates a validation run
                 ValidationRun validationRun;
-                if (fraction != null) {
+                if (StringUtils.equals(dataType, "fraction")) {
                     validationRun = ontrackBuild.validateWithFraction(
-                        validationStamp,
-                        get(fraction, "numerator"),
-                        get(fraction, "denominator"),
-                        dataValidation ? validationStatus : actualStatus
+                            validationStamp,
+                            getInt(data, "numerator"),
+                            getInt(data, "denominator"),
+                            dataValidation ? validationStatus : actualStatus
                     );
+                } else if (StringUtils.equals(dataType, "chml")) {
+                    validationRun = ontrackBuild.validateWithCHML(
+                            validationStamp,
+                            getInt(data, "critical", 0),
+                            getInt(data, "high", 0),
+                            getInt(data, "medium", 0),
+                            getInt(data, "low", 0),
+                            dataValidation ? validationStatus : actualStatus
+                    );
+                } else if (StringUtils.equals(dataType, "text")) {
+                    validationRun = ontrackBuild.validateWithText(
+                            validationStamp,
+                            dataValidation ? validationStatus : actualStatus,
+                            getString(data, "value")
+                    );
+                } else if (StringUtils.equals(dataType, "number")) {
+                    validationRun = ontrackBuild.validateWithNumber(
+                            validationStamp,
+                            getInt(data, "value"),
+                            dataValidation ? validationStatus : actualStatus
+                    );
+                } else if (StringUtils.equals(dataType, "percentage")) {
+                    validationRun = ontrackBuild.validateWithPercentage(
+                            validationStamp,
+                            getInt(data, "value"),
+                            dataValidation ? validationStatus : actualStatus
+                    );
+                } else if (dataType != null) {
+                    validationRun = ontrackBuild.validateWithData(
+                            validationStamp,
+                            data,
+                            dataType,
+                            dataValidation ? validationStatus : actualStatus
+                    );
+                } else if (data != null) {
+                    throw new IllegalArgumentException("There is some data, but no dataType.");
                 } else {
                     validationRun = ontrackBuild.validate(validationStamp, actualStatus);
                 }
@@ -175,12 +226,36 @@ public class OntrackValidateStep extends Step {
         };
     }
 
-    private <T> T get(Map<String, T> map, String field) {
-        T value = map.get(field);
+    private String getString(Map<String, ?> map, @SuppressWarnings("SameParameterValue") String field) {
+        Object value = map.get(field);
         if (value == null) {
             throw new IllegalArgumentException("Missing field " + field);
+        } else if (value instanceof String) {
+            return (String) value;
         } else {
-            return value;
+            throw new IllegalArgumentException("Field " + field + " is not a string: " + value);
+        }
+    }
+
+    private int getInt(Map<String, ?> map, String field) {
+        Object value = map.get(field);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing field " + field);
+        } else if (value instanceof Integer) {
+            return (Integer) value;
+        } else {
+            throw new IllegalArgumentException("Field " + field + " is not an integer: " + value);
+        }
+    }
+
+    private int getInt(Map<String, ?> map, String field, @SuppressWarnings("SameParameterValue") int defaultValue) {
+        Object value = map.get(field);
+        if (value == null) {
+            return defaultValue;
+        } else if (value instanceof Integer) {
+            return (Integer) value;
+        } else {
+            throw new IllegalArgumentException("Field " + field + " is not an integer: " + value);
         }
     }
 
