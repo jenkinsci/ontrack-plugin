@@ -199,4 +199,44 @@ public class OntrackValidateStepRunTest {
         verify(mockBuild, times(1)).validateWithNumber("VS", 12, "FAILED");
     }
 
+    @Test
+    public void test_validate_with_percentage_data() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'percentage', data: [value: 33])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithPercentage(anyString(), anyInt(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithPercentage("VS", 33, null);
+    }
+
+    @Test
+    public void test_validate_with_percentage_data_and_status() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'percentage', data: [value: 33])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithPercentage(anyString(), anyInt(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithPercentage("VS", 33, "FAILED");
+    }
+
 }
