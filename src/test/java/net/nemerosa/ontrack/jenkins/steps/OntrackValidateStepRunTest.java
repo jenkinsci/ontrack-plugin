@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
+import com.google.common.collect.ImmutableMap;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.ValidationRun;
@@ -237,6 +238,46 @@ public class OntrackValidateStepRunTest {
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
         verify(mockBuild, times(1)).validateWithPercentage("VS", 33, "FAILED");
+    }
+
+    @Test
+    public void test_validate_with_generic_data() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType', data: [value: 33])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithData(anyString(), any(), anyString(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithData("VS", ImmutableMap.of("value", 33), "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType", null);
+    }
+
+    @Test
+    public void test_validate_with_generic_data_and_status() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType', data: [value: 33])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithData(anyString(), any(), anyString(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithData("VS", ImmutableMap.of("value", 33), "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType", "FAILED");
     }
 
 }
