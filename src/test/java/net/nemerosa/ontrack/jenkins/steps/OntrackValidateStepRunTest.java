@@ -159,4 +159,44 @@ public class OntrackValidateStepRunTest {
         verify(mockBuild, times(1)).validateWithText("VS", "FAILED", "My text");
     }
 
+    @Test
+    public void test_validate_with_number_data() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'number', data: [value: 12])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithNumber(anyString(), anyInt(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithNumber("VS", 12, null);
+    }
+
+    @Test
+    public void test_validate_with_number_data_and_status() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'number', data: [value: 12])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithNumber(anyString(), anyInt(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validateWithNumber("VS", 12, "FAILED");
+    }
+
 }
