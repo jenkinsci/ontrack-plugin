@@ -5,6 +5,7 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.model.Result;
 import hudson.model.TaskListener;
+import hudson.tasks.junit.TestResultSummary;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.ValidationRun;
@@ -69,6 +70,11 @@ public class OntrackValidateStep extends Step {
      */
     private boolean dataValidation = true;
 
+    /**
+     * Test results. If filled in, run data as a fraction is sent.
+     */
+    private TestResultSummary testResults = null;
+
     @DataBoundConstructor
     public OntrackValidateStep(@Nonnull String project, @Nonnull String branch, @Nonnull String build, @Nonnull String validationStamp) {
         this.project = project;
@@ -107,6 +113,15 @@ public class OntrackValidateStep extends Step {
     @DataBoundSetter
     public void setDataValidation(boolean dataValidation) {
         this.dataValidation = dataValidation;
+    }
+
+    public TestResultSummary getTestResults() {
+        return testResults;
+    }
+
+    @DataBoundSetter
+    public void setTestResults(TestResultSummary testResults) {
+        this.testResults = testResults;
     }
 
     public String getProject() {
@@ -168,7 +183,16 @@ public class OntrackValidateStep extends Step {
                 }
                 // ... and creates a validation run
                 ValidationRun validationRun;
-                if (StringUtils.equals(dataType, "fraction")) {
+                if (testResults != null) {
+                    int ok = testResults.getPassCount();
+                    int total = testResults.getTotalCount() - testResults.getSkipCount();
+                    validationRun = ontrackBuild.validateWithFraction(
+                            validationStamp,
+                            ok,
+                            total,
+                            dataValidation ? validationStatus : actualStatus
+                    );
+                } else if (StringUtils.equals(dataType, "fraction")) {
                     validationRun = ontrackBuild.validateWithFraction(
                             validationStamp,
                             getInt(data, "numerator"),

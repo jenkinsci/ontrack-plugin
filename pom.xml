@@ -49,6 +49,12 @@
             <artifactId>run-condition</artifactId>
             <version>1.0</version>
         </dependency>
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>junit</artifactId>
+            <version>1.26.1</version>
+        </dependency>
         <!-- Extending the DSL -->
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
