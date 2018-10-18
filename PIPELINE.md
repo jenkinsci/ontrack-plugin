@@ -213,8 +213,7 @@ pipeline {
                         project: 'my-project',
                         branch: branchName,
                         build: version,
-                        validationStamp: "my-validation",
-                        buildResult: currentBuild.result
+                        validationStamp: "my-validation"
                     )
                 }
             }
@@ -222,6 +221,111 @@ pipeline {
     }
 }
 ```
+
+#### Validation status
+
+The status of the validation run can be provided using different ways:
+
+* explicitly, using the `validationStatus` parameter, for example: `validationStatus: 'PASSED'`
+* using a `hudson.model.Result` instance, for example: `buildResult: currentBuild.result`
+* if nothing is specified, the result is computed from the current stage (if available) or
+  the current build
+
+#### Validation data
+
+The step can be used to associate some data with the validation run.
+
+Note that the data may be validated by the validation stamp at server side, and
+might therefore be rejected.
+
+Three parameters do control the validation data:
+
+* `data` - the data to be sent
+* `dataType` - the type of data
+* `dataValidation` - `true` by default. If `true`, no validation status is computed or sent,
+  unless it is explicitly specified using the `validationStatus` parameter
+
+A data type can be specified using its fully qualified name, but most of the same, you'll
+want to use predefined aliases.
+
+For example:
+
+* for a fraction:
+
+```groovy
+ontrackValidate ...,
+    dataType: 'fraction',
+    data: [numerorator: 99, denominator: 100],
+```
+
+* for a CHML (critical / high / medium / low) type:
+
+```groovy
+ontrackValidate ...,
+    dataType: 'chtml',
+    data: [critical: 0, high: 1, medium: 10, low: 1000],
+    // Components can be omitted, they'll be set to 0
+```
+
+* for some textual data:
+
+```groovy
+ontrackValidate ...,
+    dataType: 'text',
+    data: [value: 'Some text'],
+```
+
+* for some (integer) number data:
+
+```groovy
+ontrackValidate ...,
+    dataType: 'number',
+    data: [value: 42],
+```
+
+* for some (integer) percentage data:
+
+```groovy
+ontrackValidate ...,
+    dataType: 'percentage',
+    data: [value: 42],
+```
+
+Of course, it is possible to specify a complete type by using its FQCN:
+
+```groovy
+ontrackValidate ...,
+    dataType: 'net.nemerosa.ontrack.extension.general.validation.ThresholdPercentageValidationDataType',
+    data: [value: 42],
+```
+
+(this code is equivalent to the previous one)
+
+#### Test results as validation data
+
+A common use case would be to associate the test results of a stage (tests passed vs total
+of tests) as a fraction data to a validation run.
+
+A typical usage:
+
+```groovy
+script {
+    def results = junit ...
+    ontrackValidate ..., testResults: results
+}
+```
+
+The fraction sent as data will be computed as follows:
+
+* `numerator` = `passCount`
+* `denominator` = `totalCount - skipCount`
+
+Note that a step like `junit` returns an instance of `hudson.tasks.junit.TestResultSummary`
+but this can be replaced by any other object having the same properties than
+as mentioned above.
+
+If some `testResults` parameter is set, any `data` or `dataType` parameter is ignored. 
+
 
 ### Promotion step
 
