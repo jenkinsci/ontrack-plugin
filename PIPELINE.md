@@ -365,6 +365,28 @@ ontrackScript logging: true, script: ' ... ', bindings: [VERSION: '1.0.0']
 
 ### Ontrack GraphQL step
 
+The `ontrackGraphQL` step runs a GraphQL query
+against the Ontrack server and returns the result as
+a JSON object.
+
+Example:
+
+```groovy
+ontrackGraphQL(script: '{projects{name}}')
+```
+
+The script above would return something like:
+
+````json
+{
+  "data": {
+    "projects": [{
+      "name": "ontrack"
+    }]
+  }
+}
+````
+
 ### Ontrack trigger
 
 The `ontrackTrigger` can be used as trigger.
