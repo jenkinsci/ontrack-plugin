@@ -387,6 +387,9 @@ The script above would return something like:
 }
 ````
 
+The `bindings` parameter can be used to pass variables to
+the GraphQL query.
+
 ### Ontrack trigger
 
 The `ontrackTrigger` can be used as trigger.
