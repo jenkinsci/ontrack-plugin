@@ -8,6 +8,7 @@ import hudson.model.TaskListener;
 import hudson.tasks.junit.TestResultSummary;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.dsl.TestSummary;
 import net.nemerosa.ontrack.dsl.ValidationRun;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
@@ -71,9 +72,14 @@ public class OntrackValidateStep extends Step {
     private boolean dataValidation = true;
 
     /**
-     * Test results. If filled in, run data as a fraction is sent.
+     * Test results. If filled in, run data as a test summary is sent.
      */
     private TestResultSummary testResults = null;
+
+    /**
+     * Test results as a fraction, to support Ontrack version < 3.37.6
+     */
+    private boolean testResultsAsFraction = false;
 
     @DataBoundConstructor
     public OntrackValidateStep(@Nonnull String project, @Nonnull String branch, @Nonnull String build, @Nonnull String validationStamp) {
@@ -153,6 +159,15 @@ public class OntrackValidateStep extends Step {
         this.buildResult = buildResult;
     }
 
+    public boolean isTestResultsAsFraction() {
+        return testResultsAsFraction;
+    }
+
+    @DataBoundSetter
+    public void setTestResultsAsFraction(boolean testResultsAsFraction) {
+        this.testResultsAsFraction = testResultsAsFraction;
+    }
+
     @Override
     public StepExecution start(final StepContext context) throws Exception {
         // Checks
@@ -184,14 +199,27 @@ public class OntrackValidateStep extends Step {
                 // ... and creates a validation run
                 ValidationRun validationRun;
                 if (testResults != null) {
-                    int ok = testResults.getPassCount();
-                    int total = testResults.getTotalCount() - testResults.getSkipCount();
-                    validationRun = ontrackBuild.validateWithFraction(
-                            validationStamp,
-                            ok,
-                            total,
-                            dataValidation ? validationStatus : actualStatus
-                    );
+                    if (testResultsAsFraction) {
+                        int ok = testResults.getPassCount();
+                        int total = testResults.getTotalCount() - testResults.getSkipCount();
+                        validationRun = ontrackBuild.validateWithFraction(
+                                validationStamp,
+                                ok,
+                                total,
+                                dataValidation ? validationStatus : actualStatus
+                        );
+                    } else {
+                        int passed = testResults.getPassCount();
+                        int skipped = testResults.getSkipCount();
+                        int failed = testResults.getFailCount();
+                        validationRun = ontrackBuild.validateWithTestSummary(
+                                validationStamp,
+                                new TestSummary(
+                                        passed, skipped, failed
+                                ),
+                                dataValidation ? validationStatus : actualStatus
+                        );
+                    }
                 } else if (StringUtils.equals(dataType, "fraction")) {
                     validationRun = ontrackBuild.validateWithFraction(
                             validationStamp,
