@@ -4,7 +4,20 @@ Pipeline DSL integration
 [Components](JOB_COMPONENTS.md) of the Ontrack plug-in can be called in
 the [Jenkins pipeline DSL](https://jenkins.io/doc/book/pipeline/).
 
-Following steps are currently available.
+### Table of content
+
+* [`ontrackBranchName`](#branch-name) - get a branch name suitable for Ontrack
+* [`ontrackProjectSetup`](#project-set-up) - setup of a project in Ontrack
+* [`ontrackBranchSetup`](#branch-set-up) - setup of a branch in Ontrack
+* [`ontrackBuild`](#build-creation-step) - creates a build
+* [`ontrackValidate`](#validation-step) - validates a build
+  * [Validation status](#validation-status)
+  * [Validation data](#validation-data)
+  * [Test results as validation data](#test-results-as-validation-data)
+* [`ontrackPromote`](#promotion-step) - promotes a build
+* [`ontrackScript`](#ontrack-dsl-step) - runs an Ontrack DSL script
+* [`ontrackGraphql`](#ontrack-graphql-step) - runs a GraphQL query
+* [`ontrackTrigger`](#ontrack-trigger) - triggers job based on Ontrack criteria
 
 ### Branch name
 
