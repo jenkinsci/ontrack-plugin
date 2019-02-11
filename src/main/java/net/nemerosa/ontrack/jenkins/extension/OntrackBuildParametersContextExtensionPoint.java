@@ -6,6 +6,7 @@ import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 import net.nemerosa.ontrack.jenkins.OntrackChoiceParameterDefinition;
 import net.nemerosa.ontrack.jenkins.OntrackMultiChoiceParameterDefinition;
+import net.nemerosa.ontrack.jenkins.OntrackSingleParameterDefinition;
 
 @Extension(optional = true)
 public class OntrackBuildParametersContextExtensionPoint extends ContextExtensionPoint {
@@ -36,6 +37,23 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
         executeInContext(closure, context);
         context.validate();
         return new OntrackMultiChoiceParameterDefinition(
+                context.getName(),
+                context.getDescription(),
+                context.getDsl(),
+                context.isSandbox(),
+                context.getValueProperty()
+        );
+    }
+
+    /**
+     * Single parameter
+     */
+    @DslExtensionMethod(context = BuildParametersContext.class)
+    public OntrackSingleParameterDefinition ontrackSingleParameter(Runnable closure) {
+        OntrackChoiceParameterContext context = new OntrackChoiceParameterContext();
+        executeInContext(closure, context);
+        context.validate();
+        return new OntrackSingleParameterDefinition(
                 context.getName(),
                 context.getDescription(),
                 context.getDsl(),

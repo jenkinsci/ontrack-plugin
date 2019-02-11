@@ -126,7 +126,8 @@ job("...") {
 }
 ```
 
-The `ontrackMultipleChoiceParameter` step, with the same parameters can be used to have a multiple choice. In this case, the returned value must be a list.
+* The `ontrackSingleParameter` step, with the same parameters can be used to have a single computed parameter.
+* The `ontrackMultipleChoiceParameter` step, with the same parameters can be used to have a multiple choice. In this case, the returned value must be a list.
 
 ## Future extensions
 
