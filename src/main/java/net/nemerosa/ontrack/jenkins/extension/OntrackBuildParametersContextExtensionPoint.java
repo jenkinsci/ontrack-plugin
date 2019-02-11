@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.jenkins.extension;
 
-import antlr.ANTLRException;
 import hudson.Extension;
 import javaposse.jobdsl.dsl.helpers.BuildParametersContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
@@ -15,7 +14,7 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
      * Choice parameter
      */
     @DslExtensionMethod(context = BuildParametersContext.class)
-    public OntrackChoiceParameterDefinition ontrackChoiceParameter(Runnable closure) throws ANTLRException {
+    public OntrackChoiceParameterDefinition ontrackChoiceParameter(Runnable closure) {
         OntrackChoiceParameterContext context = new OntrackChoiceParameterContext();
         executeInContext(closure, context);
         context.validate();
