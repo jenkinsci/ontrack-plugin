@@ -77,20 +77,39 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
         // TODO #52 Use binding variables
         String dsl;
         if (StringUtils.isBlank(context.getPromotion())) {
-            dsl = format(
-                    "ontrack.branch('%s', '%s').standardFilter(count: %d).collect { build -> [name: build.name, label: build.config.label] }",
-                    context.getProject(),
-                    context.getBranch(),
-                    context.getCount()
-            );
+            if (context.isUseLabel()) {
+                dsl = format(
+                        "ontrack.branch('%s', '%s').standardFilter(count: %d, withProperty: 'net.nemerosa.ontrack.extension.general.ReleasePropertyType').collect { build -> [value: build.config.label] }",
+                        context.getProject(),
+                        context.getBranch(),
+                        context.getCount()
+                );
+            } else {
+                dsl = format(
+                        "ontrack.branch('%s', '%s').standardFilter(count: %d).collect { build -> [value: build.name] }",
+                        context.getProject(),
+                        context.getBranch(),
+                        context.getCount()
+                );
+            }
         } else {
-            dsl = format(
-                    "ontrack.branch('%s', '%s').standardFilter(count: %d, withPromotionLevel: '%s').collect { build -> [name: build.name, label: build.config.label] }",
-                    context.getProject(),
-                    context.getBranch(),
-                    context.getCount(),
-                    context.getPromotion()
-            );
+            if (context.isUseLabel()) {
+                dsl = format(
+                        "ontrack.branch('%s', '%s').standardFilter(count: %d, withProperty: 'net.nemerosa.ontrack.extension.general.ReleasePropertyType', withPromotionLevel: '%s').collect { build -> [value: build.config.label] }",
+                        context.getProject(),
+                        context.getBranch(),
+                        context.getCount(),
+                        context.getPromotion()
+                );
+            } else {
+                dsl = format(
+                        "ontrack.branch('%s', '%s').standardFilter(count: %d, withPromotionLevel: '%s').collect { build -> [value: build.name] }",
+                        context.getProject(),
+                        context.getBranch(),
+                        context.getCount(),
+                        context.getPromotion()
+                );
+            }
         }
         // Creates the component
         return new OntrackChoiceParameterDefinition(
@@ -98,7 +117,7 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
                 context.getDescription(),
                 dsl,
                 true,
-                context.isUseLabel() ? "label" : "name"
+                "value"
         );
     }
 
