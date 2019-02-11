@@ -78,14 +78,14 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
         String dsl;
         if (StringUtils.isBlank(context.getPromotion())) {
             dsl = format(
-                    "ontrack.branch('%s', '%s').standardFilter(count: %d)",
+                    "ontrack.branch('%s', '%s').standardFilter(count: %d).collect { build -> [name: build.name, label: build.config.label] }",
                     context.getProject(),
                     context.getBranch(),
                     context.getCount()
             );
         } else {
             dsl = format(
-                    "ontrack.branch('%s', '%s').standardFilter(count: %d, withPromotionLevel: '%s')",
+                    "ontrack.branch('%s', '%s').standardFilter(count: %d, withPromotionLevel: '%s').collect { build -> [name: build.name, label: build.config.label] }",
                     context.getProject(),
                     context.getBranch(),
                     context.getCount(),
