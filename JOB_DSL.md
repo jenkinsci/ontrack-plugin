@@ -129,6 +129,34 @@ job("...") {
 * The `ontrackSingleParameter` step, with the same parameters can be used to have a single computed parameter.
 * The `ontrackMultipleChoiceParameter` step, with the same parameters can be used to have a multiple choice. In this case, the returned value must be a list.
 
+## Last build parameter
+
+This definition creates a parameter which offers the selection of the last builds of a given branch.
+
+```groovy
+job("...") {
+    parameters {
+        ontrackBuildParameter {
+            // Name of the environment variable to create (required)
+            name "NAME"
+            // Description to display for the parameter (defaults to "Build")
+            description "Select a build"
+            // Project & branch
+            project "my-project"
+            branch "release-1.0"
+            // Optional promotion filter
+            promotion "IRON"
+            // Use this method to specify that the returned value
+            // must be the label (release property) of the build instead
+            // of its name
+            useLabel()
+            // Number of elements to display (defaults to `10`)
+            count 10
+        }
+    }
+}
+```
+
 ## Future extensions
 
 > Future versions of the Ontrack plug-in will bring Job DSL extensions to support:
