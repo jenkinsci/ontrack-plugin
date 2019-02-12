@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.jenkins.OntrackConfiguration;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 import net.nemerosa.ontrack.jenkins.OntrackSecurityMode;
 
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -162,9 +163,11 @@ public class OntrackDSLRunner implements DSLRunner {
         return this;
     }
 
-    public OntrackDSLRunner injectProperties(String propertyValues, Run run, TaskListener listener) throws IOException, InterruptedException {
-        Map<String, String> properties = OntrackPluginSupport.parseProperties(propertyValues, run, listener);
-        bindings.putAll(properties);
+    public OntrackDSLRunner injectProperties(@CheckForNull String propertyValues, @CheckForNull Run run, @CheckForNull TaskListener listener) throws IOException, InterruptedException {
+        if (propertyValues != null) {
+            Map<String, String> properties = OntrackPluginSupport.parseProperties(propertyValues, run, listener);
+            bindings.putAll(properties);
+        }
         return this;
     }
 

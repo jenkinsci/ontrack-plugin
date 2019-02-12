@@ -121,6 +121,10 @@ job("...") {
             valueProperty "name"
             // Sandbox environment (defaults to `false`)
             sandbox()
+            // Binding to use in the DSL
+            binding "name1", "value"
+            binding "name2", 10
+            binding "name3", false
         }
     }
 }

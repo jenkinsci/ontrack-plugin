@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.jenkins.OntrackMultiChoiceParameterDefinition;
 import net.nemerosa.ontrack.jenkins.OntrackSingleParameterDefinition;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Collections;
+
 import static java.lang.String.format;
 
 @Extension(optional = true)
@@ -27,7 +29,8 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
                 context.getDescription(),
                 context.getDsl(),
                 context.isSandbox(),
-                context.getValueProperty()
+                context.getValueProperty(),
+                context.getBindings()
         );
     }
 
@@ -44,7 +47,8 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
                 context.getDescription(),
                 context.getDsl(),
                 context.isSandbox(),
-                context.getValueProperty()
+                context.getValueProperty(),
+                context.getBindings()
         );
     }
 
@@ -61,7 +65,8 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
                 context.getDescription(),
                 context.getDsl(),
                 context.isSandbox(),
-                context.getValueProperty()
+                context.getValueProperty(),
+                context.getBindings()
         );
     }
 
@@ -117,7 +122,8 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
                 context.getDescription(),
                 dsl,
                 true,
-                "value"
+                "value",
+                Collections.emptyMap()
         );
     }
 

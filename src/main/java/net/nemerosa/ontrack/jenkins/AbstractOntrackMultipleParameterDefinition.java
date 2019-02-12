@@ -1,14 +1,15 @@
 package net.nemerosa.ontrack.jenkins;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class AbstractOntrackMultipleParameterDefinition extends AbstractOntrackParameterDefinition {
 
-    public AbstractOntrackMultipleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty) {
-        super(name, description, dsl, sandbox, valueProperty);
+    public AbstractOntrackMultipleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty, String injectProperties) {
+        super(name, description, dsl, sandbox, valueProperty, injectProperties);
+    }
+
+    public AbstractOntrackMultipleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty, Map<String, Object> bindings) {
+        super(name, description, dsl, sandbox, valueProperty, bindings);
     }
 
     /**

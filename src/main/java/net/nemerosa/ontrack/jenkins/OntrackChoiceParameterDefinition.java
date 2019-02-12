@@ -9,12 +9,17 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.List;
+import java.util.Map;
 
 public class OntrackChoiceParameterDefinition extends AbstractOntrackMultipleParameterDefinition {
 
     @DataBoundConstructor
-    public OntrackChoiceParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty) {
-        super(name, description, dsl, sandbox, valueProperty);
+    public OntrackChoiceParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty, String injectProperties) {
+        super(name, description, dsl, sandbox, valueProperty, injectProperties);
+    }
+
+    public OntrackChoiceParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty, Map<String,Object> bindings) {
+        super(name, description, dsl, sandbox, valueProperty, bindings);
     }
 
     @Override

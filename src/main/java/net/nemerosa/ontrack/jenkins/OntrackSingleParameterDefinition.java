@@ -9,16 +9,22 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.Map;
+
 
 public class OntrackSingleParameterDefinition extends AbstractOntrackParameterDefinition {
 
     @DataBoundConstructor
-    public OntrackSingleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty) {
-        super(name, description, dsl, sandbox, valueProperty);
+    public OntrackSingleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty, String injectProperties) {
+        super(name, description, dsl, sandbox, valueProperty, injectProperties);
     }
 
-    public OntrackSingleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty, DSLRunner dslRunner) {
-        super(name, description, dsl, sandbox, valueProperty, dslRunner);
+    public OntrackSingleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty, Map<String, Object> bindings) {
+        super(name, description, dsl, sandbox, valueProperty, bindings);
+    }
+
+    public OntrackSingleParameterDefinition(String name, String description, String dsl, boolean sandbox, String valueProperty, DSLRunner dslRunner, String injectProperties) {
+        super(name, description, dsl, sandbox, valueProperty, dslRunner, injectProperties, null);
     }
 
     /**

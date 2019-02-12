@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.jenkins.extension;
 import javaposse.jobdsl.dsl.Context;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class OntrackChoiceParameterContext implements Context {
 
     private String name;
@@ -10,6 +13,7 @@ public class OntrackChoiceParameterContext implements Context {
     private String dsl;
     private boolean sandbox = false;
     private String valueProperty = "name";
+    private Map<String, Object> bindings = new LinkedHashMap<>();
 
     public void name(String value) {
         setName(value);
@@ -29,6 +33,10 @@ public class OntrackChoiceParameterContext implements Context {
 
     public void valueProperty(String value) {
         setValueProperty(value);
+    }
+
+    public void binding(String name, Object value) {
+        bindings.put(name, value);
     }
 
     public String getName() {
@@ -69,6 +77,14 @@ public class OntrackChoiceParameterContext implements Context {
 
     public void setValueProperty(String valueProperty) {
         this.valueProperty = valueProperty;
+    }
+
+    public Map<String, Object> getBindings() {
+        return bindings;
+    }
+
+    public void setBindings(Map<String, Object> bindings) {
+        this.bindings = bindings;
     }
 
     public void validate() {

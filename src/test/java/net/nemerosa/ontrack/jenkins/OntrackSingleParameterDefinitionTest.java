@@ -15,7 +15,8 @@ public class OntrackSingleParameterDefinitionTest {
                 "",
                 true,
                 "name",
-                new MockDSLRunner(null)
+                new MockDSLRunner(null),
+                null
         );
         ParameterValue parameterValue = definition.createValue();
         assertEquals("NAME", parameterValue.getName());
