@@ -3,10 +3,12 @@ package net.nemerosa.ontrack.jenkins.steps;
 import com.google.common.collect.ImmutableSet;
 import hudson.AbortException;
 import hudson.Extension;
+import hudson.model.Run;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.*;
@@ -86,12 +88,19 @@ public class OntrackBuildStep extends Step {
                 if (taskListener == null) {
                     throw new IllegalStateException("Cannot get any task listener.");
                 }
+                // Gets the current Jenkins build
+                Run run = context.get(Run.class);
+                if (run == null) {
+                    throw new IllegalStateException("Cannot get any run.");
+                }
                 // Gets the Ontrack connector
                 Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(taskListener);
                 // Gets the branch...
                 Branch ontrackBranch = ontrack.branch(project, branch);
                 // ... and creates a build
                 Build ontrackBuild = ontrackBranch.build(OntrackBuildStep.this.build, buildDescription, true);
+                // Ontrack build link
+                OntrackPluginSupport.createOntrackLinks(ontrack, run, ontrackBuild);
                 // ... and associates a Git commit
                 if (StringUtils.isNotBlank(gitCommit)) {
                     ontrackBuild.getConfig().gitCommit(gitCommit);

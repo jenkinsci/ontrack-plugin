@@ -1,10 +1,14 @@
 package net.nemerosa.ontrack.jenkins;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.*;
 import hudson.triggers.SCMTrigger;
 import jenkins.model.Jenkins;
+import net.nemerosa.ontrack.dsl.Build;
+import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.actions.OntrackLinkAction;
 import org.apache.commons.lang.StringUtils;
 
@@ -163,15 +167,28 @@ public final class OntrackPluginSupport {
         return runInfo;
     }
 
-    public static @CheckForNull
-    Action createBuildLinkAction(int id) {
+    private static void addOntrackLink(String name, String suffix, Run run) {
         OntrackConfiguration ontrackConfiguration = OntrackConfiguration.getOntrackConfiguration();
         if (ontrackConfiguration != null) {
             String baseUrl = ontrackConfiguration.getOntrackUrl();
-            String url = baseUrl + "/#/build/" + id;
-            return new OntrackLinkAction("Ontrack Build", url);
-        } else {
-            return null;
+            String url = baseUrl + suffix;
+            run.addAction(new OntrackLinkAction(name, url));
         }
+    }
+
+    public static void createOntrackLinks(Ontrack ontrack, Run run, Build ontrackBuild) {
+        // Creates the build link
+        addOntrackLink("Ontrack Build", "/#/build/" + ontrackBuild.getId(), run);
+        // Gets build information
+        Map<String, Integer> vars = Collections.singletonMap("id", ontrackBuild.getId());
+        Object jsonResult = ontrack.graphQLQuery("query BuildInfo($id: Int!) { builds(id: $id) { branch { id project { id } } } }", vars);
+        JsonNode json = new ObjectMapper().valueToTree(jsonResult);
+        // Gets branch and project id
+        JsonNode branchJson = json.path("data").path("builds").path(0).path("branch");
+        int branchId = branchJson.path("id").asInt();
+        int projectId = branchJson.path("project").path("id").asInt();
+        // Links
+        addOntrackLink("Ontrack Branch", "/#/branch/" + branchId, run);
+        addOntrackLink("Ontrack Project", "/#/project/" + projectId, run);
     }
 }

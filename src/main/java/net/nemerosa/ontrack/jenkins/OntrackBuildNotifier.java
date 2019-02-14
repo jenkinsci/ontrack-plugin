@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.jenkins;
 
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.model.*;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import jenkins.model.Jenkins;
@@ -11,7 +14,6 @@ import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.dsl.properties.BuildProperties;
-import net.nemerosa.ontrack.jenkins.actions.OntrackLinkAction;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -96,10 +98,7 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                 // ... and creates a build
                 Build build = branch.build(buildName, buildDescription, true);
                 // Creates the build action
-                Action action = OntrackPluginSupport.createBuildLinkAction(build.getId());
-                if (action != null) {
-                    theBuild.addAction(action);
-                }
+                OntrackPluginSupport.createOntrackLinks(ontrack, theBuild, build);
                 // Sets the Jenkins build property
                 // Note: cannot use the Groovy DSL here, using internal classes
                 OntrackConfiguration ontrackConfiguration = OntrackConfiguration.getOntrackConfiguration();
