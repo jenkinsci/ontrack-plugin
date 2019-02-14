@@ -5,6 +5,7 @@ import hudson.FilePath;
 import hudson.model.*;
 import hudson.triggers.SCMTrigger;
 import jenkins.model.Jenkins;
+import net.nemerosa.ontrack.jenkins.actions.OntrackLinkAction;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.CheckForNull;
@@ -160,5 +161,17 @@ public final class OntrackPluginSupport {
         }
         // OK
         return runInfo;
+    }
+
+    public static @CheckForNull
+    Action createBuildLinkAction(int id) {
+        OntrackConfiguration ontrackConfiguration = OntrackConfiguration.getOntrackConfiguration();
+        if (ontrackConfiguration != null) {
+            String baseUrl = ontrackConfiguration.getOntrackUrl();
+            String url = baseUrl + "/#/build/" + id;
+            return new OntrackLinkAction("Ontrack Build", url);
+        } else {
+            return null;
+        }
     }
 }
