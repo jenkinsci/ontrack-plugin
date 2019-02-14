@@ -183,12 +183,14 @@ public final class OntrackPluginSupport {
         Map<String, Integer> vars = Collections.singletonMap("id", ontrackBuild.getId());
         Object jsonResult = ontrack.graphQLQuery("query BuildInfo($id: Int!) { builds(id: $id) { branch { id project { id } } } }", vars);
         JsonNode json = new ObjectMapper().valueToTree(jsonResult);
-        // Gets branch and project id
-        JsonNode branchJson = json.path("data").path("builds").path(0).path("branch");
-        int branchId = branchJson.path("id").asInt();
-        int projectId = branchJson.path("project").path("id").asInt();
-        // Links
-        addOntrackLink("Ontrack Branch", "/#/branch/" + branchId, run);
-        addOntrackLink("Ontrack Project", "/#/project/" + projectId, run);
+        if (json != null) {
+            // Gets branch and project id
+            JsonNode branchJson = json.path("data").path("builds").path(0).path("branch");
+            int branchId = branchJson.path("id").asInt();
+            int projectId = branchJson.path("project").path("id").asInt();
+            // Links
+            addOntrackLink("Ontrack Branch", "/#/branch/" + branchId, run);
+            addOntrackLink("Ontrack Project", "/#/project/" + projectId, run);
+        }
     }
 }
