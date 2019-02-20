@@ -1,23 +1,21 @@
 package net.nemerosa.ontrack.jenkins;
 
 import antlr.ANTLRException;
-import com.google.common.collect.ImmutableMap;
 import hudson.Extension;
-import hudson.model.*;
+import hudson.model.Cause;
+import hudson.model.Item;
+import hudson.model.Job;
+import hudson.model.Result;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
-import hudson.util.LogTaskListener;
-import jenkins.model.ParameterizedJobMixIn;
-import net.nemerosa.ontrack.dsl.Branch;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
-import org.apache.commons.lang.StringUtils;
+import net.nemerosa.ontrack.jenkins.trigger.TriggerDefinition;
+import net.nemerosa.ontrack.jenkins.trigger.TriggerHelper;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import java.io.IOException;
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +28,7 @@ public class OntrackTrigger extends Trigger<Job> {
     private static final Logger LOGGER = Logger.getLogger(OntrackTrigger.class.getName());
 
     private static final Level LOG_LEVEL = Level.FINE;
-    public static final String SUCCESS = "SUCCESS";
+    public static final String SUCCESS = TriggerDefinition.SUCCESS;
     public static final String FAILURE = "FAILURE";
     public static final String UNSTABLE = "UNSTABLE";
 
@@ -81,7 +79,7 @@ public class OntrackTrigger extends Trigger<Job> {
         // Hence 'minimumResult' will be
         // - 'SUCCESS' if the input is null or an empty String
         // - 'FAILURE' if the input contains an invalid value
-        this.minimumResult = (minimumResult!=null&&!minimumResult.isEmpty())?Result.fromString(minimumResult).toString():SUCCESS;
+        this.minimumResult = (minimumResult != null && !minimumResult.isEmpty()) ? Result.fromString(minimumResult).toString() : SUCCESS;
     }
 
     public String getProject() {
@@ -105,7 +103,8 @@ public class OntrackTrigger extends Trigger<Job> {
         return minimumResult;
     }
 
-    public List<String> getChoices(){
+    @SuppressWarnings("unused")
+    public List<String> getChoices() {
         List<String> list = new ArrayList<>();
         list.add(SUCCESS);
         list.add(UNSTABLE);
@@ -123,104 +122,16 @@ public class OntrackTrigger extends Trigger<Job> {
         // Logging
         LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Check %s promotion trigger", job.getFullName(), promotion));
 
-        // Ontrack accessor
-        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(System.out);
-
-        // Gets the Ontrack branch
-        Branch ontrackBranch = ontrack.branch(project, this.branch);
-
-        // Gets the last builds
-        List<Build> ontrackBuilds;
-        if (StringUtils.isBlank(promotion)) {
-            ontrackBuilds = ontrackBranch.standardFilter(ImmutableMap.of(
-                    "count", 1
-            ));
-        }
-        // Gets the last promoted build
-        else if ("*".equals(promotion)) {
-            ontrackBuilds = ontrackBranch.getLastPromotedBuilds();
-        }
-        // Gets the last build with promotion
-        else {
-            ontrackBuilds = ontrackBranch.standardFilter(ImmutableMap.of(
-                    "count", 1,
-                    "withPromotionLevel", promotion
-            ));
-        }
-
-        // Nothing eligible
-        if (ontrackBuilds.isEmpty()) {
-            LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] No build eligible", job.getFullName()));
-            return;
-        }
-
-        // Gets the last version
-        String lastVersion = ontrackBuilds.get(0).getName();
-        LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Last available build: %s", job.getFullName(), lastVersion));
-
-        // Version parameter name
-        String parameterNameValue = this.parameterName;
-        if (StringUtils.isBlank(parameterNameValue)) {
-            parameterNameValue = "VERSION";
-        }
-
-        // Firing the job?
-        boolean firing;
-        // Gets any previous build
-        Run lastBuild = job.getLastBuild();
-        if (lastBuild != null) {
-            Result result = lastBuild.getResult();
-            Result minimum = Result.fromString(minimumResult);
-            if (result == null || (result.isWorseThan(minimum) && result.isCompleteBuild())) {
-                LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Last build was failed or unsuccessful", job.getFullName()));
-                firing = true;
-            } else {
-                // Log listener
-                TaskListener taskListener = new LogTaskListener(
-                        LOGGER,
-                        Level.FINER
-                );
-                // Gets the last build name
-                try {
-                    String lastBuildName = lastBuild.getEnvironment(taskListener).get(parameterNameValue, null);
-                    LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Version for last build: %s", job.getFullName(), lastBuildName));
-                    // Identical to last version
-                    if (StringUtils.equals(lastBuildName, lastVersion)) {
-                        LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] No new version available", job.getFullName()));
-                        firing = false;
-                    }
-                    // Not equal
-                    else {
-                        LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] New version available", job.getFullName()));
-                        firing = true;
-                    }
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(
-                            String.format("[ontrack][trigger][%s] Could not compute the trigger condition because %s environment variable could not be accessed", job.getFullName(), parameterNameValue),
-                            e
-                    );
-                }
-            }
-        } else {
-            LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] No previous build, firing", job.getFullName()));
-            firing = true;
-        }
-
-        // Summary
-        if (!firing) {
-            LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] For one of the reasons mentioned above, not firing", job.getFullName()));
-        } else {
-            LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Firing with %s = %s", job.getFullName(), parameterNameValue, lastVersion));
-            // Scheduling
-            ParameterizedJobMixIn.scheduleBuild2(
-                    job,
-                    0,
-                    new CauseAction(new OntrackTriggerCause()),
-                    new ParametersAction(
-                            new StringParameterValue(parameterNameValue, lastVersion)
-                    )
-            );
-        }
+        // Helper
+        TriggerHelper.evaluate(job, Collections.singletonList(
+                new TriggerDefinition(
+                        project,
+                        branch,
+                        promotion,
+                        parameterName,
+                        minimumResult
+                )
+        ));
 
     }
 
@@ -234,11 +145,16 @@ public class OntrackTrigger extends Trigger<Job> {
         }
 
         @Override
+        @Nonnull
         public String getDisplayName() {
             return "Ontrack: trigger";
         }
     }
 
+    /**
+     * Kept for backward compatibility
+     */
+    @Deprecated
     public static class OntrackTriggerCause extends Cause {
         @Override
         public String getShortDescription() {
