@@ -67,6 +67,17 @@ public class TriggerDefinition {
         return minimumResult;
     }
 
+    @Override
+    public String toString() {
+        return "TriggerDefinition{" +
+                "project='" + project + '\'' +
+                ", branch='" + branch + '\'' +
+                ", promotion='" + promotion + '\'' +
+                ", parameterName='" + parameterName + '\'' +
+                ", minimumResult='" + minimumResult + '\'' +
+                '}';
+    }
+
     TriggerResult noResult() {
         return new TriggerResult(parameterName, null, null);
     }

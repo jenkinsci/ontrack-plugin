@@ -44,6 +44,15 @@ public class TriggerResult {
         return newValue;
     }
 
+    @Override
+    public String toString() {
+        return "TriggerResult{" +
+                "name='" + name + '\'' +
+                ", oldValue='" + oldValue + '\'' +
+                ", newValue='" + newValue + '\'' +
+                '}';
+    }
+
     public boolean isFiring() {
         return StringUtils.isNotBlank(newValue) && !StringUtils.equals(oldValue, newValue);
     }

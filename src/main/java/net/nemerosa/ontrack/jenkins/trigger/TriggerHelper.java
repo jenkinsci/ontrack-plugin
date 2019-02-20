@@ -25,7 +25,11 @@ public class TriggerHelper {
     public static void evaluate(Job job, List<TriggerDefinition> triggers) {
         // Evaluates the condition for each trigger
         List<TriggerResult> results = triggers.stream()
-                .map(trigger -> getTriggerResult(job, trigger))
+                .map(trigger -> {
+                    TriggerResult result = getTriggerResult(job, trigger);
+                    LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] %s --> %s (firing: %s)", job.getFullName(), trigger, result, result.isFiring()));
+                    return result;
+                })
                 .collect(Collectors.toList());
 
         // Final say
