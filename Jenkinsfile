@@ -22,6 +22,9 @@ pipeline {
                 always {
                     junit 'target/surefire-reports/*.xml'
                 }
+                success {
+                    archiveArtifacts "target/*.hpi"
+                }
             }
         }
     }
