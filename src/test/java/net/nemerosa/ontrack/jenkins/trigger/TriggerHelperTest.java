@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.annotation.CheckForNull;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -22,23 +23,33 @@ public class TriggerHelperTest {
 
     private static final String PROJECT = "project";
     private static final String BRANCH = "branch";
+    private static final String OTHER = "other";
     private static final String PROMOTION = "IRON";
     private static final String VERSION = "VERSION";
+    private static final String OTHER_VERSION = "OTHER_VERSION";
 
     private static final String OLD_BUILD = "1.0.0";
     private static final String NEW_BUILD = "1.0.1";
 
+    private static final String OLD_OTHER_BUILD = "2.0.0";
+    private static final String NEW_OTHER_BUILD = "2.0.1";
+
     private Ontrack ontrack;
     private Branch ontrackBranch;
+    private Branch otherOntrackBranch;
     private Build ontrackBuild;
+    private Build ontrackOtherBuild;
 
     @Before
     public void before() {
         ontrack = mock(Ontrack.class);
         ontrackBranch = mock(Branch.class);
+        otherOntrackBranch = mock(Branch.class);
         ontrackBuild = mock(Build.class);
+        ontrackOtherBuild = mock(Build.class);
 
         when(ontrack.branch(PROJECT, BRANCH)).thenReturn(ontrackBranch);
+        when(ontrack.branch(PROJECT, OTHER)).thenReturn(otherOntrackBranch);
     }
 
     /**
@@ -264,6 +275,160 @@ public class TriggerHelperTest {
         job.checkTriggered(OLD_BUILD);
     }
 
+    /**
+     * Multiple triggers.
+     * No previous build.
+     * No match.
+     * <p>
+     * => No triggered
+     */
+    @Test
+    public void test20() {
+        MockTriggerJob job = new MockTriggerJob().withNoPromotion(ontrackBranch).withNoPromotion(otherOntrackBranch);
+        multipleTrigger(job);
+        job.checkNotTriggered();
+    }
+
+    /**
+     * Multiple triggers.
+     * No previous build.
+     * One match.
+     * <p>
+     * => No triggered
+     */
+    @Test
+    public void test21() {
+        MockTriggerJob job = new MockTriggerJob().withNoPromotion(ontrackBranch).withPromotion(otherOntrackBranch, ontrackOtherBuild, OLD_OTHER_BUILD);
+        multipleTrigger(job);
+        job.checkNotTriggered();
+    }
+
+    /**
+     * Multiple triggers.
+     * No previous build.
+     * All match.
+     * <p>
+     * => Triggered
+     */
+    @Test
+    public void test22() {
+        MockTriggerJob job = new MockTriggerJob().withPromotion(ontrackBranch, ontrackBuild, OLD_BUILD).withPromotion(otherOntrackBranch, ontrackOtherBuild, OLD_OTHER_BUILD);
+        multipleTrigger(job);
+        job.checkTriggered(VERSION, OLD_BUILD, OTHER_VERSION, OLD_OTHER_BUILD);
+    }
+
+    /**
+     * Multiple triggers.
+     * Previous build with no parameter.
+     * No match.
+     * <p>
+     * => Not triggered
+     */
+    @Test
+    public void test23() {
+        MockTriggerJob job = new MockTriggerJob()
+                .withPreviousBuild()
+                .withNoPromotion(ontrackBranch).withNoPromotion(otherOntrackBranch);
+        multipleTrigger(job);
+        job.checkNotTriggered();
+    }
+
+    /**
+     * Multiple triggers.
+     * Previous build with no parameter.
+     * One match.
+     * <p>
+     * => Not triggered
+     */
+    @Test
+    public void test24() {
+        MockTriggerJob job = new MockTriggerJob()
+                .withPreviousBuild()
+                .withNoPromotion(ontrackBranch).withPromotion(otherOntrackBranch, ontrackOtherBuild, OLD_OTHER_BUILD);
+        multipleTrigger(job);
+        job.checkNotTriggered();
+    }
+
+    /**
+     * Multiple triggers.
+     * Previous build with no parameter.
+     * All match.
+     * <p>
+     * => Triggered
+     */
+    @Test
+    public void test25() {
+        MockTriggerJob job = new MockTriggerJob()
+                .withPreviousBuild()
+                .withPromotion(ontrackBranch, ontrackBuild, OLD_BUILD).withPromotion(otherOntrackBranch, ontrackOtherBuild, OLD_OTHER_BUILD);
+        multipleTrigger(job);
+        job.checkTriggered(VERSION, OLD_BUILD, OTHER_VERSION, OLD_OTHER_BUILD);
+    }
+
+    /**
+     * Multiple triggers.
+     * Previous build with one parameter, not matching
+     * All match.
+     * <p>
+     * => Triggered
+     */
+    @Test
+    public void test26() {
+        MockTriggerJob job = new MockTriggerJob()
+                .withPreviousBuild(VERSION, OLD_BUILD)
+                .withPromotion(ontrackBranch, ontrackBuild, NEW_BUILD).withPromotion(otherOntrackBranch, ontrackOtherBuild, NEW_OTHER_BUILD);
+        multipleTrigger(job);
+        job.checkTriggered(VERSION, NEW_BUILD, OTHER_VERSION, NEW_OTHER_BUILD);
+    }
+
+    /**
+     * Multiple triggers.
+     * Previous build with one parameter, matching
+     * All match.
+     * <p>
+     * => Triggered
+     */
+    @Test
+    public void test27() {
+        MockTriggerJob job = new MockTriggerJob()
+                .withPreviousBuild(VERSION, NEW_BUILD)
+                .withPromotion(ontrackBranch, ontrackBuild, NEW_BUILD).withPromotion(otherOntrackBranch, ontrackOtherBuild, NEW_OTHER_BUILD);
+        multipleTrigger(job);
+        job.checkTriggered(VERSION, NEW_BUILD, OTHER_VERSION, NEW_OTHER_BUILD);
+    }
+
+    /**
+     * Multiple triggers.
+     * Previous build with two parameter, one matching
+     * All match.
+     * <p>
+     * => Triggered
+     */
+    @Test
+    public void test28() {
+        MockTriggerJob job = new MockTriggerJob()
+                .withPreviousBuild(VERSION, NEW_BUILD, OTHER_VERSION, OLD_OTHER_BUILD)
+                .withPromotion(ontrackBranch, ontrackBuild, NEW_BUILD).withPromotion(otherOntrackBranch, ontrackOtherBuild, NEW_OTHER_BUILD);
+        multipleTrigger(job);
+        job.checkTriggered(VERSION, NEW_BUILD, OTHER_VERSION, NEW_OTHER_BUILD);
+    }
+
+    /**
+     * Multiple triggers.
+     * Previous build with two parameter, all matching
+     * All match.
+     * <p>
+     * => Not triggered
+     */
+    @Test
+    public void test29() {
+        MockTriggerJob job = new MockTriggerJob()
+                .withPreviousBuild(VERSION, NEW_BUILD, OTHER_VERSION, NEW_OTHER_BUILD)
+                .withPromotion(ontrackBranch, ontrackBuild, NEW_BUILD).withPromotion(otherOntrackBranch, ontrackOtherBuild, NEW_OTHER_BUILD);
+        multipleTrigger(job);
+        job.checkNotTriggered();
+    }
+
     private void singleTrigger(MockTriggerJob job) {
         singleTrigger(job, null);
     }
@@ -276,6 +441,27 @@ public class TriggerHelperTest {
                 VERSION,
                 null
         )));
+    }
+
+    private void multipleTrigger(MockTriggerJob job) {
+        TriggerHelper.evaluate(ontrack, job,
+                Arrays.asList(
+                        new TriggerDefinition(
+                                PROJECT,
+                                BRANCH,
+                                PROMOTION,
+                                VERSION,
+                                null
+                        ),
+                        new TriggerDefinition(
+                                PROJECT,
+                                OTHER,
+                                PROMOTION,
+                                OTHER_VERSION,
+                                null
+                        )
+                )
+        );
     }
 
     private class MockTriggerJob implements TriggerJob {
@@ -303,6 +489,10 @@ public class TriggerHelperTest {
         }
 
         public MockTriggerJob withNoPromotion() {
+            return withNoPromotion(ontrackBranch);
+        }
+
+        public MockTriggerJob withNoPromotion(Branch ontrackBranch) {
             when(ontrackBranch.standardFilter(ImmutableMap.of(
                     "count", 1,
                     "withPromotionLevel", PROMOTION
@@ -318,11 +508,15 @@ public class TriggerHelperTest {
         }
 
         public MockTriggerJob withPromotion(String buildName) {
-            when(ontrackBuild.getName()).thenReturn(buildName);
-            when(ontrackBranch.standardFilter(ImmutableMap.of(
+            return withPromotion(ontrackBranch, ontrackBuild, buildName);
+        }
+
+        public MockTriggerJob withPromotion(Branch branch, Build build, String buildName) {
+            when(build.getName()).thenReturn(buildName);
+            when(branch.standardFilter(ImmutableMap.of(
                     "count", 1,
                     "withPromotionLevel", PROMOTION
-            ))).thenReturn(Collections.singletonList(ontrackBuild));
+            ))).thenReturn(Collections.singletonList(build));
             return this;
         }
 
@@ -355,6 +549,20 @@ public class TriggerHelperTest {
             );
         }
 
+        public MockTriggerJob withPreviousBuild(String name, String value) {
+            return withPreviousBuild(
+                    Result.SUCCESS,
+                    Collections.singletonMap(name, value)
+            );
+        }
+
+        public MockTriggerJob withPreviousBuild(String name1, String value1, String name2, String value2) {
+            return withPreviousBuild(
+                    Result.SUCCESS,
+                    ImmutableMap.of(name1, value1, name2, value2)
+            );
+        }
+
         public MockTriggerJob withPreviousBuild(Result result, Map<String, String> parameters) {
             run = new MockTriggerRun(result, parameters);
             return this;
@@ -373,9 +581,13 @@ public class TriggerHelperTest {
             checkTriggered(Collections.singletonMap(name, value));
         }
 
+        public void checkTriggered(String name1, String value1, String name2, String value2) {
+            checkTriggered(ImmutableMap.of(name1, value1, name2, value2));
+        }
+
         public void checkTriggered(Map<String, String> expected) {
-            assertNotNull(cause);
-            assertNotNull(parameters);
+            assertNotNull("Should have been triggered but missing cause", cause);
+            assertNotNull("Should have been triggered but missing parameters", parameters);
             assertEquals(expected.size(), parameters.size());
             parameters.forEach((parameterValue) -> {
                 String name = parameterValue.getName();
