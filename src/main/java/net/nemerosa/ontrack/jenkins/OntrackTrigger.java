@@ -8,6 +8,8 @@ import hudson.model.Job;
 import hudson.model.Result;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
+import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import net.nemerosa.ontrack.jenkins.trigger.JenkinsTriggerJob;
 import net.nemerosa.ontrack.jenkins.trigger.TriggerDefinition;
 import net.nemerosa.ontrack.jenkins.trigger.TriggerHelper;
@@ -123,8 +125,11 @@ public class OntrackTrigger extends Trigger<Job> {
         // Logging
         LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Check %s promotion trigger", job.getFullName(), promotion));
 
+        // Ontrack accessor
+        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(System.out);
+
         // Helper
-        TriggerHelper.evaluate(new JenkinsTriggerJob(job), Collections.singletonList(
+        TriggerHelper.evaluate(ontrack, new JenkinsTriggerJob(job), Collections.singletonList(
                 new TriggerDefinition(
                         project,
                         branch,

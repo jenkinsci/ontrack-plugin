@@ -7,7 +7,6 @@ import hudson.model.StringParameterValue;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -22,11 +21,11 @@ public class TriggerHelper {
     private static final Logger LOGGER = Logger.getLogger(TriggerHelper.class.getName());
     private static final Level LOG_LEVEL = Level.FINE;
 
-    public static void evaluate(TriggerJob job, List<TriggerDefinition> triggers) {
+    public static void evaluate(Ontrack ontrack, TriggerJob job, List<TriggerDefinition> triggers) {
         // Evaluates the condition for each trigger
         List<TriggerResult> results = triggers.stream()
                 .map(trigger -> {
-                    TriggerResult result = getTriggerResult(job, trigger);
+                    TriggerResult result = getTriggerResult(ontrack, job, trigger);
                     LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] %s --> %s (firing: %s)", job.getFullName(), trigger, result, result.isFiring()));
                     return result;
                 })
@@ -63,10 +62,7 @@ public class TriggerHelper {
         }
     }
 
-    private static TriggerResult getTriggerResult(TriggerJob job, TriggerDefinition trigger) {
-
-        // Ontrack accessor
-        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(System.out);
+    private static TriggerResult getTriggerResult(Ontrack ontrack, TriggerJob job, TriggerDefinition trigger) {
 
         // Gets the Ontrack branch
         Branch ontrackBranch = ontrack.branch(trigger.getProject(), trigger.getBranch());

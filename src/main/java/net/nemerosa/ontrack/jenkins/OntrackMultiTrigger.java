@@ -6,6 +6,8 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
+import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import net.nemerosa.ontrack.jenkins.trigger.JenkinsTriggerJob;
 import net.nemerosa.ontrack.jenkins.trigger.TriggerDefinition;
 import net.nemerosa.ontrack.jenkins.trigger.TriggerHelper;
@@ -60,8 +62,11 @@ public class OntrackMultiTrigger extends Trigger<Job> {
         // Logging
         LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Check triggers", job.getFullName()));
 
+        // Ontrack accessor
+        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(System.out);
+
         // Evaluates the trigger
-        TriggerHelper.evaluate(new JenkinsTriggerJob(job), triggers);
+        TriggerHelper.evaluate(ontrack, new JenkinsTriggerJob(job), triggers);
 
     }
 
