@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.jenkins.trigger;
 
 import com.google.common.collect.ImmutableMap;
-import hudson.model.*;
-import hudson.util.LogTaskListener;
-import jenkins.model.ParameterizedJobMixIn;
+import hudson.model.ParameterValue;
+import hudson.model.Result;
+import hudson.model.StringParameterValue;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
@@ -22,7 +22,7 @@ public class TriggerHelper {
     private static final Logger LOGGER = Logger.getLogger(TriggerHelper.class.getName());
     private static final Level LOG_LEVEL = Level.FINE;
 
-    public static void evaluate(Job job, List<TriggerDefinition> triggers) {
+    public static void evaluate(TriggerJob job, List<TriggerDefinition> triggers) {
         // Evaluates the condition for each trigger
         List<TriggerResult> results = triggers.stream()
                 .map(trigger -> {
@@ -56,16 +56,14 @@ public class TriggerHelper {
                     .map(result -> new StringParameterValue(result.getName(), result.getNewValue()))
                     .collect(Collectors.toList());
             // Scheduling
-            ParameterizedJobMixIn.scheduleBuild2(
-                    job,
-                    0,
-                    new CauseAction(new OntrackTriggerCause()),
-                    new ParametersAction(parameters)
+            job.trigger(
+                    new OntrackTriggerCause(),
+                    parameters
             );
         }
     }
 
-    private static TriggerResult getTriggerResult(Job job, TriggerDefinition trigger) {
+    private static TriggerResult getTriggerResult(TriggerJob job, TriggerDefinition trigger) {
 
         // Ontrack accessor
         Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(System.out);
@@ -106,7 +104,7 @@ public class TriggerHelper {
         String parameterName = trigger.getParameterName();
 
         // Gets any previous build
-        Run lastBuild = job.getLastBuild();
+        TriggerRun lastBuild = job.getLastBuild();
         if (lastBuild != null) {
             Result result = lastBuild.getResult();
             Result minimum = Result.fromString(trigger.getMinimumResult());
@@ -114,14 +112,9 @@ public class TriggerHelper {
                 LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Last build was failed or unsuccessful", job.getFullName()));
                 return trigger.noPrevious(newValue);
             } else {
-                // Log listener
-                TaskListener taskListener = new LogTaskListener(
-                        LOGGER,
-                        Level.FINER
-                );
                 // Gets the last build name
                 try {
-                    String previousValue = lastBuild.getEnvironment(taskListener).get(parameterName, null);
+                    String previousValue = lastBuild.getEnvironment(parameterName);
                     LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Version for last build: %s", job.getFullName(), previousValue));
                     // Result
                     return trigger.withPrevious(previousValue, newValue);

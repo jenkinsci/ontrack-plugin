@@ -6,6 +6,7 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
+import net.nemerosa.ontrack.jenkins.trigger.JenkinsTriggerJob;
 import net.nemerosa.ontrack.jenkins.trigger.TriggerDefinition;
 import net.nemerosa.ontrack.jenkins.trigger.TriggerHelper;
 import org.jenkinsci.Symbol;
@@ -60,7 +61,7 @@ public class OntrackMultiTrigger extends Trigger<Job> {
         LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Check triggers", job.getFullName()));
 
         // Evaluates the trigger
-        TriggerHelper.evaluate(job, triggers);
+        TriggerHelper.evaluate(new JenkinsTriggerJob(job), triggers);
 
     }
 

@@ -8,6 +8,7 @@ import hudson.model.Job;
 import hudson.model.Result;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
+import net.nemerosa.ontrack.jenkins.trigger.JenkinsTriggerJob;
 import net.nemerosa.ontrack.jenkins.trigger.TriggerDefinition;
 import net.nemerosa.ontrack.jenkins.trigger.TriggerHelper;
 import org.jenkinsci.Symbol;
@@ -123,7 +124,7 @@ public class OntrackTrigger extends Trigger<Job> {
         LOGGER.log(LOG_LEVEL, String.format("[ontrack][trigger][%s] Check %s promotion trigger", job.getFullName(), promotion));
 
         // Helper
-        TriggerHelper.evaluate(job, Collections.singletonList(
+        TriggerHelper.evaluate(new JenkinsTriggerJob(job), Collections.singletonList(
                 new TriggerDefinition(
                         project,
                         branch,
