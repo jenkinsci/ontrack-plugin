@@ -42,7 +42,7 @@ public class TriggerHelperTest {
     }
 
     /**
-     * Single trigger.
+     * Single trigger with promotion.
      * No previous build.
      * No promotion.
      * <p>
@@ -52,12 +52,12 @@ public class TriggerHelperTest {
     public void test1() {
         MockTriggerJob job = new MockTriggerJob().withNoPromotion();
 
-        singleTrigger(job);
+        singleTrigger(job, PROMOTION);
         job.checkNotTriggered();
     }
 
     /**
-     * Single trigger.
+     * Single trigger with promotion.
      * No previous build.
      * Promotion.
      * <p>
@@ -67,13 +67,13 @@ public class TriggerHelperTest {
     public void test2() {
         MockTriggerJob job = new MockTriggerJob().withPromotion(OLD_BUILD);
 
-        singleTrigger(job);
+        singleTrigger(job, PROMOTION);
 
         job.checkTriggered(OLD_BUILD);
     }
 
     /**
-     * Single trigger.
+     * Single trigger with promotion.
      * Previous build, without any parameter.
      * No promotion.
      * <p>
@@ -83,13 +83,13 @@ public class TriggerHelperTest {
     public void test3() {
         MockTriggerJob job = new MockTriggerJob().withPreviousBuild().withNoPromotion();
 
-        singleTrigger(job);
+        singleTrigger(job, PROMOTION);
 
         job.checkNotTriggered();
     }
 
     /**
-     * Single trigger.
+     * Single trigger with promotion.
      * Previous build, without any parameter.
      * Promotion.
      * <p>
@@ -99,13 +99,13 @@ public class TriggerHelperTest {
     public void test4() {
         MockTriggerJob job = new MockTriggerJob().withPreviousBuild().withPromotion(OLD_BUILD);
 
-        singleTrigger(job);
+        singleTrigger(job, PROMOTION);
 
         job.checkTriggered(OLD_BUILD);
     }
 
     /**
-     * Single trigger.
+     * Single trigger with promotion.
      * Previous build, with same parameter.
      * Promotion.
      * <p>
@@ -115,13 +115,13 @@ public class TriggerHelperTest {
     public void test5() {
         MockTriggerJob job = new MockTriggerJob().withPreviousBuild(OLD_BUILD).withPromotion(OLD_BUILD);
 
-        singleTrigger(job);
+        singleTrigger(job, PROMOTION);
 
         job.checkNotTriggered();
     }
 
     /**
-     * Single trigger.
+     * Single trigger with promotion.
      * Previous build, with old parameter.
      * Promotion.
      * <p>
@@ -131,13 +131,13 @@ public class TriggerHelperTest {
     public void test6() {
         MockTriggerJob job = new MockTriggerJob().withPreviousBuild(OLD_BUILD).withPromotion(NEW_BUILD);
 
-        singleTrigger(job);
+        singleTrigger(job, PROMOTION);
 
         job.checkTriggered(NEW_BUILD);
     }
 
     /**
-     * Single trigger.
+     * Single trigger with promotion.
      * Previous build, with same parameter, but failed.
      * Promotion.
      * <p>
@@ -147,16 +147,132 @@ public class TriggerHelperTest {
     public void test7() {
         MockTriggerJob job = new MockTriggerJob().withPreviousBuild(Result.FAILURE, OLD_BUILD).withPromotion(OLD_BUILD);
 
+        singleTrigger(job, PROMOTION);
+
+        job.checkTriggered(OLD_BUILD);
+    }
+
+    /**
+     * Single trigger without promotion.
+     * No previous build.
+     * No build.
+     * <p>
+     * => No triggered
+     */
+    @Test
+    public void test10() {
+        MockTriggerJob job = new MockTriggerJob().withNoBuild();
+
+        singleTrigger(job);
+
+        job.checkNotTriggered();
+    }
+
+    /**
+     * Single trigger without promotion.
+     * No previous build.
+     * New build.
+     * <p>
+     * => Triggered with promoted build
+     */
+    @Test
+    public void test11() {
+        MockTriggerJob job = new MockTriggerJob().withBuild(OLD_BUILD);
+
+        singleTrigger(job);
+
+        job.checkTriggered(OLD_BUILD);
+    }
+
+    /**
+     * Single trigger without promotion.
+     * Previous build, without any parameter.
+     * No build.
+     * <p>
+     * => No triggered
+     */
+    @Test
+    public void test12() {
+        MockTriggerJob job = new MockTriggerJob().withPreviousBuild().withNoBuild();
+
+        singleTrigger(job);
+
+        job.checkNotTriggered();
+    }
+
+    /**
+     * Single trigger without promotion.
+     * Previous build, without any parameter.
+     * Build.
+     * <p>
+     * => Triggered with promoted build
+     */
+    @Test
+    public void test13() {
+        MockTriggerJob job = new MockTriggerJob().withPreviousBuild().withBuild(OLD_BUILD);
+
+        singleTrigger(job);
+
+        job.checkTriggered(OLD_BUILD);
+    }
+
+    /**
+     * Single trigger without promotion.
+     * Previous build, with same parameter.
+     * Build.
+     * <p>
+     * => Not triggered.
+     */
+    @Test
+    public void tes14() {
+        MockTriggerJob job = new MockTriggerJob().withPreviousBuild(OLD_BUILD).withBuild(OLD_BUILD);
+
+        singleTrigger(job);
+
+        job.checkNotTriggered();
+    }
+
+    /**
+     * Single trigger without promotion.
+     * Previous build, with old parameter.
+     * Build.
+     * <p>
+     * => Not triggered.
+     */
+    @Test
+    public void test15() {
+        MockTriggerJob job = new MockTriggerJob().withPreviousBuild(OLD_BUILD).withBuild(NEW_BUILD);
+
+        singleTrigger(job);
+
+        job.checkTriggered(NEW_BUILD);
+    }
+
+    /**
+     * Single trigger without promotion.
+     * Previous build, with same parameter, but failed.
+     * Build.
+     * <p>
+     * => Triggered with promoted build
+     */
+    @Test
+    public void test16() {
+        MockTriggerJob job = new MockTriggerJob().withPreviousBuild(Result.FAILURE, OLD_BUILD).withBuild(OLD_BUILD);
+
         singleTrigger(job);
 
         job.checkTriggered(OLD_BUILD);
     }
 
     private void singleTrigger(MockTriggerJob job) {
+        singleTrigger(job, null);
+    }
+
+    private void singleTrigger(MockTriggerJob job, String promotion) {
         TriggerHelper.evaluate(ontrack, job, Collections.singletonList(new TriggerDefinition(
                 PROJECT,
                 BRANCH,
-                PROMOTION,
+                promotion,
                 VERSION,
                 null
         )));
@@ -194,11 +310,26 @@ public class TriggerHelperTest {
             return this;
         }
 
+        public MockTriggerJob withNoBuild() {
+            when(ontrackBranch.standardFilter(ImmutableMap.of(
+                    "count", 1
+            ))).thenReturn(Collections.emptyList());
+            return this;
+        }
+
         public MockTriggerJob withPromotion(String buildName) {
             when(ontrackBuild.getName()).thenReturn(buildName);
             when(ontrackBranch.standardFilter(ImmutableMap.of(
                     "count", 1,
                     "withPromotionLevel", PROMOTION
+            ))).thenReturn(Collections.singletonList(ontrackBuild));
+            return this;
+        }
+
+        public MockTriggerJob withBuild(String buildName) {
+            when(ontrackBuild.getName()).thenReturn(buildName);
+            when(ontrackBranch.standardFilter(ImmutableMap.of(
+                    "count", 1
             ))).thenReturn(Collections.singletonList(ontrackBuild));
             return this;
         }
