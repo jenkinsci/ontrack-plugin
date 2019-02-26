@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.jenkins.trigger;
 
 import hudson.model.Result;
 import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class TriggerDefinition {
 
@@ -35,6 +36,7 @@ public class TriggerDefinition {
      */
     private final String minimumResult;
 
+    @DataBoundConstructor
     public TriggerDefinition(String project, String branch, String promotion, String parameterName, String minimumResult) {
         this.project = project;
         this.branch = branch;
