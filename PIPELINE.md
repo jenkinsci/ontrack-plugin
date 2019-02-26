@@ -18,6 +18,7 @@ the [Jenkins pipeline DSL](https://jenkins.io/doc/book/pipeline/).
 * [`ontrackScript`](#ontrack-dsl-step) - runs an Ontrack DSL script
 * [`ontrackGraphql`](#ontrack-graphql-step) - runs a GraphQL query
 * [`ontrackTrigger`](#ontrack-trigger) - triggers job based on Ontrack criteria
+* [`ontrackMultiTrigger`](#ontrack-multiple-trigger) - triggers job based on _several_ Ontrack criteria
 
 ### Branch name
 
@@ -412,7 +413,11 @@ Example:
 ```groovy
 pipeline {
     triggers {
-        ontrackTrigger spec: '@nightly', project: 'my-project', branch: 'master', promotion: 'SILVER', parameterName: 'VERSION'
+        ontrackTrigger spec: '@nightly', project: 'my-project', branch: 'master', promotion: 'PLATINUM', parameterName: 'VERSION'
+    }
+    parameters {
+        // Parameters defined by triggers MUST be defined
+        string(name: "VERSION", defaultValue: "", description: "")
     }
 }
 ```
@@ -425,3 +430,38 @@ contains the build name.
 
 Other Ontrack steps can then be used to retrieve additional information.
  
+### Ontrack multiple trigger
+
+The `ontrackMultiTrigger` works like [`ontrackTrigger`](#ontrack-trigger) but accepts several trigger sources.
+
+Example:
+
+```groovy
+pipeline {
+    triggers {
+        ontrackMultiTrigger(
+            spec: '@nightly',
+            triggers: [[
+                project: 'project-a', branch: 'master', promotion: 'SILVER', parameterName: 'VERSION_A'        
+            ], [
+                project: 'project-b', branch: 'master', promotion: 'SILVER', parameterName: 'VERSION_B'        
+            ]]
+        )   
+    }
+    parameters {
+        // Parameters defined by triggers MUST be defined
+        string(name: "VERSION_A", defaultValue: "", description: "")
+        string(name: "VERSION_B", defaultValue: "", description: "")
+    }
+}
+```
+
+This example sets a trigger which checks every night (`@nightly`) if there is 
+a new `SILVER` promotion for _either_ of the specified project / branches.
+
+If at least one trigger definition has a new version, the trigger will also check that
+_all_ trigger definitions have also a proper version before firing the ob. In other words, all the
+trigger definitions must return at least one matching build.
+
+So in this example, if `project-a` returns a new version, but `project-b` has _nothing_, no job 
+will be triggered.
