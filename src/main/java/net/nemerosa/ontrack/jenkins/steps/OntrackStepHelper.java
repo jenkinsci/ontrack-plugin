@@ -7,6 +7,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.jenkins.OntrackConfiguration;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
+import org.jenkinsci.plugins.workflow.actions.BodyInvocationAction;
 import org.jenkinsci.plugins.workflow.actions.TimingAction;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
@@ -114,14 +115,14 @@ public class OntrackStepHelper {
                 };
             }
 
-            Long durationMilliSeconds = getTiming(flowNode, 0, logger);
+            Long durationMilliSeconds = getTiming(flowNode, logger);
             if (durationMilliSeconds != null) {
                 runInfo.put("runTime", durationMilliSeconds / 1000);
             }
         }
     }
 
-    private static Long getTiming(FlowNode node, long provisioningTime, Consumer<String> logger) {
+    private static Long getTiming(FlowNode node, Consumer<String> logger) {
         Long runTime = getExecutionTimeMs(node);
         String id = node.getId();
         if (node instanceof StepNode) {
@@ -132,28 +133,29 @@ public class OntrackStepHelper {
         }
         logger.accept(
                 String.format(
-                        "[ontrack][timing]node=%s,type=%s,id=%s,provisioningTime=%d,runtTime=%d",
+                        "[ontrack][timing]node=%s,type=%s,id=%s,runtTime=%d",
                         node.getDisplayName(),
                         node.getClass().getName(),
                         id,
-                        provisioningTime,
                         runTime
                 )
         );
-        long newProvisioningTime = provisioningTime;
         if (node instanceof StepNode) {
             StepNode stepNode = (StepNode) node;
             StepDescriptor stepDescriptor = stepNode.getDescriptor();
             if (stepDescriptor != null) {
                 String stepDescriptorId = stepDescriptor.getId();
                 if ("org.jenkinsci.plugins.workflow.support.steps.StageStep".equals(stepDescriptorId)) {
-                    if (runTime != null) return runTime - provisioningTime;
+                    if (runTime != null) return runTime;
                 } else if ("org.jenkinsci.plugins.workflow.support.steps.ExecutorStep".equals(stepDescriptorId)) {
-                    if (runTime != null) newProvisioningTime += runTime;
+                    BodyInvocationAction bodyInvocationAction = node.getAction(BodyInvocationAction.class);
+                    if (bodyInvocationAction != null && runTime != null) {
+                        return runTime;
+                    }
                 }
             }
         }
-        return getTiming(node.getParents(), newProvisioningTime, logger);
+        return getTiming(node.getParents(), logger);
     }
 
     private static @CheckForNull
@@ -167,11 +169,11 @@ public class OntrackStepHelper {
         }
     }
 
-    private static Long getTiming(List<FlowNode> nodes, long provisioningTime, Consumer<String> logger) {
+    private static Long getTiming(List<FlowNode> nodes, Consumer<String> logger) {
         for (FlowNode node : nodes) {
-            Long durationSeconds = getTiming(node, provisioningTime, logger);
-            if (durationSeconds != null) {
-                return durationSeconds;
+            Long durationMilliSeconds = getTiming(node, logger);
+            if (durationMilliSeconds != null) {
+                return durationMilliSeconds;
             }
         }
         return null;
