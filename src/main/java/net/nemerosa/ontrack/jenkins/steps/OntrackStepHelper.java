@@ -5,10 +5,12 @@ import com.cloudbees.workflow.rest.external.StatusExt;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import net.nemerosa.ontrack.jenkins.OntrackConfiguration;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 import org.jenkinsci.plugins.workflow.actions.TimingAction;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
+import org.jenkinsci.plugins.workflow.graph.StepNode;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 
@@ -17,6 +19,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class OntrackStepHelper {
 
@@ -81,7 +84,7 @@ public class OntrackStepHelper {
         }
     }
 
-    public static void adaptRunInfo(StepContext context, Map<String, Object> runInfo) {
+    public static void adaptRunInfo(StepContext context, Map<String, Object> runInfo) throws IOException, InterruptedException {
         // Gets the (current) duration of the stage
         FlowNode flowNode = null;
         try {
@@ -89,14 +92,43 @@ public class OntrackStepHelper {
         } catch (IOException | InterruptedException ignored) {
         }
         if (flowNode != null) {
-            Long durationSeconds = getTiming(flowNode, 0);
+
+            // Logger
+            Consumer<String> logger;
+            OntrackConfiguration ontrackConfiguration = OntrackConfiguration.getOntrackConfiguration();
+            boolean logging = ontrackConfiguration != null && ontrackConfiguration.isOntrackTraceTimings();
+            if (logging) {
+                TaskListener listener = context.get(TaskListener.class);
+                if (listener != null) {
+                    logger = (message) -> listener.getLogger().println(message);
+                } else {
+                    logger = System.out::println;
+                }
+            } else {
+                // NOP
+                logger = (message) -> {
+                };
+            }
+
+            Long durationSeconds = getTiming(flowNode, 0, logger);
             if (durationSeconds != null) {
                 runInfo.put("runTime", durationSeconds);
             }
         }
     }
 
-    private static Long getTiming(FlowNode node, long provisioningTime) {
+    private static Long getTiming(FlowNode node, long provisioningTime, Consumer<String> logger) {
+        Long runTime = getExecutionTime(node);
+        logger.accept(
+                String.format(
+                        "[ontrack][timing]node=%s,type=%s,id=%s,provisioningTime=%d,runtTime=%d",
+                        node.getDisplayName(),
+                        node.getClass().getName(),
+                        node instanceof StepNode && ((StepNode) node).getDescriptor() != null ? ((StepNode) node).getDescriptor().getId() : node.getId(),
+                        provisioningTime,
+                        runTime
+                )
+        );
         long newProvisioningTime = provisioningTime;
         if (node instanceof StepStartNode) {
             StepStartNode stepNode = (StepStartNode) node;
@@ -104,15 +136,13 @@ public class OntrackStepHelper {
             if (stepDescriptor != null) {
                 String stepDescriptorId = stepDescriptor.getId();
                 if ("org.jenkinsci.plugins.workflow.support.steps.StageStep".equals(stepDescriptorId)) {
-                    Long runTime = getExecutionTime(node);
                     if (runTime != null) return runTime - provisioningTime;
                 } else if ("org.jenkinsci.plugins.workflow.support.steps.ExecutorStep".equals(stepDescriptorId)) {
-                    Long runTime = getExecutionTime(node);
                     if (runTime != null) newProvisioningTime += runTime;
                 }
             }
         }
-        return getTiming(node.getParents(), newProvisioningTime);
+        return getTiming(node.getParents(), newProvisioningTime, logger);
     }
 
     private static @CheckForNull
@@ -126,9 +156,9 @@ public class OntrackStepHelper {
         }
     }
 
-    private static Long getTiming(List<FlowNode> nodes, long provisioningTime) {
+    private static Long getTiming(List<FlowNode> nodes, long provisioningTime, Consumer<String> logger) {
         for (FlowNode node : nodes) {
-            Long durationSeconds = getTiming(node, provisioningTime);
+            Long durationSeconds = getTiming(node, provisioningTime, logger);
             if (durationSeconds != null) {
                 return durationSeconds;
             }

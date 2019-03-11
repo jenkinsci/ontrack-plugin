@@ -33,6 +33,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
     private int ontrackRetryDelaySeconds = 10000;
     private int ontrackVersionCacheExpirationSeconds = 3600;
     private OntrackSecurityMode securityMode = OntrackSecurityMode.DEFAULT;
+    private boolean ontrackTraceTimings = false;
 
     private final transient AtomicReference<VersionCache> version = new AtomicReference<>();
 
@@ -56,6 +57,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
         ontrackRetryDelaySeconds = json.getInt("ontrackRetryDelaySeconds");
         ontrackVersionCacheExpirationSeconds = json.getInt("ontrackVersionCacheExpirationSeconds");
         securityMode = OntrackSecurityMode.valueOf(json.getString("securityMode"));
+        ontrackTraceTimings = json.has("ontrackTraceTimings") && json.getBoolean("ontrackTraceTimings");
         save();
         boolean ok = super.configure(req, json);
         // Getting the version from Ontrack
@@ -184,6 +186,14 @@ public class OntrackConfiguration extends GlobalConfiguration {
     @SuppressWarnings("unused")
     public void setOntrackVersionCacheExpirationSeconds(int ontrackVersionCacheExpirationSeconds) {
         this.ontrackVersionCacheExpirationSeconds = ontrackVersionCacheExpirationSeconds;
+    }
+
+    public boolean isOntrackTraceTimings() {
+        return ontrackTraceTimings;
+    }
+
+    public void setOntrackTraceTimings(boolean ontrackTraceTimings) {
+        this.ontrackTraceTimings = ontrackTraceTimings;
     }
 
     @SuppressWarnings("unused")
