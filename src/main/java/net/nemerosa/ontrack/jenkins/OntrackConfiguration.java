@@ -188,10 +188,12 @@ public class OntrackConfiguration extends GlobalConfiguration {
         this.ontrackVersionCacheExpirationSeconds = ontrackVersionCacheExpirationSeconds;
     }
 
+    @SuppressWarnings("unused")
     public boolean isOntrackTraceTimings() {
         return ontrackTraceTimings;
     }
 
+    @SuppressWarnings("unused")
     public void setOntrackTraceTimings(boolean ontrackTraceTimings) {
         this.ontrackTraceTimings = ontrackTraceTimings;
     }
