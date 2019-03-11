@@ -12,6 +12,7 @@ import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
@@ -88,34 +89,46 @@ public class OntrackStepHelper {
         } catch (IOException | InterruptedException ignored) {
         }
         if (flowNode != null) {
-            Long durationSeconds = getTiming(flowNode);
+            Long durationSeconds = getTiming(flowNode, 0);
             if (durationSeconds != null) {
                 runInfo.put("runTime", durationSeconds);
             }
         }
     }
 
-    private static Long getTiming(FlowNode node) {
+    private static Long getTiming(FlowNode node, long provisioningTime) {
+        long newProvisioningTime = provisioningTime;
         if (node instanceof StepStartNode) {
             StepStartNode stepNode = (StepStartNode) node;
             StepDescriptor stepDescriptor = stepNode.getDescriptor();
             if (stepDescriptor != null) {
                 String stepDescriptorId = stepDescriptor.getId();
                 if ("org.jenkinsci.plugins.workflow.support.steps.StageStep".equals(stepDescriptorId)) {
-                    TimingAction timingAction = node.getAction(TimingAction.class);
-                    if (timingAction != null) {
-                        long startTime = timingAction.getStartTime();
-                        return (System.currentTimeMillis() - startTime) / 1000;
-                    }
+                    Long runTime = getExecutionTime(node);
+                    if (runTime != null) return runTime - provisioningTime;
+                } else if ("org.jenkinsci.plugins.workflow.support.steps.ExecutorStep".equals(stepDescriptorId)) {
+                    Long runTime = getExecutionTime(node);
+                    if (runTime != null) newProvisioningTime += runTime;
                 }
             }
         }
-        return getTiming(node.getParents());
+        return getTiming(node.getParents(), newProvisioningTime);
     }
 
-    private static Long getTiming(List<FlowNode> nodes) {
+    private static @CheckForNull
+    Long getExecutionTime(FlowNode node) {
+        TimingAction timingAction = node.getAction(TimingAction.class);
+        if (timingAction != null) {
+            long startTime = timingAction.getStartTime();
+            return (System.currentTimeMillis() - startTime) / 1000;
+        } else {
+            return null;
+        }
+    }
+
+    private static Long getTiming(List<FlowNode> nodes, long provisioningTime) {
         for (FlowNode node : nodes) {
-            Long durationSeconds = getTiming(node);
+            Long durationSeconds = getTiming(node, provisioningTime);
             if (durationSeconds != null) {
                 return durationSeconds;
             }
