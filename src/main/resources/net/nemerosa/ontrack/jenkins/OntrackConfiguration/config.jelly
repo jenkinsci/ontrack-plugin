@@ -26,5 +26,8 @@
         <f:entry field="securityMode" title="Security mode">
             <f:select/>
         </f:entry>
+        <f:entry title="Timing logging">
+            <f:checkbox name="ontrack.ontrackTraceTimings" value="${descriptor.isOntrackTraceTimings()}"/>
+        </f:entry>
     </f:section>
 </j:jelly>
