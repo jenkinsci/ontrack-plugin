@@ -84,7 +84,7 @@ public class OntrackStepHelper {
         }
     }
 
-    public static void adaptRunInfo(StepContext context, Map<String, Object> runInfo) throws IOException, InterruptedException {
+    public static void adaptRunInfo(StepContext context, Map<String, Object> runInfo) {
         // Gets the (current) duration of the stage
         FlowNode flowNode = null;
         try {
@@ -98,10 +98,14 @@ public class OntrackStepHelper {
             OntrackConfiguration ontrackConfiguration = OntrackConfiguration.getOntrackConfiguration();
             boolean logging = ontrackConfiguration != null && ontrackConfiguration.isOntrackTraceTimings();
             if (logging) {
-                TaskListener listener = context.get(TaskListener.class);
-                if (listener != null) {
-                    logger = (message) -> listener.getLogger().println(message);
-                } else {
+                try {
+                    TaskListener listener = context.get(TaskListener.class);
+                    if (listener != null) {
+                        logger = (message) -> listener.getLogger().println(message);
+                    } else {
+                        logger = System.out::println;
+                    }
+                } catch (Exception ignored) {
                     logger = System.out::println;
                 }
             } else {
