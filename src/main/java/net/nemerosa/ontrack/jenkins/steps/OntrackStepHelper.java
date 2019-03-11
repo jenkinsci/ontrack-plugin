@@ -105,8 +105,8 @@ public class OntrackStepHelper {
                     } else {
                         logger = System.out::println;
                     }
-                } catch (Exception ignored) {
-                    logger = System.out::println;
+                } catch (Exception ex) {
+                    throw new IllegalStateException("Cannot get listener from context", ex);
                 }
             } else {
                 // NOP
@@ -123,12 +123,19 @@ public class OntrackStepHelper {
 
     private static Long getTiming(FlowNode node, long provisioningTime, Consumer<String> logger) {
         Long runTime = getExecutionTime(node);
+        String id = node.getId();
+        if (node instanceof StepNode) {
+            StepDescriptor descriptor = ((StepNode) node).getDescriptor();
+            if (descriptor != null) {
+                id = descriptor.getId();
+            }
+        }
         logger.accept(
                 String.format(
                         "[ontrack][timing]node=%s,type=%s,id=%s,provisioningTime=%d,runtTime=%d",
                         node.getDisplayName(),
                         node.getClass().getName(),
-                        node instanceof StepNode && ((StepNode) node).getDescriptor() != null ? ((StepNode) node).getDescriptor().getId() : node.getId(),
+                        id,
                         provisioningTime,
                         runTime
                 )
