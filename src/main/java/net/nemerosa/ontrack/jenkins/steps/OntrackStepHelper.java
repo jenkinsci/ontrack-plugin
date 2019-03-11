@@ -130,8 +130,8 @@ public class OntrackStepHelper {
                 )
         );
         long newProvisioningTime = provisioningTime;
-        if (node instanceof StepStartNode) {
-            StepStartNode stepNode = (StepStartNode) node;
+        if (node instanceof StepNode) {
+            StepNode stepNode = (StepNode) node;
             StepDescriptor stepDescriptor = stepNode.getDescriptor();
             if (stepDescriptor != null) {
                 String stepDescriptorId = stepDescriptor.getId();
