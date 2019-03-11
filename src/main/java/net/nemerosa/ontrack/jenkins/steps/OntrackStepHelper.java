@@ -114,15 +114,15 @@ public class OntrackStepHelper {
                 };
             }
 
-            Long durationSeconds = getTiming(flowNode, 0, logger);
-            if (durationSeconds != null) {
-                runInfo.put("runTime", durationSeconds);
+            Long durationMilliSeconds = getTiming(flowNode, 0, logger);
+            if (durationMilliSeconds != null) {
+                runInfo.put("runTime", durationMilliSeconds / 1000);
             }
         }
     }
 
     private static Long getTiming(FlowNode node, long provisioningTime, Consumer<String> logger) {
-        Long runTime = getExecutionTime(node);
+        Long runTime = getExecutionTimeMs(node);
         String id = node.getId();
         if (node instanceof StepNode) {
             StepDescriptor descriptor = ((StepNode) node).getDescriptor();
@@ -157,11 +157,11 @@ public class OntrackStepHelper {
     }
 
     private static @CheckForNull
-    Long getExecutionTime(FlowNode node) {
+    Long getExecutionTimeMs(FlowNode node) {
         TimingAction timingAction = node.getAction(TimingAction.class);
         if (timingAction != null) {
             long startTime = timingAction.getStartTime();
-            return (System.currentTimeMillis() - startTime) / 1000;
+            return (System.currentTimeMillis() - startTime);
         } else {
             return null;
         }
