@@ -3,8 +3,9 @@ package net.nemerosa.ontrack.jenkins.dsl;
 import groovy.lang.Binding;
 import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyShell;
-import groovy.lang.Script;
 import org.codehaus.groovy.control.CompilerConfiguration;
+
+import java.util.Collections;
 
 import static groovy.lang.GroovyShell.DEFAULT_CODE_BASE;
 
@@ -14,27 +15,23 @@ public abstract class AbstractDSLLauncher implements DSLLauncher {
     public Object run(String dsl, Binding binding) {
         CompilerConfiguration compilerConfiguration = prepareCompilerConfiguration();
         ClassLoader classLoader = prepareClassLoader(AbstractDSLLauncher.class.getClassLoader());
-        GroovyCodeSource groovyCodeSource = prepareGroovyCodeSource(dsl);
 
         // Groovy shell
         GroovyShell shell = new GroovyShell(
                 classLoader,
-                new Binding(),
+                binding,
                 compilerConfiguration
         );
 
-        // Groovy script
-        Script groovyScript = shell.parse(groovyCodeSource);
-
-        // Binding
-        groovyScript.setBinding(binding);
-
         // Runs the script
-        return run(groovyScript);
+        return run(shell, dsl);
     }
 
-    protected Object run(Script groovyScript) {
-        return groovyScript.run();
+    protected Object run(GroovyShell groovyShell, String script) {
+        return groovyShell.run(
+                prepareGroovyCodeSource(script),
+                Collections.emptyList()
+        );
     }
 
     protected GroovyCodeSource prepareGroovyCodeSource(String dsl) {

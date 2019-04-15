@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.jenkins.dsl;
 
-import groovy.lang.Script;
+import groovy.lang.GroovyShell;
 import hudson.model.Item;
-import hudson.security.ACL;
-import jenkins.model.Jenkins;
-import org.acegisecurity.AccessDeniedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.RejectedAccessException;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.Whitelist;
@@ -32,9 +29,9 @@ public class SandboxDSLLauncher extends AbstractDSLLauncher {
     }
 
     @Override
-    protected Object run(Script groovyScript) {
+    protected Object run(GroovyShell groovyShell, String script) {
         try {
-            return GroovySandbox.run(groovyScript, new ProxyWhitelist(Whitelist.all(), new OntrackDSLWhitelist()));
+            return GroovySandbox.run(groovyShell, script, new ProxyWhitelist(Whitelist.all(), new OntrackDSLWhitelist()));
         } catch (RejectedAccessException e) {
             throw new OntrackDSLException(
                     e.getMessage(),
