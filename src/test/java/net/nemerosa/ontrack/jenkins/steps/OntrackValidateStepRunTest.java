@@ -11,6 +11,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.mockito.Mockito.*;
 
 public class OntrackValidateStepRunTest {
@@ -98,6 +101,52 @@ public class OntrackValidateStepRunTest {
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
         verify(mockBuild, times(1)).validateWithFraction("VS", 99, 100, "FAILED");
+    }
+
+    @Test
+    public void test_validate_with_metrics_data() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'metrics', data: [metric1: 20.12, metric2: 50])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithMetrics(anyString(), anyMap(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        Map<String,Double> map = new HashMap<>();
+        map.put("metric1", 20.12d);
+        map.put("metric2", 50d);
+        verify(mockBuild, times(1)).validateWithMetrics("VS", map, null);
+    }
+
+    @Test
+    public void test_validate_with_metrics_data_and_status() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'metrics', data: [metric1: 20.12, metric2: 50])", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validateWithMetrics(anyString(), anyMap(), anyString())).thenReturn(mockRun);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        Map<String,Double> map = new HashMap<>();
+        map.put("metric1", 20.12d);
+        map.put("metric2", 50d);
+        verify(mockBuild, times(1)).validateWithMetrics("VS", map, "FAILED");
     }
 
     @Test
