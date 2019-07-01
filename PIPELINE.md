@@ -305,6 +305,18 @@ ontrackValidate ...,
     data: [value: 42],
 ```
 
+* for some arbitrary metrics:
+
+```groovy
+ontrackValidate ...,
+    dataType: 'metrics',
+    data: [
+            metric1: 12.34,
+            metric2: 50,
+            // Any other arbitrary metric keys
+    ],
+```
+
 Of course, it is possible to specify a complete type by using its FQCN:
 
 ```groovy

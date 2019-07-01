@@ -17,6 +17,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -254,6 +255,14 @@ public class OntrackValidateStep extends Step {
                             getInt(data, "value"),
                             dataValidation ? validationStatus : actualStatus
                     );
+                } else if (StringUtils.equals(dataType, "metrics")) {
+                    Map<String, Double> metrics = new HashMap<>();
+                    data.forEach((name, value) -> metrics.put(name, toDouble(value)));
+                    validationRun = ontrackBuild.validateWithMetrics(
+                            validationStamp,
+                            metrics,
+                            dataValidation ? validationStatus : actualStatus
+                    );
                 } else if (dataType != null) {
                     validationRun = ontrackBuild.validateWithData(
                             validationStamp,
@@ -276,6 +285,18 @@ public class OntrackValidateStep extends Step {
                 return null;
             }
         };
+    }
+
+    private Double toDouble(Object value) {
+        if (value instanceof Double) {
+            return (Double) value;
+        } else if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        } else if (value != null) {
+            return Double.parseDouble(value.toString());
+        } else {
+            throw new IllegalArgumentException("Null metrics are not valid.");
+        }
     }
 
     private String getString(Map<String, ?> map, @SuppressWarnings("SameParameterValue") String field) {
