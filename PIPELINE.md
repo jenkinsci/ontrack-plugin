@@ -276,7 +276,7 @@ ontrackValidate ...,
 
 ```groovy
 ontrackValidate ...,
-    dataType: 'chtml',
+    dataType: 'chml',
     data: [critical: 0, high: 1, medium: 10, low: 1000],
     // Components can be omitted, they'll be set to 0
 ```
