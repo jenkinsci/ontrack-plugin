@@ -46,7 +46,7 @@ pipeline {
         }
     }
 }
-``` 
+```
 
 In the sample above, if `BRANCH_NAME` is equal to `release/1.0`, `branchName` would
 be then equal to `release-1.0`.
@@ -95,7 +95,7 @@ Two other optional parameters are also available:
 
 * `logging` (`boolean`) - defaults to `false` - enables logging of the calls to Ontrack
 * `bindings` (map `String` --> any) - defaults to empty - additional objects to make
-  available to the configuration script 
+  available to the configuration script
 
 ### Branch set-up
 
@@ -117,8 +117,8 @@ pipeline {
                     echo "Ontrack branch name = ${branchName}"
                 }
                 ontrackBranchSetup(
-                    project: 'ontrack', 
-                    branch: branchName, 
+                    project: 'ontrack',
+                    branch: branchName,
                     script: """\
                         branch.config {
                             gitBranch '${branchName}', [
@@ -144,7 +144,7 @@ Two other optional parameters are also available:
 
 * `logging` (`boolean`) - defaults to `false` - enables logging of the calls to Ontrack
 * `bindings` (map `String` --> any) - defaults to empty - additional objects to make
-  available to the configuration script 
+  available to the configuration script
 
 ### Build creation step
 
@@ -350,7 +350,7 @@ Note that a step like `junit` returns an instance of `hudson.tasks.junit.TestRes
 but this can be replaced by any other object having the same properties than
 as mentioned above.
 
-If some `testResults` parameter is set, any `data` or `dataType` parameter is ignored. 
+If some `testResults` parameter is set, any `data` or `dataType` parameter is ignored.
 
 
 ### Promotion step
@@ -398,7 +398,13 @@ a JSON object.
 Example:
 
 ```groovy
-ontrackGraphQL(script: '{projects{name}}')
+ontrackGraphQL(script: """
+    query {
+        projects {
+            name
+        }
+    }
+""")
 ```
 
 The script above would return something like:
@@ -441,7 +447,7 @@ If there is a new one, the pipeline is fired, and the `VERSION` parameter
 contains the build name.
 
 Other Ontrack steps can then be used to retrieve additional information.
- 
+
 ### Ontrack multiple trigger
 
 The `ontrackMultiTrigger` works like [`ontrackTrigger`](#ontrack-trigger) but accepts several trigger sources.
@@ -454,11 +460,11 @@ pipeline {
         ontrackMultiTrigger(
             spec: '@nightly',
             triggers: [[
-                project: 'project-a', branch: 'master', promotion: 'SILVER', parameterName: 'VERSION_A'        
+                project: 'project-a', branch: 'master', promotion: 'SILVER', parameterName: 'VERSION_A'
             ], [
-                project: 'project-b', branch: 'master', promotion: 'SILVER', parameterName: 'VERSION_B'        
+                project: 'project-b', branch: 'master', promotion: 'SILVER', parameterName: 'VERSION_B'
             ]]
-        )   
+        )
     }
     parameters {
         // Parameters defined by triggers MUST be defined
@@ -468,12 +474,12 @@ pipeline {
 }
 ```
 
-This example sets a trigger which checks every night (`@nightly`) if there is 
+This example sets a trigger which checks every night (`@nightly`) if there is
 a new `SILVER` promotion for _either_ of the specified project / branches.
 
 If at least one trigger definition has a new version, the trigger will also check that
 _all_ trigger definitions have also a proper version before firing the ob. In other words, all the
 trigger definitions must return at least one matching build.
 
-So in this example, if `project-a` returns a new version, but `project-b` has _nothing_, no job 
+So in this example, if `project-a` returns a new version, but `project-b` has _nothing_, no job
 will be triggered.
