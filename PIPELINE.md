@@ -227,7 +227,8 @@ pipeline {
                         project: 'my-project',
                         branch: branchName,
                         build: version,
-                        validationStamp: "my-validation"
+                        validationStamp: "my-validation",
+                        description: "Some description",
                     )
                 }
             }

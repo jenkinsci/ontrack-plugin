@@ -16,7 +16,7 @@
     <properties>
         <jenkins.version>2.107.3</jenkins.version>
         <java.level>8</java.level>
-        <ontrack.version>3.39.4</ontrack.version>
+        <ontrack.version>3.43.1</ontrack.version>
     </properties>
 
     <developers>

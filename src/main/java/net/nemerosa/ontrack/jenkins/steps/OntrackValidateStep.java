@@ -53,6 +53,11 @@ public class OntrackValidateStep extends Step {
     private String validationStatus = null;
 
     /**
+     * Validation description
+     */
+    private String description = "";
+
+    /**
      * Build result to translate into a validation status if defined
      */
     private Result buildResult = null;
@@ -93,6 +98,15 @@ public class OntrackValidateStep extends Step {
     @DataBoundSetter
     public void setValidationStatus(String validationStatus) {
         this.validationStatus = validationStatus;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    @DataBoundSetter
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Map<String, ?> getData() {
@@ -274,6 +288,10 @@ public class OntrackValidateStep extends Step {
                     throw new IllegalArgumentException("There is some data, but no dataType.");
                 } else {
                     validationRun = ontrackBuild.validate(validationStamp, actualStatus);
+                }
+                // Sets the description
+                if (StringUtils.isNotBlank(description)) {
+                    validationRun.getLastValidationRunStatus().setDescription(description);
                 }
                 // Collecting run info
                 Map<String, ?> runInfo = OntrackStepHelper.getRunInfo(context, taskListener);

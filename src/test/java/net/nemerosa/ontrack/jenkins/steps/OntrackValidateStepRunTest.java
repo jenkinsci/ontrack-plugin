@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.ValidationRun;
+import net.nemerosa.ontrack.dsl.ValidationRunStatus;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -40,6 +41,30 @@ public class OntrackValidateStepRunTest {
 
         verify(mockBuild, times(1)).validate("VS", "PASSED");
         verify(mockRun, times(1)).setRunInfo(anyMapOf(String.class, Object.class));
+    }
+
+    @Test
+    public void test_validate_and_set_comment() throws Exception {
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "workflow");
+        // leave out the subject
+        job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', description: 'Some description')", true));
+
+        Ontrack ontrack = mock(Ontrack.class);
+        Build mockBuild = mock(Build.class);
+        ValidationRun mockRun = mock(ValidationRun.class);
+        ValidationRunStatus mockRunStatus = mock(ValidationRunStatus.class);
+
+        when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        when(mockBuild.validate("VS", "PASSED")).thenReturn(mockRun);
+        when(mockRun.getLastValidationRunStatus()).thenReturn(mockRunStatus);
+
+        OntrackDSLConnector.setOntrack(ontrack);
+
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        verify(mockBuild, times(1)).validate("VS", "PASSED");
+        verify(mockRun, times(1)).setRunInfo(anyMapOf(String.class, Object.class));
+        verify(mockRunStatus,times(1)).setDescription("Some description");
     }
 
     @Test
