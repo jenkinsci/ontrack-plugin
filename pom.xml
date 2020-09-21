@@ -27,7 +27,7 @@
         </developer>
     </developers>
 
-    <url>http://wiki.jenkins-ci.org/display/JENKINS/Ontrack+Plugin</url>
+    <url>https://github.com/jenkinsci/ontrack-plugin</url>
 
     <scm>
         <connection>scm:git:git@github.com:jenkinsci/ontrack-plugin.git</connection>
