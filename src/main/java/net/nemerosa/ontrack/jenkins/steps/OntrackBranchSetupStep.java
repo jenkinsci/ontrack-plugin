@@ -6,10 +6,10 @@ import groovy.lang.GroovyShell;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.model.TaskListener;
-import net.nemerosa.ontrack.dsl.Branch;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.Project;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BranchFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.ProjectFacade;
 import net.sf.json.JSON;
 import net.sf.json.JSONSerializer;
 import org.jenkinsci.plugins.workflow.steps.*;
@@ -109,15 +109,15 @@ public class OntrackBranchSetupStep extends Step implements Serializable {
                 TaskListener listener = context.get(TaskListener.class);
                 assert listener != null;
                 // Gets the Ontrack connector
-                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+                OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(listener);
                 // Gets the project
-                Project ontrackProject = ontrack.project(project);
+                ProjectFacade ontrackProject = ontrack.project(project);
                 // Gets the branch and creates it if it does not exist
-                Branch ontrackBranch = ontrackProject.branch(branch, "", true);
+                BranchFacade ontrackBranch = ontrackProject.branch(branch, "", true);
                 // Values to bind
                 Map<String, Object> values = new HashMap<>(bindings);
                 // Binding
-                values.put("ontrack", ontrack);
+                values.put("ontrack", ontrack.getDSLRoot());
                 values.put("branch", ontrackBranch);
                 values.put("out", listener.getLogger());
                 Binding binding = new Binding(values);

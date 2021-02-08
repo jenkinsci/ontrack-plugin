@@ -22,6 +22,11 @@ public class Version {
         this.patch = patch;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%d.%d.%d", major, minor, patch);
+    }
+
     public int getMajor() {
         return major;
     }

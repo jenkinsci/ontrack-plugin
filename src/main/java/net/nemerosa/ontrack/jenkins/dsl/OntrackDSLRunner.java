@@ -5,8 +5,6 @@ import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.OntrackLogger;
 import net.nemerosa.ontrack.jenkins.OntrackConfiguration;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 import net.nemerosa.ontrack.jenkins.OntrackSecurityMode;
@@ -21,7 +19,7 @@ public class OntrackDSLRunner implements DSLRunner {
     /**
      * Additional bindings to add to the list
      */
-    private Map<String, Object> bindings = new HashMap<>();
+    private final Map<String, Object> bindings = new HashMap<>();
 
     /**
      * Security enabled?
@@ -46,12 +44,7 @@ public class OntrackDSLRunner implements DSLRunner {
     /**
      * Logger
      */
-    private OntrackLogger ontrackLogger = new OntrackLogger() {
-        @Override
-        public void trace(String message) {
-            System.out.println(message);
-        }
-    };
+    private OntrackDSLLogger ontrackLogger = System.out::println;
 
     protected OntrackDSLRunner() {
     }
@@ -59,7 +52,7 @@ public class OntrackDSLRunner implements DSLRunner {
     @Override
     public Object run(String dsl) {
         // Connection to Ontrack
-        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLogger);
+        OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLogger);
 
         // Gets the configured security mode
         OntrackSecurityMode securityMode = getSecurityMode();
@@ -101,15 +94,15 @@ public class OntrackDSLRunner implements DSLRunner {
 
         // Binding
         Binding binding = new Binding(bindings);
-        binding.setProperty("ontrack", ontrack);
+        binding.setProperty("ontrack", ontrack.getDSLRoot());
 
         // Runs the script
-        ontrackLogger.trace(String.format("Ontrack DSL script running with launcher %s...%n", launcher.getClass().getName()));
+        ontrackLogger.log(String.format("Ontrack DSL script running with launcher %s...%n", launcher.getClass().getName()));
         Object shellResult = launcher.run(dsl, binding);
         if (logging) {
-            ontrackLogger.trace(String.format("Ontrack DSL script returned result: %s%n", shellResult));
+            ontrackLogger.log(String.format("Ontrack DSL script returned result: %s%n", shellResult));
         } else {
-            ontrackLogger.trace(String.format("Ontrack DSL script returned result.%n"));
+            ontrackLogger.log(String.format("Ontrack DSL script returned result.%n"));
         }
         // Runs the script
         return shellResult;
@@ -135,19 +128,14 @@ public class OntrackDSLRunner implements DSLRunner {
         return this;
     }
 
-    public OntrackDSLRunner setOntrackLogger(OntrackLogger ontrackLogger) {
+    public OntrackDSLRunner setOntrackLogger(OntrackDSLLogger ontrackLogger) {
         this.ontrackLogger = ontrackLogger;
         return this;
     }
 
     public OntrackDSLRunner setOntrackLogger(final TaskListener taskListener) {
         return setOntrackLogger(
-                new OntrackLogger() {
-                    @Override
-                    public void trace(String message) {
-                        taskListener.getLogger().println(message);
-                    }
-                }
+                message -> taskListener.getLogger().println(message)
         );
     }
 

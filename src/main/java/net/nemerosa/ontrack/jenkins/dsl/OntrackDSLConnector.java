@@ -2,63 +2,47 @@ package net.nemerosa.ontrack.jenkins.dsl;
 
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.OntrackConnection;
 import net.nemerosa.ontrack.dsl.OntrackLogger;
 import net.nemerosa.ontrack.jenkins.OntrackConfiguration;
+import net.nemerosa.ontrack.jenkins.dsl.v3.OntrackDSLV3Facade;
+import net.nemerosa.ontrack.jenkins.dsl.v4.OntrackDSLV4Facade;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintStream;
 
 public class OntrackDSLConnector {
 
-    public static Ontrack createOntrackConnector(final PrintStream logger) {
-        return createOntrackConnector(new OntrackLogger() {
-            @Override
-            public void trace(String message) {
-                logger.println(message);
-            }
-        });
+    public static OntrackDSLFacade createOntrackConnector(final PrintStream logger) {
+        return createOntrackConnector((OntrackDSLLogger) logger::println);
     }
 
-    public static Ontrack createOntrackConnector(final OntrackLogger logger) {
+    public static OntrackDSLFacade createOntrackConnector(final OntrackDSLLogger logger) {
         OntrackConfiguration config = OntrackConfiguration.getOntrackConfiguration();
         if (config == null) {
             throw new IllegalStateException("Could not find any Ontrack configuration.");
         }
-        OntrackConnection connection = OntrackConnection.create(config.getOntrackUrl());
-        // Logging
-        if (logger != null) {
-            connection = connection.logger(logger);
+        // Versions
+        String version = config.getOntrackVersion();
+        if (OntrackConfiguration.VERSION_3.equals(version) || StringUtils.isBlank(version)) {
+            return new OntrackDSLV3Facade(config, logger);
+        } else if (OntrackConfiguration.VERSION_4.equals(version)) {
+            return new OntrackDSLV4Facade(config, logger);
+        } else {
+            throw new IllegalStateException("Not supporting Ontrack API version " + version);
         }
-        // Authentication
-        String user = config.getOntrackUser();
-        if (StringUtils.isNotBlank(user)) {
-            connection = connection.authenticate(
-                    user,
-                    config.getOntrackPassword()
-            );
-        }
-        // Retries
-        if (config.getOntrackMaxTries() > 1) {
-            connection = connection
-                    .maxTries(config.getOntrackMaxTries())
-                    .retryDelaySeconds(config.getOntrackRetryDelaySeconds());
-        }
-        // Building the Ontrack root
-        return connection.build();
     }
 
-    public static Ontrack createOntrackConnector(final TaskListener listener) {
-        return ontrack != null ? ontrack : createOntrackConnector(listener != null ? listener.getLogger() : null);
+    public static OntrackDSLFacade createOntrackConnector(final TaskListener listener) {
+        return ontrackDSLFacade != null ? ontrackDSLFacade : createOntrackConnector(listener != null ? listener.getLogger() : System.out);
     }
 
-    private static Ontrack ontrack = null;
+    private static OntrackDSLFacade ontrackDSLFacade = null;
 
     /**
      * Used for test only - injection of a test instance to connect to Ontrack
      */
-    public static void setOntrack(Ontrack test) {
-        ontrack = test;
+    public static void setOntrack(OntrackDSLFacade test) {
+        ontrackDSLFacade = test;
     }
 
 }

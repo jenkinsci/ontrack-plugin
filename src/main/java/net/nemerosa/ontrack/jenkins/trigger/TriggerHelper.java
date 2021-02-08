@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import hudson.model.ParameterValue;
 import hudson.model.Result;
 import hudson.model.StringParameterValue;
-import net.nemerosa.ontrack.dsl.Branch;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BranchFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class TriggerHelper {
     private static final Logger LOGGER = Logger.getLogger(TriggerHelper.class.getName());
     private static final Level LOG_LEVEL = Level.FINE;
 
-    public static void evaluate(Ontrack ontrack, TriggerJob job, List<TriggerDefinition> triggers) {
+    public static void evaluate(OntrackDSLFacade ontrack, TriggerJob job, List<TriggerDefinition> triggers) {
         // Evaluates the condition for each trigger
         List<TriggerResult> results = triggers.stream()
                 .map(trigger -> {
@@ -62,13 +62,13 @@ public class TriggerHelper {
         }
     }
 
-    private static TriggerResult getTriggerResult(Ontrack ontrack, TriggerJob job, TriggerDefinition trigger) {
+    private static TriggerResult getTriggerResult(OntrackDSLFacade ontrack, TriggerJob job, TriggerDefinition trigger) {
 
         // Gets the Ontrack branch
-        Branch ontrackBranch = ontrack.branch(trigger.getProject(), trigger.getBranch());
+        BranchFacade ontrackBranch = ontrack.branch(trigger.getProject(), trigger.getBranch());
 
         // Gets the last builds
-        List<Build> ontrackBuilds;
+        List<BuildFacade> ontrackBuilds;
         if (StringUtils.isBlank(trigger.getPromotion())) {
             ontrackBuilds = ontrackBranch.standardFilter(Collections.singletonMap(
                     "count", 1

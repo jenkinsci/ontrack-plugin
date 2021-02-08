@@ -8,6 +8,10 @@
         <f:entry title="URL">
             <f:textbox name="ontrack.ontrackUrl" value="${descriptor.getOntrackUrl()}"/>
         </f:entry>
+        <f:entry title="Version">
+            <f:radio title="V3" value="V3" name="ontrack.ontrackVersion"/>
+            <f:radio title="V4" value="V4" name="ontrack.ontrackVersion"/>
+        </f:entry>
         <f:entry title="User">
             <f:textbox name="ontrack.ontrackUser" value="${descriptor.getOntrackUser()}"/>
         </f:entry>

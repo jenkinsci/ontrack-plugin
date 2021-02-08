@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableSet;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.model.TaskListener;
-import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
 import net.sf.json.JSON;
 import net.sf.json.JSONSerializer;
 import org.jenkinsci.plugins.workflow.steps.*;
@@ -70,7 +70,7 @@ public class OntrackGraphQLStep extends Step implements Serializable {
                 TaskListener listener = context.get(TaskListener.class);
                 assert listener != null;
                 // Gets the Ontrack connector
-                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+                OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(listener);
                 // Query
                 Object result = ontrack.graphQLQuery(script, bindings);
                 // Returns result as JSON

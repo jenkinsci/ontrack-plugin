@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.jenkins.changelog;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.*;
@@ -10,15 +8,16 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.*;
-import net.nemerosa.ontrack.dsl.http.OTNotFoundException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.ChangeLogFacade;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static net.nemerosa.ontrack.jenkins.OntrackPluginSupport.expand;
@@ -103,24 +102,25 @@ public class OntrackChangelogPublisher extends Notifier {
         }
 
         // Gets the Ontrack connector
-        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+        OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(listener);
 
         // Gets the two builds from Ontrack
-        Build build1;
+        BuildFacade build1;
         try {
             build1 = ontrack.build(projectName, branchName, previousBuildName);
-        } catch (OTNotFoundException ignored) {
-            return noChangeLog(listener, format("Build %s cannot be found.", previousBuildName));
+        } catch (Exception exception) {
+            String buildName = previousBuildName;
+            return ontrack.onNotFoundException(exception, () -> noChangeLog(listener, format("Build %s cannot be found.", buildName)));
         }
-        Build buildN;
+        BuildFacade buildN;
         try {
             buildN = ontrack.build(projectName, branchName, lastBuildName);
-        } catch (OTNotFoundException ignored) {
-            return noChangeLog(listener, format("Build %s cannot be found.", lastBuildName));
+        } catch (Exception exception) {
+            return ontrack.onNotFoundException(exception, () -> noChangeLog(listener, format("Build %s cannot be found.", lastBuildName)));
         }
 
         // Gets the build intervals
-        List<Build> builds = Arrays.asList(build1, buildN);
+        List<BuildFacade> builds = Arrays.asList(build1, buildN);
         // If distinctBuilds, collect all builds between 1 and N
         if (distinctBuilds) {
             builds = ontrack.branch(projectName, branchName).intervalFilter(
@@ -132,16 +132,16 @@ public class OntrackChangelogPublisher extends Notifier {
         }
 
         // Collects the change logs for each interval
-        List<OntrackChangeLog> changeLogs = new ArrayList<OntrackChangeLog>();
+        List<OntrackChangeLog> changeLogs = new ArrayList<>();
         int count = builds.size();
         for (int i = 1; i < count; i++) {
-            Build a = builds.get(i - 1);
-            Build b = builds.get(i);
+            BuildFacade a = builds.get(i - 1);
+            BuildFacade b = builds.get(i);
             // Different builds
             if (a.getId() != b.getId()) {
                 try {
                     // Gets the change log from A to B
-                    ChangeLog changeLog = a.getChangeLog(b);
+                    ChangeLogFacade changeLog = a.getChangeLog(b);
                     // Reduces the amount of information for the change log
                     OntrackChangeLog ontrackChangeLog = collectInfo(changeLog);
                     // Adds to the list
@@ -190,7 +190,7 @@ public class OntrackChangelogPublisher extends Notifier {
 
     private String getCommittersMailingList(List<OntrackChangeLog> changeLogs) {
         // Set of unique emails
-        Set<String> emails = new TreeSet<String>();
+        Set<String> emails = new TreeSet<>();
         // For all change logs
         for (OntrackChangeLog changeLog : changeLogs) {
             for (OntrackChangeLogCommit commit : changeLog.getCommits()) {
@@ -212,15 +212,13 @@ public class OntrackChangelogPublisher extends Notifier {
         return StringUtils.join(emails, ",");
     }
 
-    private OntrackChangeLog collectInfo(ChangeLog changeLog) {
+    private OntrackChangeLog collectInfo(ChangeLogFacade changeLog) {
 
         // Gets the commits
-        List<OntrackChangeLogCommit> commits = Lists.transform(
-                changeLog.getCommits(),
-                new Function<ChangeLogCommit, OntrackChangeLogCommit>() {
-                    @Override
-                    public OntrackChangeLogCommit apply(ChangeLogCommit input) {
-                        return new OntrackChangeLogCommit(
+        List<OntrackChangeLogCommit> commits = changeLog.getCommits()
+                .stream()
+                .map(input ->
+                        new OntrackChangeLogCommit(
                                 input.getId(),
                                 input.getShortId(),
                                 input.getAuthor(),
@@ -229,50 +227,35 @@ public class OntrackChangelogPublisher extends Notifier {
                                 input.getMessage(),
                                 input.getFormattedMessage(),
                                 input.getLink()
-                        );
-                    }
-                }
-        );
+                        )
+                )
+                .collect(Collectors.toList());
 
         // Gets the issues
-        List<OntrackChangeLogIssue> issues = Lists.transform(
-                changeLog.getIssues(),
-                new Function<ChangeLogIssue, OntrackChangeLogIssue>() {
-                    @Override
-                    public OntrackChangeLogIssue apply(ChangeLogIssue input) {
-                        return new OntrackChangeLogIssue(
-                                input.getKey(),
-                                input.getDisplayKey(),
-                                input.getSummary(),
-                                input.getStatus(),
-                                input.getUpdateTime(),
-                                input.getUrl()
-                        );
-                    }
-                }
-        );
+        List<OntrackChangeLogIssue> issues = changeLog.getIssues()
+                .stream()
+                .map(input -> new OntrackChangeLogIssue(
+                        input.getKey(),
+                        input.getDisplayKey(),
+                        input.getSummary(),
+                        input.getStatus(),
+                        input.getUpdateTime(),
+                        input.getUrl()
+                )).collect(Collectors.toList());
 
         // Gets the files
         List<OntrackChangeLogFile> files;
         if (collectFiles) {
-            files = Lists.transform(
-                    changeLog.getFiles(),
-                    new Function<ChangeLogFile, OntrackChangeLogFile>() {
-                        @Override
-                        public OntrackChangeLogFile apply(ChangeLogFile input) {
-                            return new OntrackChangeLogFile(
-                                    input.getPath(),
-                                    input.getChangeTypes()
-                            );
-                        }
-                    }
-            );
+            files = changeLog.getFiles().stream().map(input -> new OntrackChangeLogFile(
+                    input.getPath(),
+                    input.getChangeTypes()
+            )).collect(Collectors.toList());
         } else {
             files = Collections.emptyList();
         }
 
         // Page link
-        String page = changeLog.link("page");
+        String page = changeLog.getPageLink();
 
         // OK
         return new OntrackChangeLog(
@@ -280,13 +263,13 @@ public class OntrackChangelogPublisher extends Notifier {
                 changeLog.getFrom().getName(),
                 changeLog.getTo().getName(),
                 page,
-                new ArrayList<OntrackChangeLogCommit>(
+                new ArrayList<>(
                         commits
                 ),
-                new ArrayList<OntrackChangeLogIssue>(
+                new ArrayList<>(
                         issues
                 ),
-                new ArrayList<OntrackChangeLogFile>(
+                new ArrayList<>(
                         files
                 )
         );

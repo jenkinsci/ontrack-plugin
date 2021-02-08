@@ -8,6 +8,7 @@ import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.envinject.EnvInjectException;
 import org.jenkinsci.plugins.envinject.model.EnvInjectJobPropertyContributor;
@@ -54,11 +55,11 @@ public class OntrackDSLEnvInjectJobPropertyContributor extends EnvInjectJobPrope
             return Collections.emptyMap();
         }
         // Ontrack connection
-        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLog ? listener.getLogger() : null);
+        OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLog ? listener.getLogger() : null);
         // Values to bind
         Map<String, Object> values = new HashMap<String, Object>();
         // Binding
-        values.put("ontrack", ontrack);
+        values.put("ontrack", ontrack.getDSLRoot());
         values.put("jenkins", Jenkins.getInstanceOrNull());
         values.put("build", build);
         values.put("out", listener.getLogger());

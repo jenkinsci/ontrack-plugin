@@ -6,11 +6,10 @@ import hudson.Extension;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.tasks.junit.TestResultSummary;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.TestSummary;
-import net.nemerosa.ontrack.dsl.ValidationRun;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.ValidationRunFacade;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -199,9 +198,9 @@ public class OntrackValidateStep extends Step {
                     throw new IllegalStateException("Cannot get any task listener.");
                 }
                 // Gets the Ontrack connector
-                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(taskListener);
+                OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(taskListener);
                 // Gets the build...
-                Build ontrackBuild = ontrack.build(project, branch, build);
+                BuildFacade ontrackBuild = ontrack.build(project, branch, build);
                 // Validation status from the build result if defined
                 String actualStatus = validationStatus;
                 if (actualStatus == null && buildResult != null) {
@@ -212,7 +211,7 @@ public class OntrackValidateStep extends Step {
                     actualStatus = OntrackStepHelper.getValidationRunStatusFromStage(context);
                 }
                 // ... and creates a validation run
-                ValidationRun validationRun;
+                ValidationRunFacade validationRun;
                 if (testResults != null) {
                     if (testResultsAsFraction) {
                         int ok = testResults.getPassCount();
@@ -229,9 +228,7 @@ public class OntrackValidateStep extends Step {
                         int failed = testResults.getFailCount();
                         validationRun = ontrackBuild.validateWithTestSummary(
                                 validationStamp,
-                                new TestSummary(
-                                        passed, skipped, failed
-                                ),
+                                passed, skipped, failed,
                                 dataValidation ? validationStatus : actualStatus
                         );
                     }

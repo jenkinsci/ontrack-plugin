@@ -7,9 +7,11 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.OntrackPluginSupport;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BranchFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -94,16 +96,16 @@ public class OntrackBuildStep extends Step {
                     throw new IllegalStateException("Cannot get any run.");
                 }
                 // Gets the Ontrack connector
-                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(taskListener);
+                OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(taskListener);
                 // Gets the branch...
-                Branch ontrackBranch = ontrack.branch(project, branch);
+                BranchFacade ontrackBranch = ontrack.branch(project, branch);
                 // ... and creates a build
-                Build ontrackBuild = ontrackBranch.build(OntrackBuildStep.this.build, buildDescription, true);
+                BuildFacade ontrackBuild = ontrackBranch.build(OntrackBuildStep.this.build, buildDescription, true);
                 // Ontrack build link
                 OntrackPluginSupport.createOntrackLinks(ontrack, run, ontrackBuild);
                 // ... and associates a Git commit
                 if (StringUtils.isNotBlank(gitCommit)) {
-                    ontrackBuild.getConfig().gitCommit(gitCommit);
+                    ontrackBuild.setGitCommit(gitCommit);
                 }
                 // Collecting run info
                 Map<String, ?> runInfo = OntrackStepHelper.getRunInfo(context, taskListener);

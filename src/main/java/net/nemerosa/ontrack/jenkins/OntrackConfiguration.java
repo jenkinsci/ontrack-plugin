@@ -19,6 +19,9 @@ public class OntrackConfiguration extends GlobalConfiguration {
 
     private static Logger LOGGER = Logger.getLogger(OntrackConfiguration.class.getName());
 
+    public static final String VERSION_3 = "V3";
+    public static final String VERSION_4 = "V4";
+
     public static @Nullable
     OntrackConfiguration getOntrackConfiguration() {
         Jenkins instance = Jenkins.getInstanceOrNull();
@@ -27,6 +30,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
 
     private String ontrackConfigurationName;
     private String ontrackUrl;
+    private String ontrackVersion;
     private String ontrackUser;
     private String ontrackPassword;
     private int ontrackMaxTries = 1;
@@ -51,6 +55,7 @@ public class OntrackConfiguration extends GlobalConfiguration {
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
         ontrackConfigurationName = json.getString("ontrackConfigurationName");
         ontrackUrl = json.getString("ontrackUrl");
+        ontrackVersion = json.has("ontrackVersion") ? json.getString("ontrackVersion") : VERSION_3;
         ontrackUser = json.getString("ontrackUser");
         ontrackPassword = json.getString("ontrackPassword");
         ontrackMaxTries = json.getInt("ontrackMaxTries");
@@ -123,6 +128,10 @@ public class OntrackConfiguration extends GlobalConfiguration {
         return ontrackUrl;
     }
 
+    public String getOntrackVersion() {
+        return ontrackVersion;
+    }
+
     public String getOntrackUser() {
         return ontrackUser;
     }
@@ -148,6 +157,11 @@ public class OntrackConfiguration extends GlobalConfiguration {
     @SuppressWarnings("unused")
     public void setOntrackUrl(String ontrackUrl) {
         this.ontrackUrl = ontrackUrl;
+    }
+
+    @SuppressWarnings("unused")
+    public void setOntrackVersion(String ontrackVersion) {
+        this.ontrackVersion = ontrackVersion;
     }
 
     @SuppressWarnings("unused")

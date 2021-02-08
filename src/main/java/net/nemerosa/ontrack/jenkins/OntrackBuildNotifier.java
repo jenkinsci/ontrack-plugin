@@ -9,12 +9,10 @@ import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import jenkins.model.Jenkins;
-import net.nemerosa.ontrack.dsl.Branch;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
-import net.nemerosa.ontrack.dsl.properties.BuildProperties;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BranchFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -91,19 +89,19 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
             // Build description
             String buildDescription = String.format("Build %s", theBuild);
             // Gets the Ontrack connector
-            Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+            OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(listener);
             try {
                 // Gets the branch...
-                Branch branch = ontrack.branch(projectName, branchName);
+                BranchFacade branch = ontrack.branch(projectName, branchName);
                 // ... and creates a build
-                Build build = branch.build(buildName, buildDescription, true);
+                BuildFacade build = branch.build(buildName, buildDescription, true);
                 // Creates the build action
                 OntrackPluginSupport.createOntrackLinks(ontrack, theBuild, build);
                 // Sets the Jenkins build property
                 // Note: cannot use the Groovy DSL here, using internal classes
                 OntrackConfiguration ontrackConfiguration = OntrackConfiguration.getOntrackConfiguration();
                 if (ontrackConfiguration != null) {
-                    new BuildProperties(ontrack, build).jenkinsBuild(
+                    build.setJenkinsBuild(
                             ontrackConfiguration.getOntrackConfigurationName(),
                             getProjectPath(theBuild),
                             theBuild.getNumber()
@@ -116,11 +114,13 @@ public class OntrackBuildNotifier extends AbstractOntrackNotifier {
                         build.setRunInfo(runInfo);
                     }
                 }
-            } catch (OTMessageClientException ex) {
-                listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
-                if (!ignoreFailure) {
-                    theBuild.setResult(Result.FAILURE);
-                }
+            } catch (Exception ex) {
+                ontrack.onClientException(ex, (message) -> {
+                    listener.getLogger().format("[ontrack] ERROR %s%n", message);
+                    if (!ignoreFailure) {
+                        theBuild.setResult(Result.FAILURE);
+                    }
+                });
             }
         } else {
             listener.getLogger().format("[ontrack] No creation of build since it is broken");

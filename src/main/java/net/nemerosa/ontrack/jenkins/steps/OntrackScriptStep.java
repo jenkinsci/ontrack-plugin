@@ -7,9 +7,9 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.JenkinsConnector;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
 import net.sf.json.JSON;
 import net.sf.json.JSONSerializer;
 import org.jenkinsci.plugins.workflow.steps.*;
@@ -89,7 +89,7 @@ public class OntrackScriptStep extends Step implements Serializable {
                 TaskListener listener = context.get(TaskListener.class);
                 assert listener != null;
                 // Gets the Ontrack connector
-                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+                OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(listener);
                 // Values to bind
                 Map<String, Object> values = new HashMap<>(bindings);
                 // Jenkins connector
@@ -102,7 +102,7 @@ public class OntrackScriptStep extends Step implements Serializable {
                     ));
                 }
                 // Binding
-                values.put("ontrack", ontrack);
+                values.put("ontrack", ontrack.getDSLRoot());
                 values.put("out", listener.getLogger());
                 Binding binding = new Binding(values);
                 // Groovy shell

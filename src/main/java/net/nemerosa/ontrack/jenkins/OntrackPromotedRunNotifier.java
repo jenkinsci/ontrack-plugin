@@ -12,6 +12,8 @@ import net.nemerosa.ontrack.dsl.Build;
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
@@ -70,9 +72,9 @@ public class OntrackPromotedRunNotifier extends AbstractOntrackNotifier {
         if (result != null && result.isBetterOrEqualTo(Result.SUCCESS)) {
             try {
                 // Gets the Ontrack connector
-                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+                OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(listener);
                 // Gets the build
-                Build build = ontrack.build(projectName, branchName, buildName);
+                BuildFacade build = ontrack.build(projectName, branchName, buildName);
                 // Promotes it
                 listener.getLogger().format("[ontrack] Promoting build %s of branch %s of project %s for %s%n", buildName, branchName, projectName, promotionLevelName);
                 build.promote(promotionLevelName);

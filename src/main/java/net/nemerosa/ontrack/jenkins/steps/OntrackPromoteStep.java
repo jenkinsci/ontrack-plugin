@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableSet;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.model.TaskListener;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -74,9 +74,9 @@ public class OntrackPromoteStep extends Step {
             @Override
             protected Void run() throws Exception {
                 // Gets the Ontrack connector
-                Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(context.get(TaskListener.class));
+                OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(context.get(TaskListener.class));
                 // Gets the build...
-                Build ontrackBuild = ontrack.build(project, branch, build);
+                BuildFacade ontrackBuild = ontrack.build(project, branch, build);
                 // ... and creates a promotion run
                 ontrackBuild.promote(promotionLevel);
                 // Done

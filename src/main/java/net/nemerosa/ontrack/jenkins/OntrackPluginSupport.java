@@ -7,9 +7,9 @@ import hudson.FilePath;
 import hudson.model.*;
 import hudson.triggers.SCMTrigger;
 import jenkins.model.Jenkins;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.jenkins.actions.OntrackLinkAction;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.CheckForNull;
@@ -176,7 +176,7 @@ public final class OntrackPluginSupport {
         }
     }
 
-    public static void createOntrackLinks(Ontrack ontrack, Run run, Build ontrackBuild) {
+    public static void createOntrackLinks(OntrackDSLFacade ontrack, Run run, BuildFacade ontrackBuild) {
         // Creates the build link
         addOntrackLink("Ontrack Build", "/#/build/" + ontrackBuild.getId(), run);
         // Gets build information

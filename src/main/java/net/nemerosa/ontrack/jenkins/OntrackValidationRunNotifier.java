@@ -8,11 +8,10 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.ValidationRun;
-import net.nemerosa.ontrack.dsl.http.OTMessageClientException;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.ValidationRunFacade;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
@@ -81,10 +80,10 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
         // Run status
         String runStatus = getRunStatus(theBuild);
         // Gets the Ontrack connector
-        Ontrack ontrack = OntrackDSLConnector.createOntrackConnector(listener);
+        OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(listener);
         try {
             // Gets the build
-            Build build = ontrack.build(projectName, branchName, buildName);
+            BuildFacade build = ontrack.build(projectName, branchName, buildName);
             // Validation
             listener.getLogger().format("[ontrack] Running %s with status %s for build %s of branch %s of project %s%n",
                     validationStampName,
@@ -93,7 +92,7 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
                     branchName,
                     projectName
             );
-            ValidationRun validationRun = build.validate(validationStampName, runStatus);
+            ValidationRunFacade validationRun = build.validate(validationStampName, runStatus);
             // Run info
             if (runInfo) {
                 Map<String, Object> runInfo = getRunInfo(theBuild, listener);
@@ -101,11 +100,13 @@ public class OntrackValidationRunNotifier extends AbstractOntrackNotifier {
                     validationRun.setRunInfo(runInfo);
                 }
             }
-        } catch (OTMessageClientException ex) {
-            listener.getLogger().format("[ontrack] ERROR %s%n", ex.getMessage());
-            if (!ignoreFailure) {
-                theBuild.setResult(Result.FAILURE);
-            }
+        } catch (Exception ex) {
+            ontrack.onClientException(ex, (message) -> {
+                listener.getLogger().format("[ontrack] ERROR %s%n", message);
+                if (!ignoreFailure) {
+                    theBuild.setResult(Result.FAILURE);
+                }
+            });
         }
         // OK
         return true;
