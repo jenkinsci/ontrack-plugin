@@ -19,6 +19,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Using a path
+     *
+     * @param path Path to the script
      */
     public void path(String path) {
         scriptLocation = ScriptLocation.path(path);
@@ -26,6 +28,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Using a script
+     *
+     * @param script Script content
      */
     public void script(String script) {
         scriptLocation = ScriptLocation.text(script);
@@ -33,6 +37,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Injects environment variables
+     *
+     * @param names List of environment variables
      */
     public void environment(String... names) {
         environment.addAll(Arrays.asList(names));
@@ -40,6 +46,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Properties to inject
+     *
+     * @param properties Properties to inject
      */
     public void properties(String properties) {
         injectProperties = properties;
@@ -54,6 +62,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Enables or disables the log
+     *
+     * @param log Enabling or disabling logging
      */
     public void log(boolean log) {
         this.log = log;
@@ -68,6 +78,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Enables or disables the sandbox
+     *
+     * @param sandbox Enabling or disabling the sandbox
      */
     public void sandbox(boolean sandbox) {
         this.sandbox = sandbox;
@@ -75,6 +87,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Computed location
+     *
+     * @return Script location
      */
     public ScriptLocation getScriptLocation() {
         return scriptLocation;
@@ -82,6 +96,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Computed environment
+     *
+     * @return Environment to inject
      */
     public String getInjectEnvironment() {
         return StringUtils.join(environment, ",");
@@ -89,6 +105,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Properties definition
+     *
+     * @return Properties to inject
      */
     public String getInjectProperties() {
         return injectProperties;
@@ -96,6 +114,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Logging
+     *
+     * @return Is logging enabled?
      */
     public boolean isLog() {
         return log;
@@ -103,6 +123,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Sandbox
+     *
+     * @return Is sandbox enabled?
      */
     public boolean isSandbox() {
         return sandbox;
@@ -110,6 +132,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Ignoring failure
+     *
+     * @return Are failures ignored?
      */
     public boolean isIgnoreFailure() {
         return ignoreFailure;
@@ -124,6 +148,8 @@ public class OntrackDslContext implements Context {
 
     /**
      * Ignoring failure
+     *
+     * @param value If failures must be ignored
      */
     public void ignoreFailure(boolean value) {
         ignoreFailure = value;

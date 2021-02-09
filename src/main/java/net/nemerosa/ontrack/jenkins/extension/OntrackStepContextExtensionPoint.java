@@ -11,6 +11,9 @@ public class OntrackStepContextExtensionPoint extends ContextExtensionPoint {
 
     /**
      * DSL
+     *
+     * @param closure Closure running in the context of {@link OntrackDslContext}
+     * @return Step
      */
     @DslExtensionMethod(context = StepContext.class)
     public OntrackDSLStep ontrackDsl(Runnable closure) {

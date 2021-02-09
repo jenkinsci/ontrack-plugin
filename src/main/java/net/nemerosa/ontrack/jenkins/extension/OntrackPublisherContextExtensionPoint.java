@@ -14,6 +14,11 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
 
     /**
      * Creation of a build
+     *
+     * @param project Name of the project
+     * @param branch  Name of the branch
+     * @param build   Name of the build
+     * @return Step
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackBuildNotifier ontrackBuild(String project, String branch, String build) {
@@ -22,6 +27,12 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
 
     /**
      * Creation of a build with ignore failure option
+     *
+     * @param project       Name of the project
+     * @param branch        Name of the branch
+     * @param build         Name of the build
+     * @param ignoreFailure If failures must be ignored
+     * @return Step
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackBuildNotifier ontrackBuild(String project, String branch, String build, boolean ignoreFailure) {
@@ -30,6 +41,13 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
 
     /**
      * Creation of a build with ignore failure and run info option
+     *
+     * @param project       Name of the project
+     * @param branch        Name of the branch
+     * @param build         Name of the build
+     * @param ignoreFailure If failures must be ignored
+     * @param runInfo       If run info must be collected
+     * @return Step
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackBuildNotifier ontrackBuild(String project, String branch, String build, boolean ignoreFailure, boolean runInfo) {
@@ -38,6 +56,12 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
 
     /**
      * Promotion
+     *
+     * @param project        Name of the project
+     * @param branch         Name of the branch
+     * @param build          Name of the build
+     * @param promotionLevel Name of the promotion level
+     * @return Step
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackPromotedRunNotifier ontrackPromotion(String project, String branch, String build, String promotionLevel) {
@@ -46,6 +70,13 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
 
     /**
      * Promotion with ignoring of the failure option
+     *
+     * @param project        Name of the project
+     * @param branch         Name of the branch
+     * @param build          Name of the build
+     * @param promotionLevel Name of the promotion level
+     * @param ignoreFailure  If failures must be ignored
+     * @return Step
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackPromotedRunNotifier ontrackPromotion(String project, String branch, String build, String promotionLevel, boolean ignoreFailure) {
@@ -54,6 +85,12 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
 
     /**
      * Validation
+     *
+     * @param project         Name of the project
+     * @param branch          Name of the branch
+     * @param build           Name of the build
+     * @param validationStamp Name of the validation stamp
+     * @return Step
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackValidationRunNotifier ontrackValidation(String project, String branch, String build, String validationStamp) {
@@ -62,6 +99,13 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
 
     /**
      * Validation with ignoring of the failure option
+     *
+     * @param project         Name of the project
+     * @param branch          Name of the branch
+     * @param build           Name of the build
+     * @param validationStamp Name of the validation stamp
+     * @param ignoreFailure   If failures must be ignored
+     * @return Step
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackValidationRunNotifier ontrackValidation(String project, String branch, String build, String validationStamp, boolean ignoreFailure) {
@@ -70,6 +114,14 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
 
     /**
      * Validation with ignoring of the failure and run info options
+     *
+     * @param project         Name of the project
+     * @param branch          Name of the branch
+     * @param build           Name of the build
+     * @param validationStamp Name of the validation stamp
+     * @param ignoreFailure   If failures must be ignored
+     * @param runInfo       If run info must be collected
+     * @return Step
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackValidationRunNotifier ontrackValidation(String project, String branch, String build, String validationStamp, boolean ignoreFailure, boolean runInfo) {
@@ -78,6 +130,9 @@ public class OntrackPublisherContextExtensionPoint extends ContextExtensionPoint
 
     /**
      * DSL
+     *
+     * @param closure Closure running in the context of {@link OntrackDslContext}
+     * @return Step
      */
     @DslExtensionMethod(context = PublisherContext.class)
     public OntrackDSLNotifier ontrackDsl(Runnable closure) {

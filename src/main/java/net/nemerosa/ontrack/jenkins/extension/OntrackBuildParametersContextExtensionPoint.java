@@ -18,6 +18,9 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
 
     /**
      * Choice parameter
+     *
+     * @param closure Code to run. It runs in the context of {@link OntrackChoiceParameterContext}.
+     * @return The definition
      */
     @DslExtensionMethod(context = BuildParametersContext.class)
     public OntrackChoiceParameterDefinition ontrackChoiceParameter(Runnable closure) {
@@ -36,6 +39,9 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
 
     /**
      * Multiple choice parameter
+     *
+     * @param closure Code to run. It runs in the context of {@link OntrackChoiceParameterContext}.
+     * @return The definition
      */
     @DslExtensionMethod(context = BuildParametersContext.class)
     public OntrackMultiChoiceParameterDefinition ontrackMultipleChoiceParameter(Runnable closure) {
@@ -54,6 +60,9 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
 
     /**
      * Single parameter
+     *
+     * @param closure Code to run. It runs in the context of {@link OntrackChoiceParameterContext}.
+     * @return The definition
      */
     @DslExtensionMethod(context = BuildParametersContext.class)
     public OntrackSingleParameterDefinition ontrackSingleParameter(Runnable closure) {
@@ -72,6 +81,9 @@ public class OntrackBuildParametersContextExtensionPoint extends ContextExtensio
 
     /**
      * Last parameter
+     *
+     * @param closure Code to run. It runs in the context of {@link OntrackChoiceParameterContext}.
+     * @return The definition
      */
     @DslExtensionMethod(context = BuildParametersContext.class)
     public OntrackChoiceParameterDefinition ontrackBuildParameter(Runnable closure) {

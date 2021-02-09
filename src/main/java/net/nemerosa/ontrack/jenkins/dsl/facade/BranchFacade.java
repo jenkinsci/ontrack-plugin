@@ -23,7 +23,7 @@ public interface BranchFacade {
     /**
      * Gets an interval filter
      *
-     * @param Interval filter
+     * @param filter Interval filter
      * @return List of builds
      */
     List<BuildFacade> intervalFilter(Map<String, ?> filter);
@@ -34,7 +34,7 @@ public interface BranchFacade {
      * @param name        Name of the build
      * @param description Description of the build
      * @param getIfExists If <code>true</code>, gets the build if it exists already, otherwise fails.
-     * @return
+     * @return An existing build or new one
      */
     BuildFacade build(String name, String description, boolean getIfExists);
 }

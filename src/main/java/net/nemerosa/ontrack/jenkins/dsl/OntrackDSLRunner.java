@@ -166,6 +166,10 @@ public class OntrackDSLRunner implements DSLRunner {
 
     /**
      * Creates a DSL runner for a build environment
+     *
+     * @param run      Jenkins item where to run the scripts
+     * @param listener Jenkins listener (for the console)
+     * @return DSL runner
      */
     public static OntrackDSLRunner getRunnerForBuild(Item run, TaskListener listener) {
         return new OntrackDSLRunner()

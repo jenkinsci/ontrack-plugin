@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.jenkins.dsl;
 
 import hudson.model.TaskListener;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.OntrackLogger;
 import net.nemerosa.ontrack.jenkins.OntrackConfiguration;
 import net.nemerosa.ontrack.jenkins.dsl.v3.OntrackDSLV3Facade;
 import net.nemerosa.ontrack.jenkins.dsl.v4.OntrackDSLV4Facade;
@@ -40,6 +38,8 @@ public class OntrackDSLConnector {
 
     /**
      * Used for test only - injection of a test instance to connect to Ontrack
+     *
+     * @param test Test instance to use
      */
     public static void setOntrack(OntrackDSLFacade test) {
         ontrackDSLFacade = test;

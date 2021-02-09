@@ -33,6 +33,10 @@ public class JenkinsConnector {
      * <p>
      * The returned map can be directly as a run info parameter for a build
      * or a validation run.
+     *
+     * @return Run info
+     * @throws IOException In case of I/O error
+     * @throws InterruptedException If the collection is interrupted
      */
     public Map<String, ?> getRunInfo() throws IOException, InterruptedException {
         Map<String, Object> runInfo = OntrackPluginSupport.getRunInfo(build, listener);
