@@ -1,11 +1,12 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
 import com.google.common.collect.ImmutableMap;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.ValidationRun;
-import net.nemerosa.ontrack.dsl.ValidationRunStatus;
+import net.nemerosa.ontrack.jenkins.MockBuild;
+import net.nemerosa.ontrack.jenkins.MockOntrack;
+import net.nemerosa.ontrack.jenkins.MockValidationRun;
+import net.nemerosa.ontrack.jenkins.MockValidationRunStatus;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.Rule;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 public class OntrackValidateStepRunTest {
 
@@ -28,14 +30,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS')", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validate("VS", "PASSED")).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -49,22 +53,24 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', description: 'Some description')", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
-        ValidationRunStatus mockRunStatus = mock(ValidationRunStatus.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
+        MockValidationRunStatus mockRunStatus = mock(MockValidationRunStatus.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validate("VS", "PASSED")).thenReturn(mockRun);
         when(mockRun.getLastValidationRunStatus()).thenReturn(mockRunStatus);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
         verify(mockBuild, times(1)).validate("VS", "PASSED");
         verify(mockRun, times(1)).setRunInfo(anyMapOf(String.class, Object.class));
-        verify(mockRunStatus,times(1)).setDescription("Some description");
+        verify(mockRunStatus, times(1)).setDescription("Some description");
     }
 
     @Test
@@ -73,14 +79,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED')", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validate("VS", "FAILED")).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -94,14 +102,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'fraction', data: [numerator: 99, denominator: 100])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithFraction(anyString(), anyInt(), anyInt(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -114,14 +124,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'fraction', data: [numerator: 99, denominator: 100])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithFraction(anyString(), anyInt(), anyInt(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -134,18 +146,21 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'metrics', data: [metric1: 20.12, metric2: 50])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        //noinspection unchecked
         when(mockBuild.validateWithMetrics(anyString(), anyMap(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
-        Map<String,Double> map = new HashMap<>();
+        Map<String, Double> map = new HashMap<>();
         map.put("metric1", 20.12d);
         map.put("metric2", 50d);
         verify(mockBuild, times(1)).validateWithMetrics("VS", map, null);
@@ -157,18 +172,21 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'metrics', data: [metric1: 20.12, metric2: 50])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
+        //noinspection unchecked
         when(mockBuild.validateWithMetrics(anyString(), anyMap(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
-        Map<String,Double> map = new HashMap<>();
+        Map<String, Double> map = new HashMap<>();
         map.put("metric1", 20.12d);
         map.put("metric2", 50d);
         verify(mockBuild, times(1)).validateWithMetrics("VS", map, "FAILED");
@@ -180,14 +198,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'chml', data: [critical: 12, high: 100])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithCHML(anyString(), anyInt(), anyInt(), anyInt(), anyInt(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -200,14 +220,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'chml', data: [critical: 12, high: 100])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithCHML(anyString(), anyInt(), anyInt(), anyInt(), anyInt(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -220,14 +242,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'text', data: [value: 'My text'])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithText(anyString(), anyString(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -240,14 +264,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'number', data: [value: 12])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithNumber(anyString(), anyInt(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -260,14 +286,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'number', data: [value: 12])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithNumber(anyString(), anyInt(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -280,14 +308,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'percentage', data: [value: 33])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithPercentage(anyString(), anyInt(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -300,14 +330,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'percentage', data: [value: 33])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithPercentage(anyString(), anyInt(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -320,14 +352,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', dataType: 'net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType', data: [value: 33])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithData(anyString(), any(), anyString(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 
@@ -340,14 +374,16 @@ public class OntrackValidateStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackValidate(project: 'prj', branch: 'master', build: '1', validationStamp: 'VS', validationStatus: 'FAILED', dataType: 'net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType', data: [value: 33])", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
-        ValidationRun mockRun = mock(ValidationRun.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
+        MockValidationRun mockRun = mock(MockValidationRun.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
         when(mockBuild.validateWithData(anyString(), any(), anyString(), anyString())).thenReturn(mockRun);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 

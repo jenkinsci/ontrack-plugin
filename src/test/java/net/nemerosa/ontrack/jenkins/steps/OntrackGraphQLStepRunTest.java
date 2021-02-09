@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
-import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.MockOntrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.Rule;
@@ -23,9 +24,11 @@ public class OntrackGraphQLStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackGraphQL(script: '{projects{name}}')", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 

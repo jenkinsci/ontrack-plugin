@@ -1,8 +1,9 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.MockBuild;
+import net.nemerosa.ontrack.jenkins.MockOntrack;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.Rule;
@@ -22,12 +23,14 @@ public class OntrackPromoteStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackPromote(project: 'prj', branch: 'master', build: '1', promotionLevel: 'PL')", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Build mockBuild = mock(Build.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBuild mockBuild = mock(MockBuild.class);
 
         when(ontrack.build("prj", "master", "1")).thenReturn(mockBuild);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 

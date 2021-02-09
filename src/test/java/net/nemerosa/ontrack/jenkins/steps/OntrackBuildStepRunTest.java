@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
 import hudson.model.Result;
-import net.nemerosa.ontrack.dsl.Branch;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.MockBranch;
+import net.nemerosa.ontrack.jenkins.MockBuild;
+import net.nemerosa.ontrack.jenkins.MockOntrack;
+import net.nemerosa.ontrack.jenkins.MockValidationRun;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -55,14 +57,16 @@ public class OntrackBuildStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackBuild(project: 'prj', branch: 'master', build: '1')", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Branch mockBranch = mock(Branch.class);
-        Build mockBuild = mock(Build.class);
+        OntrackDSLFacade ontrackFacade = mock(OntrackDSLFacade.class);
+        MockOntrack ontrack = mock(MockOntrack.class);
+        when(ontrackFacade.getDSLRoot()).thenReturn(ontrack);
+        MockBranch mockBranch = mock(MockBranch.class);
+        MockBuild mockBuild = mock(MockBuild.class);
 
         when(ontrack.branch("prj", "master")).thenReturn(mockBranch);
         when(mockBranch.build("1", "Build 1", true)).thenReturn(mockBuild);
 
-        OntrackDSLConnector.setOntrack(ontrack);
+        OntrackDSLConnector.setOntrack(ontrackFacade);
 
         jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
 

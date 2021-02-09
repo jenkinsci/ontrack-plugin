@@ -3,9 +3,9 @@ package net.nemerosa.ontrack.jenkins.trigger;
 import com.google.common.collect.ImmutableMap;
 import hudson.model.ParameterValue;
 import hudson.model.Result;
-import net.nemerosa.ontrack.dsl.Branch;
-import net.nemerosa.ontrack.dsl.Build;
-import net.nemerosa.ontrack.dsl.Ontrack;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BranchFacade;
+import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,19 +34,19 @@ public class TriggerHelperTest {
     private static final String OLD_OTHER_BUILD = "2.0.0";
     private static final String NEW_OTHER_BUILD = "2.0.1";
 
-    private Ontrack ontrack;
-    private Branch ontrackBranch;
-    private Branch otherOntrackBranch;
-    private Build ontrackBuild;
-    private Build ontrackOtherBuild;
+    private OntrackDSLFacade ontrack;
+    private BranchFacade ontrackBranch;
+    private BranchFacade otherOntrackBranch;
+    private BuildFacade ontrackBuild;
+    private BuildFacade ontrackOtherBuild;
 
     @Before
     public void before() {
-        ontrack = mock(Ontrack.class);
-        ontrackBranch = mock(Branch.class);
-        otherOntrackBranch = mock(Branch.class);
-        ontrackBuild = mock(Build.class);
-        ontrackOtherBuild = mock(Build.class);
+        ontrack = mock(OntrackDSLFacade.class);
+        ontrackBranch = mock(BranchFacade.class);
+        otherOntrackBranch = mock(BranchFacade.class);
+        ontrackBuild = mock(BuildFacade.class);
+        ontrackOtherBuild = mock(BuildFacade.class);
 
         when(ontrack.branch(PROJECT, BRANCH)).thenReturn(ontrackBranch);
         when(ontrack.branch(PROJECT, OTHER)).thenReturn(otherOntrackBranch);
@@ -492,7 +492,7 @@ public class TriggerHelperTest {
             return withNoPromotion(ontrackBranch);
         }
 
-        public MockTriggerJob withNoPromotion(Branch ontrackBranch) {
+        public MockTriggerJob withNoPromotion(BranchFacade ontrackBranch) {
             when(ontrackBranch.standardFilter(ImmutableMap.of(
                     "count", 1,
                     "withPromotionLevel", PROMOTION
@@ -511,7 +511,7 @@ public class TriggerHelperTest {
             return withPromotion(ontrackBranch, ontrackBuild, buildName);
         }
 
-        public MockTriggerJob withPromotion(Branch branch, Build build, String buildName) {
+        public MockTriggerJob withPromotion(BranchFacade branch, BuildFacade build, String buildName) {
             when(build.getName()).thenReturn(buildName);
             when(branch.standardFilter(ImmutableMap.of(
                     "count", 1,

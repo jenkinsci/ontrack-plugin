@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.jenkins.steps;
 
-import net.nemerosa.ontrack.dsl.Ontrack;
-import net.nemerosa.ontrack.dsl.Project;
 import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.Rule;
@@ -25,11 +24,14 @@ public class OntrackScriptStepRunTest {
         // leave out the subject
         job.setDefinition(new CpsFlowDefinition("ontrackScript(script: 'ontrack.projects*.name')", true));
 
-        Ontrack ontrack = mock(Ontrack.class);
-        Project project = mock(Project.class);
-
-        when(ontrack.getProjects()).thenReturn(Collections.singletonList(project));
-        when(project.getName()).thenReturn("MYPRJ");
+        OntrackDSLFacade ontrack = mock(OntrackDSLFacade.class);
+        when(ontrack.getDSLRoot()).thenReturn(Collections.singletonMap(
+                "projects", Collections.singletonList(
+                        Collections.singletonMap(
+                                "name", "MYPRJ"
+                        )
+                )
+        ));
 
         OntrackDSLConnector.setOntrack(ontrack);
 
