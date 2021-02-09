@@ -105,7 +105,7 @@ public class OntrackProjectSetupStep extends Step implements Serializable {
                 Map<String, Object> values = new HashMap<>(bindings);
                 // Binding
                 values.put("ontrack", ontrack.getDSLRoot());
-                values.put("project", ontrackProject);
+                values.put("project", ontrackProject.getDSLRoot());
                 values.put("out", listener.getLogger());
                 Binding binding = new Binding(values);
                 // Groovy shell

@@ -13,6 +13,11 @@ public class ProjectV4Facade implements ProjectFacade {
     }
 
     @Override
+    public Object getDSLRoot() {
+        return project;
+    }
+
+    @Override
     public BranchFacade branch(String name, String description, boolean getIfExists) {
         return new BranchV4Facade(
                 project.branch(name, description, getIfExists)

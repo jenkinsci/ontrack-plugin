@@ -37,4 +37,10 @@ public interface BranchFacade {
      * @return An existing build or new one
      */
     BuildFacade build(String name, String description, boolean getIfExists);
+
+    /**
+     * Object to inject in any Ontrack DSL script
+     * @return Object to inject in place of this facade
+     */
+    Object getDSLRoot();
 }

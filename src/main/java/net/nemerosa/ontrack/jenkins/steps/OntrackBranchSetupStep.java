@@ -118,7 +118,7 @@ public class OntrackBranchSetupStep extends Step implements Serializable {
                 Map<String, Object> values = new HashMap<>(bindings);
                 // Binding
                 values.put("ontrack", ontrack.getDSLRoot());
-                values.put("branch", ontrackBranch);
+                values.put("branch", ontrackBranch.getDSLRoot());
                 values.put("out", listener.getLogger());
                 Binding binding = new Binding(values);
                 // Groovy shell

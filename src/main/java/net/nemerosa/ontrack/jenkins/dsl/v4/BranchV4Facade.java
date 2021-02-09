@@ -16,6 +16,11 @@ public class BranchV4Facade implements BranchFacade {
     }
 
     @Override
+    public Object getDSLRoot() {
+        return branch;
+    }
+
+    @Override
     public List<BuildFacade> standardFilter(Map<String, ?> filter) {
         return branch.standardFilter(filter).stream()
                 .map(BuildV4Facade::new)

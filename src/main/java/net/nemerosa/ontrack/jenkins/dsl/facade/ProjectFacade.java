@@ -10,4 +10,10 @@ public interface ProjectFacade {
      * @return Created or existing branch
      */
     BranchFacade branch(String name, String description, boolean getIfExists);
+
+    /**
+     * Object to inject in any Ontrack DSL script
+     * @return Object to inject in place of this facade
+     */
+    Object getDSLRoot();
 }
