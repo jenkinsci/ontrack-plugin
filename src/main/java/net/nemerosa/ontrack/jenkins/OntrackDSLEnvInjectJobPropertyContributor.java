@@ -55,7 +55,7 @@ public class OntrackDSLEnvInjectJobPropertyContributor extends EnvInjectJobPrope
             return Collections.emptyMap();
         }
         // Ontrack connection
-        OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLog ? listener.getLogger() : null);
+        OntrackDSLFacade ontrack = OntrackDSLConnector.createOntrackConnector(ontrackLog ? listener.getLogger() : System.out);
         // Values to bind
         Map<String, Object> values = new HashMap<String, Object>();
         // Binding
