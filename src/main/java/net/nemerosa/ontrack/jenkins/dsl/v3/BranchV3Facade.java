@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.jenkins.dsl.v3;
 
-import com.google.common.collect.ImmutableMap;
 import net.nemerosa.ontrack.dsl.Branch;
 import net.nemerosa.ontrack.jenkins.dsl.facade.BranchFacade;
 import net.nemerosa.ontrack.jenkins.dsl.facade.BuildFacade;
@@ -32,7 +31,7 @@ public class BranchV3Facade implements BranchFacade {
     }
 
     @Override
-    public List<BuildFacade> intervalFilter(ImmutableMap<String, ?> filter) {
+    public List<BuildFacade> intervalFilter(Map<String, ?> filter) {
         return branch.intervalFilter(filter).stream()
                 .map(BuildV3Facade::new)
                 .collect(Collectors.toList());
