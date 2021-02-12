@@ -16,6 +16,10 @@ public class OntrackDSLConnector {
 
     public static OntrackDSLFacade createOntrackConnector(final OntrackDSLLogger logger) {
         OntrackConfiguration config = OntrackConfiguration.getOntrackConfiguration();
+        return createOntrackConnector(config, logger);
+    }
+
+    public static OntrackDSLFacade createOntrackConnector(OntrackConfiguration config, final OntrackDSLLogger logger) {
         if (config == null) {
             throw new IllegalStateException("Could not find any Ontrack configuration.");
         }

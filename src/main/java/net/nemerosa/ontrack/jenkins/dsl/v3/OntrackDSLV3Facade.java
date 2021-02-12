@@ -50,6 +50,11 @@ public class OntrackDSLV3Facade implements OntrackDSLFacade {
     }
 
     @Override
+    public String getAppVersion() {
+        return ontrack.getVersion();
+    }
+
+    @Override
     public Object getDSLRoot() {
         return ontrack;
     }

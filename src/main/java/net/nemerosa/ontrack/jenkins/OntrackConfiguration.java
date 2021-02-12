@@ -2,12 +2,11 @@ package net.nemerosa.ontrack.jenkins;
 
 import hudson.Extension;
 import hudson.util.ListBoxModel;
-import jenkins.management.AdministrativeMonitorsConfiguration;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
-import net.nemerosa.ontrack.dsl.OntrackConnection;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLConnector;
+import net.nemerosa.ontrack.jenkins.dsl.OntrackDSLFacade;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nullable;
@@ -99,15 +98,8 @@ public class OntrackConfiguration extends GlobalConfiguration {
 
     private Version getRemoteVersion() {
         try {
-            OntrackConnection connection = OntrackConnection.create(ontrackUrl);
-            String user = ontrackUser;
-            if (StringUtils.isNotBlank(user)) {
-                connection = connection.authenticate(
-                        user,
-                        ontrackPassword
-                );
-            }
-            String versionString = connection.build().getVersion();
+            OntrackDSLFacade facade = OntrackDSLConnector.createOntrackConnector(this, message -> LOGGER.info(message));
+            String versionString = facade.getAppVersion();
             return Version.of(versionString);
         } catch (Exception ignored) {
             return null;

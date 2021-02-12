@@ -82,4 +82,11 @@ public interface OntrackDSLFacade {
      * @return GraphQL JSON response
      */
     Object graphQLQuery(String query, Map<String, ?> vars);
+
+    /**
+     * Gets the version of the remote app version
+     *
+     * @return Version
+     */
+    String getAppVersion();
 }
