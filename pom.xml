@@ -17,7 +17,7 @@
         <jenkins.version>2.107.3</jenkins.version>
         <java.level>8</java.level>
         <ontrack.version>3.43.5</ontrack.version>
-        <ontrack-v4.version>4.0-beta.2</ontrack-v4.version>
+        <ontrack-v4.version>4.3.0</ontrack-v4.version>
     </properties>
 
     <developers>
